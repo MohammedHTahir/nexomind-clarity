@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
 const messages = [
-  "I feel a bit overwhelmed today.",
-  "You're not alone. Want to talk about it?",
-  "I think I just needed to say it out loud.",
+  "I feel overwhelmed today.",
+  "I can help you break that down.",
+  "Let's figure out what's actually bothering you.",
 ];
 
 const TYPING_SPEED = 100;
