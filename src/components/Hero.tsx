@@ -40,10 +40,10 @@ const Hero = () => {
           className="text-white"
         >
           <span className="block font-barlow font-medium text-[40px] md:text-[68px] lg:text-[80px] leading-[1.05] md:leading-[0.95] tracking-[-1.5px] md:tracking-[-4px]">
-            Think clearly again —
+            AI journaling that
           </span>
           <span className="block font-instrument italic text-[48px] md:text-[76px] lg:text-[96px] leading-[1.05] md:leading-[1] mt-2">
-            with AI-guided journaling
+            helps you think clearly
           </span>
         </motion.h1>
 
@@ -76,10 +76,13 @@ const Hero = () => {
             type="button"
             className="bg-white text-[#111] rounded-full px-8 py-4 font-barlow font-medium text-[15px] hover:bg-white/90 hover:scale-[1.02] transition-all duration-300"
           >
-            Try your first reflection
+            Start your first reflection (free)
           </button>
           <p className="font-barlow text-sm text-white/60">
-            No signup. Just start writing.
+            No signup required. Just start writing.
+          </p>
+          <p className="font-barlow text-sm text-white/50">
+            Takes less than 30 seconds to get your first insight.
           </p>
         </motion.div>
 
