@@ -11,6 +11,7 @@
     --font-instrument: "Instrument Serif", serif;
     --font-serif: "Instrument Serif", serif;
     --font-sans: "Inter", sans-serif;
+    --font-barlow: "Barlow", sans-serif;
     --font-nokia: "Nokia Cellphone FC Small", monospace;
 
     --background: 60 20% 94%;
@@ -82,5 +83,8 @@
   }
   .font-nokia {
     font-family: var(--font-nokia);
+  }
+  .font-barlow {
+    font-family: var(--font-barlow);
   }
 }
