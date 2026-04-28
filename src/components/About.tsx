@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
 
 const steps = [
-  { n: "01", t: "Write freely", d: "Open NexoMind and type whatever's on your mind. No prompts, no judgment." },
-  { n: "02", t: "Listen back", d: "Our AI gently reflects patterns, emotions and themes from what you wrote." },
-  { n: "03", t: "Find clarity", d: "End each session with a calmer mind and one small, honest insight." },
+  { n: "01", t: "Write what's on your mind", d: "No structure needed. Just start." },
+  { n: "02", t: "AI understands your thoughts", d: "Finds patterns and emotions." },
+  { n: "03", t: "Get clarity in minutes", d: "Walk away with insight." },
 ];
 
 const About = () => {
@@ -16,7 +16,7 @@ const About = () => {
               ( About )
             </p>
             <h2 className="font-instrument text-[44px] md:text-[64px] leading-[1] text-[#111]">
-              A quiet place <br /> for a loud <span className="italic">mind.</span>
+              A simple way to <br /> clear your <span className="italic">mind.</span>
             </h2>
           </div>
           <div className="md:col-span-6 md:col-start-7">

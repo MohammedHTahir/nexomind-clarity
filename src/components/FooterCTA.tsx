@@ -1,25 +1,22 @@
-import { ArrowUpRight } from "lucide-react";
+
 
 const FooterCTA = () => {
   return (
     <section className="bg-[#111] text-white">
       {/* CTA */}
       <div className="px-6 py-32 text-center max-w-4xl mx-auto">
-        <h2 className="font-instrument text-[56px] md:text-[96px] leading-[0.95] tracking-tight">
-          Begin the <span className="italic">quiet.</span>
+        <h2 className="font-instrument text-[48px] md:text-[88px] leading-[1.05] md:leading-[0.95] tracking-tight">
+          Start your mental clarity <br /> journey <span className="italic">today.</span>
         </h2>
-        <p className="font-barlow text-[17px] text-white/60 mt-6 max-w-md mx-auto">
-          Two minutes a day is enough. Your first reflection is free.
-        </p>
         <button
           type="button"
-          className="group mt-10 inline-flex items-center gap-2 bg-white text-[#111] rounded-full pl-7 pr-1.5 py-1.5 font-barlow font-medium text-[15px] hover:bg-white/90 transition-colors"
+          className="mt-12 bg-white text-[#111] rounded-full px-8 py-4 font-barlow font-medium text-[15px] hover:bg-white/90 hover:scale-[1.02] transition-all duration-300"
         >
-          <span>Start free</span>
-          <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[#111] text-white group-hover:rotate-45 transition-transform duration-300">
-            <ArrowUpRight className="w-4 h-4 -rotate-45 group-hover:rotate-0 transition-transform duration-300" strokeWidth={2.25} />
-          </span>
+          Try your first reflection — free
         </button>
+        <p className="font-barlow text-sm text-white/60 mt-4">
+          No signup required
+        </p>
       </div>
 
       {/* Footer */}

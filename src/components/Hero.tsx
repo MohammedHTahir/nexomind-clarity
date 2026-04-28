@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { Play } from "lucide-react";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -20,19 +19,31 @@ const Hero = () => {
         />
       </video>
 
+      {/* Subtle readability overlay */}
+      <div className="absolute inset-0 z-[1] bg-white/20 backdrop-blur-[2px]" aria-hidden />
+
       {/* Hero content */}
       <div className="relative z-10 text-center px-6 pt-32 pb-16 max-w-5xl mx-auto">
+        <motion.p
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 0.7, y: 0 }}
+          transition={{ duration: 1, ease }}
+          className="font-barlow font-medium text-[13px] md:text-[14px] text-white/70 mb-6 tracking-wide"
+        >
+          For when your mind feels noisy.
+        </motion.p>
+
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, ease }}
           className="text-white"
         >
-          <span className="block font-barlow font-medium text-[44px] md:text-[72px] lg:text-[84px] leading-[0.95] tracking-[-2px] md:tracking-[-4px]">
-            A space that quiets your
+          <span className="block font-barlow font-medium text-[40px] md:text-[68px] lg:text-[80px] leading-[1.05] md:leading-[0.95] tracking-[-1.5px] md:tracking-[-4px]">
+            Think clearly again —
           </span>
-          <span className="block font-instrument italic text-[52px] md:text-[78px] lg:text-[100px] leading-[1] mt-2">
-            mind &amp; brings clarity
+          <span className="block font-instrument italic text-[48px] md:text-[76px] lg:text-[96px] leading-[1.05] md:leading-[1] mt-2">
+            with AI-guided journaling
           </span>
         </motion.h1>
 
@@ -42,25 +53,44 @@ const Hero = () => {
           transition={{ duration: 1, delay: 0.25, ease }}
           className="font-barlow font-medium text-[16px] md:text-[18px] text-white/85 mt-8 max-w-xl mx-auto"
         >
-          Private AI journaling for thinkers, creators and anyone navigating the noise of modern life.
+          Write what's on your mind. NexoMind listens, understands, and helps you
+          make sense of your thoughts — privately, in minutes.
+        </motion.p>
+
+        <motion.p
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.35, ease }}
+          className="font-barlow text-sm text-white/60 mt-4 max-w-xl mx-auto"
+        >
+          An AI mental clarity app for journaling, reflection, and emotional insight.
         </motion.p>
 
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.45, ease }}
-          className="mt-10 flex justify-center"
+          className="mt-10 flex flex-col items-center gap-3"
         >
           <button
             type="button"
-            className="group flex items-center gap-3 bg-white text-[#111] rounded-full pl-2 pr-7 py-2 font-barlow font-medium text-[15px] hover:bg-white/90 transition-colors"
+            className="bg-white text-[#111] rounded-full px-8 py-4 font-barlow font-medium text-[15px] hover:bg-white/90 hover:scale-[1.02] transition-all duration-300"
           >
-            <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[#111] text-white">
-              <Play className="w-4 h-4 fill-white" strokeWidth={0} />
-            </span>
-            See Our Workreel
+            Try your first reflection
           </button>
+          <p className="font-barlow text-sm text-white/60">
+            No signup. Just start writing.
+          </p>
         </motion.div>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.6 }}
+          transition={{ duration: 1, delay: 0.7, ease }}
+          className="font-barlow text-sm text-white mt-10 tracking-wide"
+        >
+          Private. Secure. Judgment-free.
+        </motion.p>
       </div>
     </section>
   );
