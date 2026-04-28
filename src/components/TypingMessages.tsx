@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 const messages = [
   "I feel overwhelmed today.",
   "That makes sense. Let's break it down.",
-  "It looks like stress and mental overload. Want clarity on it?",
+  "It looks like mental overload. Want clarity on it?",
 ];
 
 const TYPING_SPEED = 100;
