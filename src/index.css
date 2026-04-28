@@ -84,4 +84,7 @@
   .font-nokia {
     font-family: var(--font-nokia);
   }
+  .font-barlow {
+    font-family: var(--font-barlow);
+  }
 }
