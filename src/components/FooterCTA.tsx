@@ -1,4 +1,4 @@
-import { ArrowUpRight } from "lucide-react";
+
 
 const FooterCTA = () => {
   return (
