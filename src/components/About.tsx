@@ -2,8 +2,8 @@ import { motion } from "framer-motion";
 
 const steps = [
   { n: "01", t: "Write what's on your mind", d: "No structure needed. Just start." },
-  { n: "02", t: "AI understands your thoughts", d: "Finds patterns and emotions." },
-  { n: "03", t: "Get clarity in minutes", d: "Walk away with insight." },
+  { n: "02", t: "AI understands your thoughts", d: "Finds emotional patterns and meaning." },
+  { n: "03", t: "Get clarity instantly", d: "Turn thoughts into insight." },
 ];
 
 const About = () => {
