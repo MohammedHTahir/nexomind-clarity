@@ -1,64 +1,64 @@
 import { motion } from "framer-motion";
-import TypingMessages from "./TypingMessages";
+import { Play } from "lucide-react";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
 const Hero = () => {
   return (
-    <section className="min-h-screen bg-[#F3F4ED] pt-24 md:pt-32 flex flex-col items-center justify-center relative overflow-hidden">
-      {/* Video background */}
+    <section className="relative min-h-[90vh] w-full overflow-hidden flex items-center justify-center">
+      {/* Video bg */}
       <video
         autoPlay
         loop
         muted
         playsInline
-        className="absolute inset-0 z-0 object-cover w-full h-full"
+        className="absolute inset-0 w-full h-full object-cover z-0"
       >
         <source
-          src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260427_054418_a6d194f0-ac86-4df9-abe5-ded73e596d7c.mp4"
+          src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260228_065522_522e2295-ba22-457e-8fdb-fbcd68109c73.mp4"
           type="video/mp4"
         />
       </video>
 
-      {/* Soft overlay */}
-      <div className="absolute inset-0 z-10 bg-white/10" />
-
-      {/* Typing message inside the phone */}
-      <TypingMessages />
-
-      {/* Hero text */}
-      <div className="relative z-20 text-center pointer-events-none px-4">
+      {/* Hero content */}
+      <div className="relative z-10 text-center px-6 pt-32 pb-16 max-w-5xl mx-auto">
         <motion.h1
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.5, ease }}
-          className="font-instrument text-[38px] md:text-[56px] lg:text-[72px] leading-[0.9] tracking-tight text-[#1a1a1a] mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.2, ease }}
+          className="text-white"
         >
-          Clarity, one thought
-          <br />
-          at a time.
+          <span className="block font-barlow font-medium text-[44px] md:text-[72px] lg:text-[84px] leading-[0.95] tracking-[-2px] md:tracking-[-4px]">
+            A space that quiets your
+          </span>
+          <span className="block font-instrument italic text-[52px] md:text-[78px] lg:text-[100px] leading-[1] mt-2">
+            mind &amp; brings clarity
+          </span>
         </motion.h1>
 
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, delay: 0.3, ease }}
-          className="font-sans text-[16px] md:text-[18px] text-[#1a1a1a]/70 leading-relaxed max-w-xl mx-auto"
+          transition={{ duration: 1, delay: 0.25, ease }}
+          className="font-barlow font-medium text-[16px] md:text-[18px] text-white/85 mt-8 max-w-xl mx-auto"
         >
-          Write freely. NexoMind listens, understands, and helps you make sense of what's on your mind — privately, every day.
+          Private AI journaling for thinkers, creators and anyone navigating the noise of modern life.
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1.2, delay: 0.6, ease }}
-          className="pointer-events-auto"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.45, ease }}
+          className="mt-10 flex justify-center"
         >
           <button
             type="button"
-            className="mt-8 px-6 py-3 rounded-full bg-black text-white text-sm hover:scale-[1.02] transition-transform"
+            className="group flex items-center gap-3 bg-white text-[#111] rounded-full pl-2 pr-7 py-2 font-barlow font-medium text-[15px] hover:bg-white/90 transition-colors"
           >
-            Try your first reflection
+            <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[#111] text-white">
+              <Play className="w-4 h-4 fill-white" strokeWidth={0} />
+            </span>
+            See Our Workreel
           </button>
         </motion.div>
       </div>
