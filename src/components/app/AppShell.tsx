@@ -1,0 +1,99 @@
+import { NavLink, Link, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
+import { ReactNode } from "react";
+
+const ease = [0.16, 1, 0.3, 1] as const;
+
+const nav = [
+  { to: "/app", label: "Reflect" },
+  { to: "/app/journal", label: "Write" },
+  { to: "/app/insights", label: "Insights" },
+  { to: "/app/settings", label: "Settings" },
+];
+
+const AppShell = ({ children }: { children: ReactNode }) => {
+  const { pathname } = useLocation();
+
+  return (
+    <div className="min-h-screen bg-[#F3F4ED] text-[#111] relative overflow-hidden">
+      {/* Soft ambient gradients (subtle, matches landing calm) */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full opacity-[0.35] blur-3xl"
+        style={{ background: "radial-gradient(circle, #C9D2E8 0%, transparent 70%)" }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute top-[40%] -right-40 w-[520px] h-[520px] rounded-full opacity-[0.30] blur-3xl"
+        style={{ background: "radial-gradient(circle, #E0D5EE 0%, transparent 70%)" }}
+      />
+
+      {/* Top bar */}
+      <header className="fixed top-5 left-1/2 -translate-x-1/2 w-[95%] max-w-6xl z-50 pointer-events-none">
+        <nav className="pointer-events-auto bg-white/80 backdrop-blur-md rounded-[16px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-black/5 flex items-center justify-between pl-6 pr-3 py-2">
+          <Link to="/app" className="font-instrument text-[24px] tracking-tight leading-none">
+            nexo<span className="italic text-[#111]/60">mind</span>
+          </Link>
+
+          <div className="hidden md:flex gap-7">
+            {nav.map((n) => {
+              const active =
+                n.to === "/app" ? pathname === "/app" : pathname.startsWith(n.to);
+              return (
+                <NavLink
+                  key={n.to}
+                  to={n.to}
+                  end={n.to === "/app"}
+                  className={`font-barlow font-medium text-[14px] transition-opacity ${
+                    active ? "opacity-100" : "opacity-50 hover:opacity-90"
+                  }`}
+                >
+                  {n.label}
+                </NavLink>
+              );
+            })}
+          </div>
+
+          <Link
+            to="/"
+            className="font-barlow font-medium text-[12px] text-[#111]/60 hover:text-[#111] transition-colors px-3 py-1.5"
+          >
+            Exit
+          </Link>
+        </nav>
+      </header>
+
+      {/* Mobile bottom nav */}
+      <div className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-white/85 backdrop-blur-md border border-black/5 rounded-full px-2 py-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] flex gap-1">
+        {nav.map((n) => {
+          const active =
+            n.to === "/app" ? pathname === "/app" : pathname.startsWith(n.to);
+          return (
+            <NavLink
+              key={n.to}
+              to={n.to}
+              end={n.to === "/app"}
+              className={`font-barlow text-[12px] px-3 py-1.5 rounded-full transition-all ${
+                active ? "bg-[#111] text-white" : "text-[#111]/60"
+              }`}
+            >
+              {n.label}
+            </NavLink>
+          );
+        })}
+      </div>
+
+      <motion.main
+        key={pathname}
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease }}
+        className="relative z-10 pt-28 pb-32 px-5 md:px-8"
+      >
+        {children}
+      </motion.main>
+    </div>
+  );
+};
+
+export default AppShell;
