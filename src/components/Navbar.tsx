@@ -29,7 +29,7 @@ const Navbar = () => {
 
         {/* CTA */}
         <Link
-          to="/onboarding"
+          to="/auth"
           className="group flex items-center gap-2 bg-[#222] text-white rounded-full pl-5 pr-1.5 py-1.5 font-barlow font-medium text-[13px] hover:bg-black transition-colors"
         >
           <span>Begin reflection</span>
