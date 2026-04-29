@@ -1,4 +1,4 @@
-
+import { Link } from "react-router-dom";
 
 const FooterCTA = () => {
   return (
@@ -8,12 +8,12 @@ const FooterCTA = () => {
         <h2 className="font-instrument text-[48px] md:text-[88px] leading-[1.05] md:leading-[0.95] tracking-tight">
           Start your mental clarity <br /> journey <span className="italic">today.</span>
         </h2>
-        <button
-          type="button"
-          className="mt-12 bg-white text-[#111] rounded-full px-8 py-4 font-barlow font-medium text-[15px] hover:bg-white/90 hover:scale-[1.02] transition-all duration-300"
+        <Link
+          to="/onboarding"
+          className="inline-block mt-12 bg-white text-[#111] rounded-full px-8 py-4 font-barlow font-medium text-[15px] hover:bg-white/90 hover:scale-[1.02] transition-all duration-300"
         >
           Try your first reflection — free
-        </button>
+        </Link>
         <p className="font-barlow text-sm text-white/60 mt-4">
           No signup required
         </p>
