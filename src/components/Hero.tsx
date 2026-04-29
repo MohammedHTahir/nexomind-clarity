@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -72,12 +73,12 @@ const Hero = () => {
           transition={{ duration: 1, delay: 0.45, ease }}
           className="mt-10 flex flex-col items-center gap-3"
         >
-          <button
-            type="button"
+          <Link
+            to="/onboarding"
             className="bg-white text-[#111] rounded-full px-8 py-4 font-barlow font-medium text-[15px] hover:bg-white/90 hover:scale-[1.02] transition-all duration-300"
           >
             Start your first reflection
-          </button>
+          </Link>
           <p className="font-barlow text-sm text-white/60">
             No signup required
           </p>
