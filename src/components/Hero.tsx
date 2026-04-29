@@ -20,8 +20,12 @@ const Hero = () => {
         />
       </video>
 
-      {/* Subtle readability overlay */}
-      <div className="absolute inset-0 z-[1] bg-white/25 backdrop-blur-[2px]" aria-hidden />
+      {/* Readability overlay — dark scrim for light video */}
+      <div className="absolute inset-0 z-[1] bg-black/45" aria-hidden />
+      <div
+        className="absolute inset-0 z-[1] bg-gradient-to-b from-black/40 via-black/20 to-black/60"
+        aria-hidden
+      />
 
       {/* Hero content */}
       <div className="relative z-10 text-center px-6 pt-32 pb-16 max-w-5xl mx-auto">
