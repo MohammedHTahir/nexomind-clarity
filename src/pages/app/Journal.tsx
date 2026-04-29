@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { analyze, saveEntry, type Analysis, type JournalEntry } from "@/lib/journal";
+import { analyzeAndStore, clarityBand, type AnalysisRow } from "@/lib/journal";
+import { toast } from "sonner";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -10,13 +11,7 @@ const Journal = () => {
   const navigate = useNavigate();
   const [text, setText] = useState("");
   const [phase, setPhase] = useState<"write" | "processing" | "done">("write");
-  const [result, setResult] = useState<Analysis | null>(null);
-
-  // Live analysis (lightweight) while typing
-  const live = useMemo(() => {
-    if (!text.trim()) return null;
-    return analyze(text);
-  }, [text]);
+  const [result, setResult] = useState<AnalysisRow | null>(null);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -28,27 +23,19 @@ const Journal = () => {
   const submit = async () => {
     if (!text.trim()) return;
     setPhase("processing");
-    await new Promise((r) => setTimeout(r, 1400));
-    const a = analyze(text);
-    const entry: JournalEntry = {
-      id: crypto.randomUUID(),
-      text: text.trim(),
-      createdAt: Date.now(),
-      mood: a.mood,
-      clarity: a.clarity,
-      tags: a.tags,
-      summary: a.summary,
-      emotion: a.emotion,
-      suggestion: a.suggestion,
-    };
-    saveEntry(entry);
-    setResult(a);
-    setPhase("done");
+    try {
+      const { analysis } = await analyzeAndStore(text);
+      setResult(analysis);
+      setPhase("done");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Analysis failed";
+      toast.error(msg);
+      setPhase("write");
+    }
   };
 
   return (
     <div className="fixed inset-0 z-50 bg-[#F3F4ED] overflow-hidden">
-      {/* Soft ambient gradients */}
       <div
         aria-hidden
         className="pointer-events-none absolute -top-60 -left-40 w-[700px] h-[700px] rounded-full opacity-40 blur-3xl"
@@ -60,7 +47,6 @@ const Journal = () => {
         style={{ background: "radial-gradient(circle, #E0D5EE 0%, transparent 70%)" }}
       />
 
-      {/* Top bar */}
       <div className="absolute top-6 left-6 right-6 flex items-center justify-between z-20">
         <Link to="/" className="font-instrument text-[22px] tracking-tight">
           nexo<span className="italic text-[#111]/60">mind</span>
@@ -75,7 +61,6 @@ const Journal = () => {
       </div>
 
       <div className="relative z-10 h-full flex">
-        {/* Writing area */}
         <div className="flex-1 flex items-center justify-center px-6 md:px-10">
           <div className="w-full max-w-2xl">
             <AnimatePresence mode="wait">
@@ -94,7 +79,7 @@ const Journal = () => {
                     autoFocus
                     value={text}
                     onChange={(e) => setText(e.target.value)}
-                    placeholder="Begin anywhere. Nothing here leaves this page."
+                    placeholder="Begin anywhere. Only you can read this."
                     rows={10}
                     className="w-full resize-none bg-transparent outline-none font-instrument text-[26px] md:text-[34px] leading-[1.4] placeholder:text-[#111]/25 text-[#111]"
                   />
@@ -130,9 +115,7 @@ const Journal = () => {
                     transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                     className="w-3 h-3 rounded-full bg-[#111]/60 mx-auto mb-6"
                   />
-                  <p className="font-instrument italic text-[24px] text-[#111]/70">
-                    Listening…
-                  </p>
+                  <p className="font-instrument italic text-[24px] text-[#111]/70">Listening…</p>
                 </motion.div>
               )}
 
@@ -144,10 +127,10 @@ const Journal = () => {
                   transition={{ duration: 0.9, ease }}
                 >
                   <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45 mb-4">
-                    ( Reflection )
+                    ( Reflection · {clarityBand(result.clarity_score)} )
                   </p>
                   <h2 className="font-instrument text-[34px] md:text-[44px] leading-[1.1] mb-5">
-                    {result.emotion}
+                    {result.clarity_insight}
                   </h2>
                   <p className="font-barlow text-[15px] text-[#111]/65 leading-relaxed mb-6">
                     {result.summary}
@@ -161,10 +144,10 @@ const Journal = () => {
                   >
                     <div className="bg-white/80 backdrop-blur-md rounded-[17px] p-5">
                       <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45 mb-2">
-                        ( A small action )
+                        ( A small reflection )
                       </p>
                       <p className="font-instrument italic text-[20px] text-[#111]/85 leading-snug">
-                        {result.suggestion}
+                        {result.suggested_reflection}
                       </p>
                     </div>
                   </div>
@@ -192,19 +175,20 @@ const Journal = () => {
           </div>
         </div>
 
-        {/* Right panel - live analysis */}
         <aside className="hidden lg:flex flex-col justify-center w-[320px] px-8 border-l border-black/5">
           <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45 mb-6">
-            ( Live analysis )
+            ( Reflection panel )
           </p>
 
           <div className="space-y-7">
             <div>
               <p className="font-barlow text-[11px] text-[#111]/45 uppercase tracking-wider mb-2">
-                Tone
+                Emotional state
               </p>
               <p className="font-instrument text-[24px]">
-                {live ? live.mood : <span className="text-[#111]/30 italic">listening</span>}
+                {result?.emotional_state ?? (
+                  <span className="text-[#111]/30 italic">awaiting</span>
+                )}
               </p>
             </div>
 
@@ -214,13 +198,13 @@ const Journal = () => {
               </p>
               <div className="flex items-end gap-2">
                 <span className="font-instrument text-[44px] leading-none">
-                  {live ? live.clarity : "—"}
+                  {result?.clarity_score ?? "—"}
                 </span>
                 <span className="font-barlow text-[12px] text-[#111]/40 mb-2">/ 100</span>
               </div>
               <div className="h-1 bg-[#111]/8 rounded-full mt-3 overflow-hidden">
                 <motion.div
-                  animate={{ width: `${live ? live.clarity : 0}%` }}
+                  animate={{ width: `${result?.clarity_score ?? 0}%` }}
                   transition={{ duration: 0.6, ease }}
                   className="h-full bg-[#111]/60 rounded-full"
                 />
@@ -229,11 +213,11 @@ const Journal = () => {
 
             <div>
               <p className="font-barlow text-[11px] text-[#111]/45 uppercase tracking-wider mb-3">
-                Themes
+                Patterns
               </p>
               <div className="flex flex-wrap gap-1.5">
-                {live && live.tags.length ? (
-                  live.tags.slice(0, 4).map((t) => (
+                {result?.cognitive_patterns?.length ? (
+                  result.cognitive_patterns.slice(0, 4).map((t) => (
                     <span
                       key={t}
                       className="font-barlow text-[11px] text-[#111]/65 bg-white/70 border border-black/5 rounded-full px-2.5 py-1"
