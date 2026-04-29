@@ -4,7 +4,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Mic, ArrowRight, ChevronDown } from "lucide-react";
 import AppShell from "@/components/app/AppShell";
 import GlassCard from "@/components/app/GlassCard";
-import { analyze, loadEntries, saveEntry, type JournalEntry, type Analysis } from "@/lib/journal";
+import {
+  analyzeAndStore,
+  fetchJournals,
+  clarityBand,
+  type AnalysisRow,
+  type JournalWithAnalysis,
+} from "@/lib/journal";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -17,11 +25,12 @@ const greeting = () => {
 };
 
 const Dashboard = () => {
+  const { user } = useAuth();
   const [text, setText] = useState("");
   const [name, setName] = useState("");
   const [analyzing, setAnalyzing] = useState(false);
-  const [result, setResult] = useState<Analysis | null>(null);
-  const [entries, setEntries] = useState<JournalEntry[]>([]);
+  const [result, setResult] = useState<AnalysisRow | null>(null);
+  const [entries, setEntries] = useState<JournalWithAnalysis[]>([]);
   const [openId, setOpenId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -29,43 +38,41 @@ const Dashboard = () => {
       const o = JSON.parse(localStorage.getItem("nexomind:onboarding") || "{}");
       if (o.name) setName(o.name);
     } catch {}
-    setEntries(loadEntries());
-  }, []);
+    if (!name && user?.email) setName(user.email.split("@")[0]);
+    fetchJournals().then(setEntries).catch((e) => console.error(e));
+  }, [user]);
 
   const submit = async () => {
     if (!text.trim() || analyzing) return;
     setAnalyzing(true);
     setResult(null);
-    await new Promise((r) => setTimeout(r, 1100));
-    const a = analyze(text);
-    const entry: JournalEntry = {
-      id: crypto.randomUUID(),
-      text: text.trim(),
-      createdAt: Date.now(),
-      mood: a.mood,
-      clarity: a.clarity,
-      tags: a.tags,
-      summary: a.summary,
-      emotion: a.emotion,
-      suggestion: a.suggestion,
-    };
-    saveEntry(entry);
-    setEntries(loadEntries());
-    setResult(a);
-    setText("");
-    setAnalyzing(false);
+    try {
+      const { analysis } = await analyzeAndStore(text);
+      setResult(analysis);
+      setText("");
+      const fresh = await fetchJournals();
+      setEntries(fresh);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Analysis failed";
+      toast.error(msg);
+    } finally {
+      setAnalyzing(false);
+    }
   };
 
   const weekly = useMemo(() => {
-    // Last 7 days clarity average
     const days = Array.from({ length: 7 }).map((_, i) => {
       const d = new Date();
       d.setHours(0, 0, 0, 0);
       d.setDate(d.getDate() - (6 - i));
       const next = d.getTime() + 86400000;
-      const dayEntries = entries.filter((e) => e.createdAt >= d.getTime() && e.createdAt < next);
+      const dayEntries = entries.filter((e) => {
+        const t = new Date(e.created_at).getTime();
+        return t >= d.getTime() && t < next && e.analysis?.clarity_score != null;
+      });
       const avg = dayEntries.length
-        ? dayEntries.reduce((acc, e) => acc + e.clarity, 0) / dayEntries.length
+        ? dayEntries.reduce((acc, e) => acc + (e.analysis!.clarity_score ?? 0), 0) /
+          dayEntries.length
         : null;
       return { label: d.toLocaleDateString(undefined, { weekday: "short" })[0], value: avg };
     });
@@ -75,7 +82,6 @@ const Dashboard = () => {
   return (
     <AppShell>
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
         <motion.header
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -93,7 +99,6 @@ const Dashboard = () => {
           </p>
         </motion.header>
 
-        {/* Primary input */}
         <GlassCard className="p-6 md:p-8 mb-6">
           <textarea
             value={text}
@@ -128,7 +133,6 @@ const Dashboard = () => {
           </div>
         </GlassCard>
 
-        {/* Analyzing pulse */}
         <AnimatePresence>
           {analyzing && (
             <motion.div
@@ -150,7 +154,6 @@ const Dashboard = () => {
           )}
         </AnimatePresence>
 
-        {/* Result */}
         <AnimatePresence>
           {result && !analyzing && (
             <motion.div
@@ -169,20 +172,28 @@ const Dashboard = () => {
               >
                 <div className="bg-white/80 backdrop-blur-md rounded-[21px] p-7 md:p-9">
                   <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45 mb-3">
-                    ( Your reflection )
+                    ( {result.emotional_state} · {clarityBand(result.clarity_score)} )
                   </p>
                   <h3 className="font-instrument text-[28px] md:text-[34px] leading-[1.15] mb-4">
-                    {result.emotion}
+                    {result.clarity_insight}
                   </h3>
                   <p className="font-barlow text-[15px] text-[#111]/65 leading-relaxed mb-6">
                     {result.summary}
                   </p>
 
                   <div className="flex flex-wrap gap-2 mb-6">
-                    {result.tags.map((t) => (
+                    {(result.cognitive_patterns ?? []).map((t) => (
                       <span
                         key={t}
                         className="font-barlow text-[12px] text-[#111]/70 bg-white/80 border border-black/5 rounded-full px-3 py-1"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                    {(result.distortions_or_biases ?? []).map((t) => (
+                      <span
+                        key={`d-${t}`}
+                        className="font-barlow text-[12px] text-[#111]/70 bg-white/60 border border-black/10 rounded-full px-3 py-1"
                       >
                         {t}
                       </span>
@@ -194,7 +205,7 @@ const Dashboard = () => {
                       ( Try this )
                     </p>
                     <p className="font-instrument italic text-[20px] leading-snug text-[#111]/85">
-                      {result.suggestion}
+                      {result.suggested_reflection}
                     </p>
                   </div>
                 </div>
@@ -203,9 +214,7 @@ const Dashboard = () => {
           )}
         </AnimatePresence>
 
-        {/* Two-column: chart + history */}
         <div className="grid md:grid-cols-2 gap-5">
-          {/* Mood chart */}
           <GlassCard className="p-7" delay={0.05}>
             <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45 mb-2">
               ( This week )
@@ -241,7 +250,6 @@ const Dashboard = () => {
             </p>
           </GlassCard>
 
-          {/* Quick links */}
           <GlassCard className="p-7" delay={0.1}>
             <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45 mb-2">
               ( Continue )
@@ -274,7 +282,6 @@ const Dashboard = () => {
           </GlassCard>
         </div>
 
-        {/* History */}
         <div className="mt-14">
           <div className="flex items-end justify-between mb-6">
             <div>
@@ -298,6 +305,7 @@ const Dashboard = () => {
             <div className="space-y-2">
               {entries.map((e, i) => {
                 const open = openId === e.id;
+                const a = e.analysis;
                 return (
                   <motion.div
                     key={e.id}
@@ -311,21 +319,21 @@ const Dashboard = () => {
                       className="w-full text-left px-5 py-4 flex items-center gap-4"
                     >
                       <div className="flex-1 min-w-0">
-                        <p className="font-barlow text-[14px] text-[#111] truncate">
-                          {e.text}
-                        </p>
+                        <p className="font-barlow text-[14px] text-[#111] truncate">{e.content}</p>
                         <div className="flex items-center gap-3 mt-1">
                           <span className="font-barlow text-[11px] text-[#111]/45">
-                            {new Date(e.createdAt).toLocaleString(undefined, {
+                            {new Date(e.created_at).toLocaleString(undefined, {
                               month: "short",
                               day: "numeric",
                               hour: "numeric",
                               minute: "2-digit",
                             })}
                           </span>
-                          <span className="font-barlow text-[11px] text-[#111]/50 bg-[#111]/5 rounded-full px-2 py-0.5">
-                            {e.mood}
-                          </span>
+                          {a?.emotional_state && (
+                            <span className="font-barlow text-[11px] text-[#111]/50 bg-[#111]/5 rounded-full px-2 py-0.5">
+                              {a.emotional_state}
+                            </span>
+                          )}
                         </div>
                       </div>
                       <ChevronDown
@@ -333,7 +341,7 @@ const Dashboard = () => {
                       />
                     </button>
                     <AnimatePresence>
-                      {open && (
+                      {open && a && (
                         <motion.div
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: "auto", opacity: 1 }}
@@ -343,13 +351,13 @@ const Dashboard = () => {
                         >
                           <div className="px-5 pb-5 pt-1 border-t border-black/5">
                             <p className="font-instrument italic text-[18px] text-[#111]/85 mb-3">
-                              {e.emotion}
+                              {a.clarity_insight}
                             </p>
                             <p className="font-barlow text-[13px] text-[#111]/60 leading-relaxed mb-3">
-                              {e.suggestion}
+                              {a.suggested_reflection}
                             </p>
                             <div className="flex flex-wrap gap-1.5">
-                              {e.tags.map((t) => (
+                              {(a.cognitive_patterns ?? []).map((t) => (
                                 <span
                                   key={t}
                                   className="font-barlow text-[11px] text-[#111]/55 bg-white border border-black/5 rounded-full px-2 py-0.5"

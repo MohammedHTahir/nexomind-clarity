@@ -9,7 +9,7 @@ const FooterCTA = () => {
           Start your mental clarity <br /> journey <span className="italic">today.</span>
         </h2>
         <Link
-          to="/onboarding"
+          to="/auth"
           className="inline-block mt-12 bg-white text-[#111] rounded-full px-8 py-4 font-barlow font-medium text-[15px] hover:bg-white/90 hover:scale-[1.02] transition-all duration-300"
         >
           Try your first reflection — free

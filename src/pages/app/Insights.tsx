@@ -1,28 +1,33 @@
 import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/app/AppShell";
 import GlassCard from "@/components/app/GlassCard";
-import { loadEntries, type JournalEntry } from "@/lib/journal";
+import { fetchJournals, type JournalWithAnalysis } from "@/lib/journal";
 
 const Insights = () => {
-  const [entries, setEntries] = useState<JournalEntry[]>([]);
+  const [entries, setEntries] = useState<JournalWithAnalysis[]>([]);
 
   useEffect(() => {
-    setEntries(loadEntries());
+    fetchJournals().then(setEntries).catch((e) => console.error(e));
   }, []);
 
   const stats = useMemo(() => {
-    if (!entries.length) return null;
+    const withA = entries.filter((e) => e.analysis);
+    if (!withA.length) return null;
+
     const moodCount: Record<string, number> = {};
-    entries.forEach((e) => (moodCount[e.mood] = (moodCount[e.mood] || 0) + 1));
+    withA.forEach((e) => {
+      const m = e.analysis!.emotional_state ?? "Unknown";
+      moodCount[m] = (moodCount[m] || 0) + 1;
+    });
     const topMood = Object.entries(moodCount).sort((a, b) => b[1] - a[1])[0][0];
 
     const hourCount: Record<number, number> = {};
-    entries.forEach((e) => {
-      const h = new Date(e.createdAt).getHours();
+    withA.forEach((e) => {
+      const h = new Date(e.created_at).getHours();
       hourCount[h] = (hourCount[h] || 0) + 1;
     });
     const peakHour = Number(
-      Object.entries(hourCount).sort((a, b) => b[1] - a[1])[0][0]
+      Object.entries(hourCount).sort((a, b) => b[1] - a[1])[0][0],
     );
     const peakLabel =
       peakHour < 5 ? "Late nights" :
@@ -30,11 +35,15 @@ const Insights = () => {
       peakHour < 18 ? "Afternoons" : "Evenings";
 
     const avgClarity = Math.round(
-      entries.reduce((acc, e) => acc + e.clarity, 0) / entries.length
+      withA.reduce((acc, e) => acc + (e.analysis!.clarity_score ?? 0), 0) / withA.length,
     );
 
     const tagCount: Record<string, number> = {};
-    entries.forEach((e) => e.tags.forEach((t) => (tagCount[t] = (tagCount[t] || 0) + 1)));
+    withA.forEach((e) => {
+      (e.analysis!.cognitive_patterns ?? []).forEach((t) => {
+        tagCount[t] = (tagCount[t] || 0) + 1;
+      });
+    });
     const topTag = Object.entries(tagCount).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "—";
 
     return { topMood, peakLabel, avgClarity, topTag, count: entries.length };

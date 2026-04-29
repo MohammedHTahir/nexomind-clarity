@@ -78,7 +78,7 @@ const Hero = () => {
           className="mt-10 flex flex-col items-center gap-3"
         >
           <Link
-            to="/onboarding"
+            to="/auth"
             className="bg-white text-[#111] rounded-full px-8 py-4 font-barlow font-medium text-[15px] hover:bg-white/90 hover:scale-[1.02] transition-all duration-300"
           >
             Start your first reflection
