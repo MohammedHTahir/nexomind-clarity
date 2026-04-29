@@ -14,7 +14,107 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      journal_analysis: {
+        Row: {
+          clarity_insight: string | null
+          clarity_score: number | null
+          cognitive_patterns: Json | null
+          created_at: string
+          distortions_or_biases: Json | null
+          emotional_state: string | null
+          id: string
+          intensity_score: number | null
+          journal_id: string
+          key_thoughts: Json | null
+          suggested_reflection: string | null
+          summary: string | null
+          user_id: string
+        }
+        Insert: {
+          clarity_insight?: string | null
+          clarity_score?: number | null
+          cognitive_patterns?: Json | null
+          created_at?: string
+          distortions_or_biases?: Json | null
+          emotional_state?: string | null
+          id?: string
+          intensity_score?: number | null
+          journal_id: string
+          key_thoughts?: Json | null
+          suggested_reflection?: string | null
+          summary?: string | null
+          user_id: string
+        }
+        Update: {
+          clarity_insight?: string | null
+          clarity_score?: number | null
+          cognitive_patterns?: Json | null
+          created_at?: string
+          distortions_or_biases?: Json | null
+          emotional_state?: string | null
+          id?: string
+          intensity_score?: number | null
+          journal_id?: string
+          key_thoughts?: Json | null
+          suggested_reflection?: string | null
+          summary?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journal_analysis_journal_id_fkey"
+            columns: ["journal_id"]
+            isOneToOne: true
+            referencedRelation: "journals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      journals: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
