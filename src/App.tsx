@@ -13,6 +13,9 @@ import Dashboard from "./pages/app/Dashboard.tsx";
 import Journal from "./pages/app/Journal.tsx";
 import Insights from "./pages/app/Insights.tsx";
 import Settings from "./pages/app/Settings.tsx";
+import AiJournalingApp from "./pages/seo/AiJournalingApp.tsx";
+import StopOverthinking from "./pages/seo/StopOverthinking.tsx";
+import MentalClarity from "./pages/seo/MentalClarity.tsx";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +29,9 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/ai-journaling-app" element={<AiJournalingApp />} />
+            <Route path="/stop-overthinking" element={<StopOverthinking />} />
+            <Route path="/mental-clarity" element={<MentalClarity />} />
             <Route
               path="/onboarding"
               element={
