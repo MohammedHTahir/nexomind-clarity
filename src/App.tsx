@@ -39,6 +39,9 @@ const App = () => (
             {seoPages.map((p) => (
               <Route key={p.path} path={p.path} element={<SeoPage config={p} />} />
             ))}
+            {programmaticSeoPages.map((p) => (
+              <Route key={p.path} path={p.path} element={<SeoPage config={p} />} />
+            ))}
             <Route
               path="/onboarding"
               element={
