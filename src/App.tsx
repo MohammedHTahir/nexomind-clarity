@@ -16,6 +16,8 @@ import Settings from "./pages/app/Settings.tsx";
 import AiJournalingApp from "./pages/seo/AiJournalingApp.tsx";
 import StopOverthinking from "./pages/seo/StopOverthinking.tsx";
 import MentalClarity from "./pages/seo/MentalClarity.tsx";
+import SeoPage from "./components/SeoPage.tsx";
+import { seoPages } from "./pages/seo/seoPages.ts";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +34,9 @@ const App = () => (
             <Route path="/ai-journaling-app" element={<AiJournalingApp />} />
             <Route path="/stop-overthinking" element={<StopOverthinking />} />
             <Route path="/mental-clarity" element={<MentalClarity />} />
+            {seoPages.map((p) => (
+              <Route key={p.path} path={p.path} element={<SeoPage config={p} />} />
+            ))}
             <Route
               path="/onboarding"
               element={
