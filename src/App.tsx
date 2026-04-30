@@ -18,6 +18,8 @@ import StopOverthinking from "./pages/seo/StopOverthinking.tsx";
 import MentalClarity from "./pages/seo/MentalClarity.tsx";
 import SeoPage from "./components/SeoPage.tsx";
 import { seoPages } from "./pages/seo/seoPages.ts";
+import ProgrammaticSeoRoute from "./pages/seo/ProgrammaticSeoRoute.tsx";
+import { programmaticSeoPages } from "./pages/seo/programmatic.ts";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +37,9 @@ const App = () => (
             <Route path="/stop-overthinking" element={<StopOverthinking />} />
             <Route path="/mental-clarity" element={<MentalClarity />} />
             {seoPages.map((p) => (
+              <Route key={p.path} path={p.path} element={<SeoPage config={p} />} />
+            ))}
+            {programmaticSeoPages.map((p) => (
               <Route key={p.path} path={p.path} element={<SeoPage config={p} />} />
             ))}
             <Route
