@@ -13,12 +13,7 @@ import Dashboard from "./pages/app/Dashboard.tsx";
 import Journal from "./pages/app/Journal.tsx";
 import Insights from "./pages/app/Insights.tsx";
 import Settings from "./pages/app/Settings.tsx";
-import SeoPage from "./components/SeoPage.tsx";
-import { seoPages } from "./pages/seo/seoPages.ts";
-import { programmaticSeoPages } from "./pages/seo/programmatic.ts";
-import { requiredSeoPages } from "./pages/seo/requiredSeoPages.ts";
-
-const dynamicSeoPages = [...requiredSeoPages, ...seoPages, ...programmaticSeoPages];
+import DynamicSeoPage from "./pages/seo/DynamicSeoPage.tsx";
 
 const queryClient = new QueryClient();
 
@@ -32,9 +27,6 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
-            {dynamicSeoPages.map((p) => (
-              <Route key={p.path} path={p.path} element={<SeoPage config={p} />} />
-            ))}
             <Route
               path="/onboarding"
               element={
@@ -75,6 +67,7 @@ const App = () => (
                 </RequireAuth>
               }
             />
+            <Route path="/:slug" element={<DynamicSeoPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
