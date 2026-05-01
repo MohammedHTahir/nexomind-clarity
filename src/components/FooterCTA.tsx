@@ -1,5 +1,13 @@
 import { Link } from "react-router-dom";
 
+const exploreLinks = [
+  { to: "/stop-overthinking", label: "Stop overthinking" },
+  { to: "/ai-journaling-app", label: "AI journaling app" },
+  { to: "/mental-clarity", label: "Mental clarity" },
+  { to: "/overthinking-at-night", label: "Overthinking at night" },
+  { to: "/why-do-i-overthink", label: "Why do I overthink?" },
+];
+
 const FooterCTA = () => {
   return (
     <section className="bg-[#111] text-white">
@@ -20,6 +28,22 @@ const FooterCTA = () => {
         <p className="font-barlow text-sm text-white/60 mt-4">
           No signup required
         </p>
+      </div>
+
+      {/* Explore */}
+      <div className="border-t border-white/10 px-6 py-12">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="font-instrument text-[32px] md:text-[42px] leading-tight mb-6">
+            Explore
+          </h2>
+          <div className="flex flex-wrap gap-x-7 gap-y-3 font-barlow text-[14px] text-white/55">
+            {exploreLinks.map((link) => (
+              <Link key={link.to} to={link.to} className="hover:text-white transition-colors">
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Footer */}
