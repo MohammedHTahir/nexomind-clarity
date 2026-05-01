@@ -11,6 +11,7 @@ import {
   type AnalysisRow,
   type JournalWithAnalysis,
 } from "@/lib/journal";
+import PaywallModal from "@/components/PaywallModal";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
@@ -30,6 +31,8 @@ const Dashboard = () => {
   const [name, setName] = useState("");
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisRow | null>(null);
+  const [paywallOpen, setPaywallOpen] = useState(false);
+  const [fullUnlocked, setFullUnlocked] = useState(false);
   const [entries, setEntries] = useState<JournalWithAnalysis[]>([]);
   const [openId, setOpenId] = useState<string | null>(null);
 
@@ -49,6 +52,8 @@ const Dashboard = () => {
     try {
       const { analysis } = await analyzeAndStore(text);
       setResult(analysis);
+      setFullUnlocked(false);
+      window.setTimeout(() => setPaywallOpen(true), 650);
       setText("");
       const fresh = await fetchJournals();
       setEntries(fresh);
@@ -172,47 +177,62 @@ const Dashboard = () => {
               >
                 <div className="bg-white/80 backdrop-blur-md rounded-[21px] p-7 md:p-9">
                   <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45 mb-3">
-                    ( {result.emotional_state} · {clarityBand(result.clarity_score)} )
+                    ( {result.emotional_state} )
                   </p>
-                  <h3 className="font-instrument text-[28px] md:text-[34px] leading-[1.15] mb-4">
-                    {result.clarity_insight}
-                  </h3>
                   <p className="font-barlow text-[15px] text-[#111]/65 leading-relaxed mb-6">
                     {result.summary}
                   </p>
 
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {(result.cognitive_patterns ?? []).map((t) => (
-                      <span
-                        key={t}
-                        className="font-barlow text-[12px] text-[#111]/70 bg-white/80 border border-black/5 rounded-full px-3 py-1"
-                      >
-                        {t}
-                      </span>
-                    ))}
-                    {(result.distortions_or_biases ?? []).map((t) => (
-                      <span
-                        key={`d-${t}`}
-                        className="font-barlow text-[12px] text-[#111]/70 bg-white/60 border border-black/10 rounded-full px-3 py-1"
-                      >
-                        {t}
-                      </span>
-                    ))}
-                  </div>
+                  <div className={`transition-all duration-500 ${fullUnlocked ? "blur-0 opacity-100" : "blur-sm opacity-45 select-none pointer-events-none"}`}>
+                    <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45 mb-3">
+                      ( {clarityBand(result.clarity_score)} )
+                    </p>
+                    <h3 className="font-instrument text-[28px] md:text-[34px] leading-[1.15] mb-4">
+                      {result.clarity_insight}
+                    </h3>
 
-                  <div className="border-t border-black/5 pt-5">
-                    <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45 mb-2">
-                      ( Try this )
-                    </p>
-                    <p className="font-instrument italic text-[20px] leading-snug text-[#111]/85">
-                      {result.suggested_reflection}
-                    </p>
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {(result.cognitive_patterns ?? []).map((t) => (
+                        <span
+                          key={t}
+                          className="font-barlow text-[12px] text-[#111]/70 bg-white/80 border border-black/5 rounded-full px-3 py-1"
+                        >
+                          {t}
+                        </span>
+                      ))}
+                      {(result.distortions_or_biases ?? []).map((t) => (
+                        <span
+                          key={`d-${t}`}
+                          className="font-barlow text-[12px] text-[#111]/70 bg-white/60 border border-black/10 rounded-full px-3 py-1"
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="border-t border-black/5 pt-5">
+                      <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45 mb-2">
+                        ( Try this )
+                      </p>
+                      <p className="font-instrument italic text-[20px] leading-snug text-[#111]/85">
+                        {result.suggested_reflection}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
+
+        <PaywallModal
+          open={paywallOpen}
+          onUnlock={() => {
+            setPaywallOpen(false);
+            toast.info("Payment setup is ready to activate.");
+          }}
+          onContinue={() => setPaywallOpen(false)}
+        />
 
         <div className="grid md:grid-cols-2 gap-5">
           <GlassCard className="p-7" delay={0.05}>
