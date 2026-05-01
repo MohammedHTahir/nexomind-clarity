@@ -75,13 +75,13 @@ const AiDemo = () => {
         {/* Heading */}
         <div className="max-w-2xl mb-16">
           <p className="font-barlow font-medium text-[12px] tracking-[0.2em] uppercase text-[#111]/50 mb-6">
-            ( See it in motion )
+            ( The shift )
           </p>
           <h2 className="font-instrument text-[44px] md:text-[64px] leading-[1] tracking-tight text-[#111]">
-            From a messy thought to <span className="italic">quiet clarity.</span>
+            Not just writing. <span className="italic">Understanding.</span>
           </h2>
           <p className="font-barlow text-[17px] md:text-[19px] leading-relaxed text-[#111]/70 mt-6">
-            Watch what happens when a real, half-formed thought meets NexoMind. No edits. No prompts. Just reflection, in seconds.
+            Clarity begins when thoughts leave your head — not to write more, but to finally see what's actually going on. One entry is enough.
           </p>
         </div>
 
@@ -186,7 +186,7 @@ const AiDemo = () => {
                         Summary
                       </p>
                       <p className="font-instrument text-[22px] md:text-[26px] leading-snug text-white">
-                        Your thoughts show a pattern of repetitive mental loops, especially at night.
+                        You're not stuck. You're overwhelmed without a way to process your thoughts.
                       </p>
                     </motion.div>
 
@@ -223,7 +223,7 @@ const AiDemo = () => {
                         Insight
                       </p>
                       <p className="font-instrument italic text-[22px] md:text-[26px] leading-snug text-white">
-                        You're not stuck — your mind is overloaded without a way to process it.
+                        Your mind is trying to solve too many things at once. That's why it keeps looping. This is where clarity starts.
                       </p>
                     </motion.div>
                   </motion.div>
@@ -251,7 +251,7 @@ const AiDemo = () => {
             Start your first reflection
           </Link>
           <p className="font-barlow text-sm text-[#111]/50 mt-3">
-            Free to try — takes less than 30 seconds.
+            No signup required.
           </p>
         </motion.div>
       </div>

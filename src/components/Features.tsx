@@ -1,12 +1,12 @@
 import { Lock, Sparkles, Moon, Waves, NotebookPen, HeartPulse } from "lucide-react";
 
 const features = [
-  { icon: Lock, t: "End-to-end private", d: "Your entries are encrypted on-device. Only you ever read them." },
-  { icon: Sparkles, t: "Gentle AI reflections", d: "Soft, non-clinical prompts that help you think — not diagnose you." },
-  { icon: Moon, t: "Wind-down mode", d: "A calm late-night writing surface designed to help you actually sleep." },
-  { icon: Waves, t: "Mood patterns", d: "See subtle weekly patterns without turning your life into a dashboard." },
-  { icon: NotebookPen, t: "Voice or text", d: "Write, dictate or ramble. NexoMind transcribes and listens back." },
-  { icon: HeartPulse, t: "Therapist-friendly", d: "Export sessions as PDFs to share with a therapist if you choose to." },
+  { icon: Sparkles, t: "Unlimited AI reflections", d: "Reflect as often as your mind needs. No caps, no limits." },
+  { icon: Waves, t: "Pattern recognition over time", d: "See the loops, triggers, and themes that quietly shape your days." },
+  { icon: HeartPulse, t: "Personalized clarity", d: "Every session is tuned to what you're actually going through." },
+  { icon: Moon, t: "It gets clearer over time", d: "You tend to overthink more at night. This pattern has appeared 6 times." },
+  { icon: NotebookPen, t: "Small clarity, every day", d: "One thought. One reflection. That's enough." },
+  { icon: Lock, t: "Private. Secure. No data shared.", d: "Your reflections stay yours. We never sell, train on, or read them." },
 ];
 
 const Features = () => {
@@ -15,12 +15,15 @@ const Features = () => {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-20 max-w-2xl mx-auto">
           <p className="font-barlow font-medium text-[12px] tracking-[0.2em] uppercase text-white/40 mb-4">
-            ( Services )
+            ( NexoMind Premium · $59.99 / month )
           </p>
           <h2 className="font-instrument text-[44px] md:text-[64px] leading-[1]">
-            Everything you need <br />
-            <span className="italic">nothing</span> you don't.
+            See what your mind <br />
+            is <span className="italic">actually</span> doing.
           </h2>
+          <p className="font-barlow text-[15px] text-white/55 mt-6">
+            Less than $2 a day for clarity.
+          </p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/10 rounded-[20px] overflow-hidden border border-white/10">

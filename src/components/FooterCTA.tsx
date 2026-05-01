@@ -6,13 +6,16 @@ const FooterCTA = () => {
       {/* CTA */}
       <div className="px-6 py-32 text-center max-w-4xl mx-auto">
         <h2 className="font-instrument text-[48px] md:text-[88px] leading-[1.05] md:leading-[0.95] tracking-tight">
-          Start your mental clarity <br /> journey <span className="italic">today.</span>
+          Start understanding <br /> your mind <span className="italic">today.</span>
         </h2>
+        <p className="font-barlow text-[16px] md:text-[18px] text-white/70 mt-8">
+          It takes less than 30 seconds.
+        </p>
         <Link
           to="/auth"
-          className="inline-block mt-12 bg-white text-[#111] rounded-full px-8 py-4 font-barlow font-medium text-[15px] hover:bg-white/90 hover:scale-[1.02] transition-all duration-300"
+          className="inline-block mt-10 bg-white text-[#111] rounded-full px-8 py-4 font-barlow font-medium text-[15px] hover:bg-white/90 hover:scale-[1.02] transition-all duration-300"
         >
-          Try your first reflection — free
+          Start your first reflection
         </Link>
         <p className="font-barlow text-sm text-white/60 mt-4">
           No signup required
