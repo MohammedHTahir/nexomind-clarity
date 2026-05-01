@@ -50,4 +50,5 @@ ${paths
 `;
 
 mkdirSync(resolve(root, "dist"), { recursive: true });
+writeFileSync(resolve(root, "public/sitemap.xml"), xml);
 writeFileSync(resolve(root, "dist/sitemap.xml"), xml);
