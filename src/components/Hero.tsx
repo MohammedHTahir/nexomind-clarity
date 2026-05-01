@@ -35,7 +35,7 @@ const Hero = () => {
           transition={{ duration: 1, ease }}
           className="font-barlow font-medium text-[13px] md:text-[14px] text-white/70 mb-6 tracking-wide"
         >
-          For when your mind feels noisy.
+          For when your mind won't slow down.
         </motion.p>
 
         <motion.h1
@@ -45,10 +45,10 @@ const Hero = () => {
           className="text-white"
         >
           <span className="block font-barlow font-medium text-[40px] md:text-[68px] lg:text-[80px] leading-[1.05] md:leading-[0.95] tracking-[-1.5px] md:tracking-[-4px]">
-            Clear your mind
+            Understand your thoughts
           </span>
           <span className="block font-instrument italic text-[48px] md:text-[76px] lg:text-[96px] leading-[1.05] md:leading-[1] mt-2">
-            with AI journaling
+            in seconds.
           </span>
         </motion.h1>
 
@@ -58,8 +58,7 @@ const Hero = () => {
           transition={{ duration: 1, delay: 0.25, ease }}
           className="font-barlow font-medium text-[16px] md:text-[18px] text-white/85 mt-8 max-w-xl mx-auto"
         >
-          Write what's on your mind. NexoMind helps you understand your thoughts
-          and emotions — privately, in seconds.
+          Not journaling. Not therapy. Just clarity when your mind won't slow down.
         </motion.p>
 
         <motion.p
@@ -68,7 +67,7 @@ const Hero = () => {
           transition={{ duration: 1, delay: 0.35, ease }}
           className="font-barlow text-sm text-white/60 mt-4 max-w-xl mx-auto"
         >
-          A private AI journaling app for reflection, clarity, and emotional insight.
+          Used when your thoughts feel stuck, repetitive, or overwhelming.
         </motion.p>
 
         <motion.div
@@ -87,7 +86,7 @@ const Hero = () => {
             No signup required
           </p>
           <p className="font-barlow text-sm text-white/50">
-            Takes less than 30 seconds to get your first insight.
+            Takes less than 30 seconds.
           </p>
         </motion.div>
 
@@ -97,7 +96,7 @@ const Hero = () => {
           transition={{ duration: 1, delay: 0.65, ease }}
           className="font-barlow italic text-sm text-white mt-8"
         >
-          Used when your thoughts feel too loud.
+          It starts with a thought you can't shake.
         </motion.p>
 
         <motion.p
