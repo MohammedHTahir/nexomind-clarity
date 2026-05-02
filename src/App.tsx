@@ -14,6 +14,10 @@ import Journal from "./pages/app/Journal.tsx";
 import Insights from "./pages/app/Insights.tsx";
 import Settings from "./pages/app/Settings.tsx";
 import DynamicSeoPage from "./pages/seo/DynamicSeoPage.tsx";
+import About from "./pages/About.tsx";
+import Contact from "./pages/Contact.tsx";
+import PrivacyPolicy from "./pages/PrivacyPolicy.tsx";
+import TermsOfService from "./pages/TermsOfService.tsx";
 
 const queryClient = new QueryClient();
 
@@ -67,6 +71,10 @@ const App = () => (
                 </RequireAuth>
               }
             />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/:slug" element={<DynamicSeoPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

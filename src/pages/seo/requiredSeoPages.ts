@@ -146,4 +146,62 @@ export const requiredSeoPages: SeoPageConfig[] = [
       { to: "/ai-journaling-app", label: "AI journaling app", desc: "A private way to turn thoughts into insight." },
     ],
   },
+  {
+    path: "/how-to-stop-overthinking",
+    metaTitle: "How to Stop Overthinking — A Calm Guide | NexoMind",
+    metaDescription:
+      "A calm, practical guide to stop overthinking. Learn what loops mean, how to interrupt them, and how AI reflection can help in seconds.",
+    eyebrow: "How to Stop Overthinking",
+    title: "How to stop",
+    italic: "overthinking.",
+    intro:
+      "Overthinking isn't a flaw. It's a loop with nowhere to land. This is the calm, practical version of how to interrupt it — without forcing yourself to feel okay.",
+    sections: [
+      {
+        h2: "Name what's underneath",
+        body: "Most loops aren't logical problems — they're emotions in disguise. Before trying to solve the thought, name the feeling: fear, guilt, pressure, resentment, uncertainty. Naming it gives the loop somewhere to land.",
+      },
+      {
+        h2: "Get the loop out of your head",
+        body: "Write the thought exactly as it sounds. Don't soften it, don't organize it. Once it's outside your head, it stops feeling infinite — it becomes a sentence you can actually look at.",
+      },
+      {
+        h2: "Let reflection do the structuring",
+        body: "NexoMind reads what you wrote and reflects it back as a short summary, emotional state, and one grounded takeaway — so the loop becomes something you understand instead of something you're stuck inside.",
+      },
+    ],
+    related: [
+      { to: "/why-do-i-overthink", label: "Why do I overthink?", desc: "What recurring thoughts are really asking for." },
+      { to: "/overthinking-at-night", label: "Overthinking at night", desc: "Why thoughts get louder when the day goes quiet." },
+    ],
+  },
+  {
+    path: "/ai-journaling",
+    metaTitle: "AI Journaling — A Calmer Way to Reflect | NexoMind",
+    metaDescription:
+      "AI journaling turns messy thoughts into structured insight. Learn how it works and why NexoMind keeps it private, gentle, and fast.",
+    eyebrow: "AI Journaling",
+    title: "AI journaling,",
+    italic: "explained.",
+    intro:
+      "AI journaling isn't a chatbot and it isn't a blank page. It's a quiet way to turn what you're already thinking into something you can actually see.",
+    sections: [
+      {
+        h2: "What AI journaling actually is",
+        body: "You write the way you'd write to yourself — in fragments, full paragraphs, half-thoughts. The AI reads it and reflects back a summary, the emotion underneath, the pattern, and a single gentle takeaway.",
+      },
+      {
+        h2: "Why it works when traditional journaling doesn't",
+        body: "Traditional journaling asks you to know what to write about. AI journaling doesn't. You bring the mess. The structure comes back to you — without advice, without performance, without streaks to maintain.",
+      },
+      {
+        h2: "Private by design",
+        body: "Your reflections aren't used to train public models. They're encrypted, only visible to you, and easy to delete. The point of journaling is honesty — and honesty needs privacy.",
+      },
+    ],
+    related: [
+      { to: "/ai-journaling-app", label: "AI journaling app", desc: "How NexoMind structures your reflections." },
+      { to: "/mental-clarity", label: "Mental clarity", desc: "What clarity really means — and how to reach it." },
+    ],
+  },
 ];

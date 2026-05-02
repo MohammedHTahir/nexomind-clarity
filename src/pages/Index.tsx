@@ -5,7 +5,9 @@ import AiDemo from "@/components/AiDemo";
 import Features from "@/components/Features";
 import Testimonials from "@/components/Testimonials";
 import FAQ from "@/components/FAQ";
+import BlogPreview from "@/components/BlogPreview";
 import FooterCTA from "@/components/FooterCTA";
+import SiteFooter from "@/components/SiteFooter";
 
 const Index = () => {
   return (
@@ -17,7 +19,9 @@ const Index = () => {
       <Features />
       <Testimonials />
       <FAQ />
+      <BlogPreview />
       <FooterCTA />
+      <SiteFooter />
     </main>
   );
 };

@@ -46,22 +46,6 @@ const FooterCTA = () => {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="border-t border-white/10 px-6 py-10">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <span className="font-instrument text-[24px] tracking-tight">
-            nexo<span className="italic text-white/60">mind</span>
-          </span>
-          <div className="flex gap-8 font-barlow text-[13px] text-white/50">
-            <a href="#" className="hover:text-white transition-colors">Privacy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms</a>
-            <a href="#" className="hover:text-white transition-colors">Contact</a>
-          </div>
-          <p className="font-barlow text-[13px] text-white/40">
-            © {new Date().getFullYear()} NexoMind. All rights reserved.
-          </p>
-        </div>
-      </footer>
     </section>
   );
 };

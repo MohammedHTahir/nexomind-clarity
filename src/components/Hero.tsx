@@ -62,6 +62,15 @@ const Hero = () => {
         </motion.p>
 
         <motion.p
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.3, ease }}
+          className="font-barlow text-[15px] md:text-[16px] text-white/75 mt-5 max-w-2xl mx-auto leading-relaxed"
+        >
+          A private AI journaling app designed to help you stop overthinking and gain mental clarity.
+        </motion.p>
+
+        <motion.p
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.35, ease }}
@@ -88,6 +97,13 @@ const Hero = () => {
           <p className="font-barlow text-sm text-white/50">
             Takes less than 30 seconds.
           </p>
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 font-barlow text-[12px] tracking-[0.12em] uppercase text-white/55">
+            <span>Private by design</span>
+            <span className="opacity-40">•</span>
+            <span>No data sold</span>
+            <span className="opacity-40">•</span>
+            <span>Encrypted reflections</span>
+          </div>
         </motion.div>
 
         <motion.p
