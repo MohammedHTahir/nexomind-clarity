@@ -97,6 +97,13 @@ const Hero = () => {
           <p className="font-barlow text-sm text-white/50">
             Takes less than 30 seconds.
           </p>
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 font-barlow text-[12px] tracking-[0.12em] uppercase text-white/55">
+            <span>Private by design</span>
+            <span className="opacity-40">•</span>
+            <span>No data sold</span>
+            <span className="opacity-40">•</span>
+            <span>Encrypted reflections</span>
+          </div>
         </motion.div>
 
         <motion.p
