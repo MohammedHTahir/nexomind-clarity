@@ -28,8 +28,10 @@ const programmaticPaths = intents.flatMap((intent) =>
   ),
 );
 
+const staticPaths = ["/", "/about", "/contact", "/privacy-policy", "/terms-of-service"];
+
 const paths = Array.from(
-  new Set(["/", ...extractPaths(requiredSeoFile), ...extractPaths(seoPagesFile), ...programmaticPaths]),
+  new Set([...staticPaths, ...extractPaths(requiredSeoFile), ...extractPaths(seoPagesFile), ...programmaticPaths]),
 );
 
 const siteUrl = "https://nexomind.app";
