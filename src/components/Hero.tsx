@@ -62,6 +62,15 @@ const Hero = () => {
         </motion.p>
 
         <motion.p
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.3, ease }}
+          className="font-barlow text-[15px] md:text-[16px] text-white/75 mt-5 max-w-2xl mx-auto leading-relaxed"
+        >
+          A private AI journaling app designed to help you stop overthinking and gain mental clarity.
+        </motion.p>
+
+        <motion.p
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.35, ease }}
