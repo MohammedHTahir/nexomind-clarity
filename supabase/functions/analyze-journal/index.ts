@@ -77,15 +77,21 @@ const refineTool = {
   },
 };
 
+// Direct Google Gemini API (no Lovable Gateway).
+// We use OpenAI-compatible endpoint Google exposes so the existing
+// tools / tool_choice payload works unchanged.
 async function callGateway(body: unknown, apiKey: string) {
-  const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
+  const r = await fetch(
+    "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
     },
-    body: JSON.stringify(body),
-  });
+  );
   return r;
 }
 
@@ -124,8 +130,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    const apiKey = Deno.env.get("LOVABLE_API_KEY");
-    if (!apiKey) throw new Error("LOVABLE_API_KEY not configured");
+    const apiKey = Deno.env.get("GEMINI_API_KEY");
+    if (!apiKey) throw new Error("GEMINI_API_KEY not configured");
 
     // 1) insert journal
     const { data: journal, error: jErr } = await supabase
@@ -138,7 +144,7 @@ Deno.serve(async (req) => {
     // 2) primary analysis
     const aiResp = await callGateway(
       {
-        model: "google/gemini-2.5-flash",
+        model: "gemini-2.5-flash",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           {
@@ -179,7 +185,7 @@ Deno.serve(async (req) => {
     try {
       const refineResp = await callGateway(
         {
-          model: "google/gemini-2.5-flash-lite",
+          model: "gemini-2.5-flash-lite",
           messages: [
             { role: "system", content: REFINE_SYSTEM },
             {

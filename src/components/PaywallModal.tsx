@@ -2,13 +2,38 @@ import { AnimatePresence, motion } from "framer-motion";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
 interface PaywallModalProps {
   open: boolean;
-  onUnlock: () => void;
+  onUnlock?: () => void;
   onContinue: () => void;
 }
 
 const PaywallModal = ({ open, onUnlock, onContinue }: PaywallModalProps) => {
+  const [loading, setLoading] = useState(false);
+
+  const handleUnlock = async () => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-checkout");
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url as string;
+      } else {
+        throw new Error("No checkout URL returned");
+      }
+      onUnlock?.();
+    } catch (e) {
+      console.error(e);
+      toast.error("Could not start checkout. Please try again.");
+      setLoading(false);
+    }
+  };
+
   return (
     <AnimatePresence>
       {open && (
@@ -44,10 +69,11 @@ const PaywallModal = ({ open, onUnlock, onContinue }: PaywallModalProps) => {
               </p>
             </div>
             <button
-              onClick={onUnlock}
-              className="w-full rounded-full bg-[#111] px-6 py-3.5 font-barlow text-[14px] font-medium text-white shadow-[0_0_30px_rgba(17,17,17,0.18)] transition-all duration-300 hover:bg-black hover:shadow-[0_0_40px_rgba(17,17,17,0.28)]"
+              onClick={handleUnlock}
+              disabled={loading}
+              className="w-full rounded-full bg-[#111] px-6 py-3.5 font-barlow text-[14px] font-medium text-white shadow-[0_0_30px_rgba(17,17,17,0.18)] transition-all duration-300 hover:bg-black hover:shadow-[0_0_40px_rgba(17,17,17,0.28)] disabled:opacity-60"
             >
-              Unlock full clarity
+              {loading ? "Opening checkout…" : "Unlock full clarity"}
             </button>
             <button
               onClick={onContinue}
