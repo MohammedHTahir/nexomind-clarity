@@ -13,6 +13,7 @@ import {
 } from "@/lib/journal";
 import PaywallModal from "@/components/PaywallModal";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 import { toast } from "sonner";
 
 const ease = [0.16, 1, 0.3, 1] as const;
