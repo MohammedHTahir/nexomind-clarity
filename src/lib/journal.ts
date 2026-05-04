@@ -33,16 +33,44 @@ export const clarityBand = (score: number | null | undefined) => {
   return "High clarity";
 };
 
+export type AnalyzeUsage = { limit: number | null; used: number; remaining: number | null };
+
+export class FreeLimitReachedError extends Error {
+  limit: number;
+  used: number;
+  constructor(message: string, limit: number, used: number) {
+    super(message);
+    this.name = "FreeLimitReachedError";
+    this.limit = limit;
+    this.used = used;
+  }
+}
+
 export async function analyzeAndStore(content: string): Promise<{
   journal: JournalRow;
   analysis: AnalysisRow;
+  usage?: AnalyzeUsage;
+  isPremium?: boolean;
 }> {
   const { data, error } = await supabase.functions.invoke("analyze-journal", {
     body: { content },
   });
+  const payload = (data ?? {}) as any;
+  if (payload?.code === "FREE_LIMIT_REACHED") {
+    throw new FreeLimitReachedError(
+      payload.error ?? "Free limit reached",
+      payload.limit ?? 3,
+      payload.used ?? 0,
+    );
+  }
   if (error) throw error;
-  if ((data as any)?.error) throw new Error((data as any).error);
-  return data as { journal: JournalRow; analysis: AnalysisRow };
+  if (payload?.error) throw new Error(payload.error);
+  return payload as {
+    journal: JournalRow;
+    analysis: AnalysisRow;
+    usage?: AnalyzeUsage;
+    isPremium?: boolean;
+  };
 }
 
 export async function fetchJournals(): Promise<JournalWithAnalysis[]> {
