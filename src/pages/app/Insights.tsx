@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/app/AppShell";
 import GlassCard from "@/components/app/GlassCard";
+import PremiumGate from "@/components/PremiumGate";
 import { fetchJournals, type JournalWithAnalysis } from "@/lib/journal";
 
 const Insights = () => {
@@ -84,26 +85,31 @@ const Insights = () => {
             </p>
           </GlassCard>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {cards.map((c, i) => (
-              <GlassCard
-                key={c.label}
-                delay={i * 0.05}
-                whileHover={{
-                  y: -3,
-                  boxShadow: "0 12px 40px rgba(120,140,200,0.18)",
-                }}
-                className="p-7 transition-shadow duration-500"
-              >
-                <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45 mb-4">
-                  ( {c.label} )
-                </p>
-                <p className="font-instrument text-[36px] leading-[1.1]">
-                  <span className="italic">{c.value}</span>
-                </p>
-              </GlassCard>
-            ))}
-          </div>
+          <PremiumGate
+            title="Premium clarity insights"
+            subtitle="Patterns across all your reflections"
+          >
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {cards.map((c, i) => (
+                <GlassCard
+                  key={c.label}
+                  delay={i * 0.05}
+                  whileHover={{
+                    y: -3,
+                    boxShadow: "0 12px 40px rgba(120,140,200,0.18)",
+                  }}
+                  className="p-7 transition-shadow duration-500"
+                >
+                  <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45 mb-4">
+                    ( {c.label} )
+                  </p>
+                  <p className="font-instrument text-[36px] leading-[1.1]">
+                    <span className="italic">{c.value}</span>
+                  </p>
+                </GlassCard>
+              ))}
+            </div>
+          </PremiumGate>
         )}
       </div>
     </AppShell>

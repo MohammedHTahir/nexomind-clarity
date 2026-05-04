@@ -13,6 +13,7 @@ import {
   type JournalWithAnalysis,
 } from "@/lib/journal";
 import PaywallModal from "@/components/PaywallModal";
+import PremiumGate from "@/components/PremiumGate";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { toast } from "sonner";
@@ -35,16 +36,12 @@ const Dashboard = () => {
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisRow | null>(null);
   const [paywallOpen, setPaywallOpen] = useState(false);
-  const [fullUnlocked, setFullUnlocked] = useState(false);
   const [entries, setEntries] = useState<JournalWithAnalysis[]>([]);
   const [openId, setOpenId] = useState<string | null>(null);
 
-  // Auto-unlock when subscription is active (e.g. webhook fires after checkout)
+  // Close any open paywall the moment the subscription becomes active.
   useEffect(() => {
-    if (isPremium) {
-      setFullUnlocked(true);
-      setPaywallOpen(false);
-    }
+    if (isPremium) setPaywallOpen(false);
   }, [isPremium]);
 
   useEffect(() => {
@@ -64,7 +61,6 @@ const Dashboard = () => {
       const { analysis } = await analyzeAndStore(text);
       setResult(analysis);
       if (!isPremium) {
-        setFullUnlocked(false);
         window.setTimeout(() => setPaywallOpen(true), 650);
       }
       setText("");
@@ -201,7 +197,10 @@ const Dashboard = () => {
                     {result.summary}
                   </p>
 
-                  <div className={`transition-all duration-500 ${fullUnlocked ? "blur-0 opacity-100" : "blur-sm opacity-45 select-none pointer-events-none"}`}>
+                  <PremiumGate
+                    title="Full clarity insight"
+                    subtitle="Unlock deep patterns and reflections"
+                  >
                     <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45 mb-3">
                       ( {clarityBand(result.clarity_score)} )
                     </p>
@@ -236,7 +235,7 @@ const Dashboard = () => {
                         {result.suggested_reflection}
                       </p>
                     </div>
-                  </div>
+                  </PremiumGate>
                 </div>
               </div>
             </motion.div>
