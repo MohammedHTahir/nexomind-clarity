@@ -61,7 +61,6 @@ const Dashboard = () => {
       const { analysis } = await analyzeAndStore(text);
       setResult(analysis);
       if (!isPremium) {
-        setFullUnlocked(false);
         window.setTimeout(() => setPaywallOpen(true), 650);
       }
       setText("");
