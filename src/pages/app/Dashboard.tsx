@@ -62,8 +62,10 @@ const Dashboard = () => {
     try {
       const { analysis } = await analyzeAndStore(text);
       setResult(analysis);
-      setFullUnlocked(false);
-      window.setTimeout(() => setPaywallOpen(true), 650);
+      if (!isPremium) {
+        setFullUnlocked(false);
+        window.setTimeout(() => setPaywallOpen(true), 650);
+      }
       setText("");
       const fresh = await fetchJournals();
       setEntries(fresh);
