@@ -269,7 +269,24 @@ Deno.serve(async (req) => {
       .single();
     if (aErr) throw aErr;
 
-    return new Response(JSON.stringify({ journal, analysis }), {
+    // Recompute usage post-insert so the client can show "X of 3 left"
+    let usage: { limit: number | null; used: number; remaining: number | null } = {
+      limit: null,
+      used: 0,
+      remaining: null,
+    };
+    if (!isPremium) {
+      const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      const { count } = await admin
+        .from("journal_analysis")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId)
+        .gte("created_at", since);
+      const used = count ?? 0;
+      usage = { limit: FREE_MONTHLY_LIMIT, used, remaining: Math.max(FREE_MONTHLY_LIMIT - used, 0) };
+    }
+
+    return new Response(JSON.stringify({ journal, analysis, usage, isPremium }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
