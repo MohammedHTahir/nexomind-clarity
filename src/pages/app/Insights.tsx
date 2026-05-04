@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/app/AppShell";
 import GlassCard from "@/components/app/GlassCard";
+import PremiumGate from "@/components/PremiumGate";
 import { fetchJournals, type JournalWithAnalysis } from "@/lib/journal";
 
 const Insights = () => {
