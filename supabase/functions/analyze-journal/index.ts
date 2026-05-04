@@ -130,6 +130,44 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Free-tier enforcement: 3 analyses / rolling 30 days for non-premium users.
+    // Uses the service role client for an authoritative count that bypasses RLS.
+    const FREE_MONTHLY_LIMIT = 3;
+    const admin = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
+
+    const { data: isPremiumData, error: premErr } = await admin.rpc("is_premium", {
+      _user_id: userId,
+    });
+    if (premErr) console.error("is_premium check failed", premErr);
+    const isPremium = !!isPremiumData;
+
+    if (!isPremium) {
+      const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      const { count, error: countErr } = await admin
+        .from("journal_analysis")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId)
+        .gte("created_at", since);
+      if (countErr) throw countErr;
+      const used = count ?? 0;
+
+      if (used >= FREE_MONTHLY_LIMIT) {
+        return new Response(
+          JSON.stringify({
+            error: "Free limit reached. Upgrade to Premium for unlimited analyses.",
+            code: "FREE_LIMIT_REACHED",
+            limit: FREE_MONTHLY_LIMIT,
+            used,
+            remaining: 0,
+          }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+    }
+
     const apiKey = Deno.env.get("GEMINI_API_KEY");
     if (!apiKey) throw new Error("GEMINI_API_KEY not configured");
 
@@ -231,7 +269,24 @@ Deno.serve(async (req) => {
       .single();
     if (aErr) throw aErr;
 
-    return new Response(JSON.stringify({ journal, analysis }), {
+    // Recompute usage post-insert so the client can show "X of 3 left"
+    let usage: { limit: number | null; used: number; remaining: number | null } = {
+      limit: null,
+      used: 0,
+      remaining: null,
+    };
+    if (!isPremium) {
+      const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      const { count } = await admin
+        .from("journal_analysis")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId)
+        .gte("created_at", since);
+      const used = count ?? 0;
+      usage = { limit: FREE_MONTHLY_LIMIT, used, remaining: Math.max(FREE_MONTHLY_LIMIT - used, 0) };
+    }
+
+    return new Response(JSON.stringify({ journal, analysis, usage, isPremium }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
