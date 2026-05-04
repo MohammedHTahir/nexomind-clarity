@@ -71,8 +71,13 @@ const Dashboard = () => {
       const fresh = await fetchJournals();
       setEntries(fresh);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Analysis failed";
-      toast.error(msg);
+      if (e instanceof FreeLimitReachedError) {
+        toast.error(`You've used all ${e.limit} free analyses this month.`);
+        setPaywallOpen(true);
+      } else {
+        const msg = e instanceof Error ? e.message : "Analysis failed";
+        toast.error(msg);
+      }
     } finally {
       setAnalyzing(false);
     }
