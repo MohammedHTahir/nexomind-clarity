@@ -13,6 +13,7 @@ import {
   type JournalWithAnalysis,
 } from "@/lib/journal";
 import PaywallModal from "@/components/PaywallModal";
+import PremiumGate from "@/components/PremiumGate";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { toast } from "sonner";
