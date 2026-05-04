@@ -8,6 +8,7 @@ import {
   analyzeAndStore,
   fetchJournals,
   clarityBand,
+  FreeLimitReachedError,
   type AnalysisRow,
   type JournalWithAnalysis,
 } from "@/lib/journal";
