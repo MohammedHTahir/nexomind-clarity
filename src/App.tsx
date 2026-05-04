@@ -8,6 +8,7 @@ import RequireAuth from "@/components/RequireAuth";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import Auth from "./pages/Auth.tsx";
+import AuthCallback from "./pages/AuthCallback.tsx";
 import Onboarding from "./pages/Onboarding.tsx";
 import Dashboard from "./pages/app/Dashboard.tsx";
 import Journal from "./pages/app/Journal.tsx";
@@ -31,6 +32,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
             <Route
               path="/onboarding"
               element={
