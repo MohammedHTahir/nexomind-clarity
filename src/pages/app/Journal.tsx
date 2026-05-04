@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { analyzeAndStore, clarityBand, type AnalysisRow } from "@/lib/journal";
+import { analyzeAndStore, clarityBand, FreeLimitReachedError, type AnalysisRow } from "@/lib/journal";
+import PremiumGate from "@/components/PremiumGate";
 import { toast } from "sonner";
 
 const ease = [0.16, 1, 0.3, 1] as const;
