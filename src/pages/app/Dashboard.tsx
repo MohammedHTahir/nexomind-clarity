@@ -13,6 +13,7 @@ import {
 } from "@/lib/journal";
 import PaywallModal from "@/components/PaywallModal";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 import { toast } from "sonner";
 
 const ease = [0.16, 1, 0.3, 1] as const;
@@ -27,6 +28,7 @@ const greeting = () => {
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { isPremium } = useSubscription();
   const [text, setText] = useState("");
   const [name, setName] = useState("");
   const [analyzing, setAnalyzing] = useState(false);
@@ -35,6 +37,14 @@ const Dashboard = () => {
   const [fullUnlocked, setFullUnlocked] = useState(false);
   const [entries, setEntries] = useState<JournalWithAnalysis[]>([]);
   const [openId, setOpenId] = useState<string | null>(null);
+
+  // Auto-unlock when subscription is active (e.g. webhook fires after checkout)
+  useEffect(() => {
+    if (isPremium) {
+      setFullUnlocked(true);
+      setPaywallOpen(false);
+    }
+  }, [isPremium]);
 
   useEffect(() => {
     try {
@@ -52,8 +62,10 @@ const Dashboard = () => {
     try {
       const { analysis } = await analyzeAndStore(text);
       setResult(analysis);
-      setFullUnlocked(false);
-      window.setTimeout(() => setPaywallOpen(true), 650);
+      if (!isPremium) {
+        setFullUnlocked(false);
+        window.setTimeout(() => setPaywallOpen(true), 650);
+      }
       setText("");
       const fresh = await fetchJournals();
       setEntries(fresh);
