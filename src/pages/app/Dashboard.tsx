@@ -36,16 +36,12 @@ const Dashboard = () => {
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisRow | null>(null);
   const [paywallOpen, setPaywallOpen] = useState(false);
-  const [fullUnlocked, setFullUnlocked] = useState(false);
   const [entries, setEntries] = useState<JournalWithAnalysis[]>([]);
   const [openId, setOpenId] = useState<string | null>(null);
 
-  // Auto-unlock when subscription is active (e.g. webhook fires after checkout)
+  // Close any open paywall the moment the subscription becomes active.
   useEffect(() => {
-    if (isPremium) {
-      setFullUnlocked(true);
-      setPaywallOpen(false);
-    }
+    if (isPremium) setPaywallOpen(false);
   }, [isPremium]);
 
   useEffect(() => {
