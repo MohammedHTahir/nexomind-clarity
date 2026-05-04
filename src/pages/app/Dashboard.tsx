@@ -201,7 +201,10 @@ const Dashboard = () => {
                     {result.summary}
                   </p>
 
-                  <div className={`transition-all duration-500 ${fullUnlocked ? "blur-0 opacity-100" : "blur-sm opacity-45 select-none pointer-events-none"}`}>
+                  <PremiumGate
+                    title="Full clarity insight"
+                    subtitle="Unlock deep patterns and reflections"
+                  >
                     <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45 mb-3">
                       ( {clarityBand(result.clarity_score)} )
                     </p>
@@ -236,7 +239,7 @@ const Dashboard = () => {
                         {result.suggested_reflection}
                       </p>
                     </div>
-                  </div>
+                  </PremiumGate>
                 </div>
               </div>
             </motion.div>
