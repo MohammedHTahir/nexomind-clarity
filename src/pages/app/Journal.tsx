@@ -134,28 +134,33 @@ const Journal = () => {
                   <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45 mb-4">
                     ( Reflection · {clarityBand(result.clarity_score)} )
                   </p>
-                  <h2 className="font-instrument text-[34px] md:text-[44px] leading-[1.1] mb-5">
-                    {result.clarity_insight}
-                  </h2>
                   <p className="font-barlow text-[15px] text-[#111]/65 leading-relaxed mb-6">
                     {result.summary}
                   </p>
-                  <div
-                    className="rounded-[18px] p-[1px] mb-8"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, rgba(180,200,235,0.5), rgba(220,200,235,0.5), rgba(0,0,0,0.05))",
-                    }}
+                  <PremiumGate
+                    title="Full reflection"
+                    subtitle="Unlock the deeper insight from this entry"
                   >
-                    <div className="bg-white/80 backdrop-blur-md rounded-[17px] p-5">
-                      <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45 mb-2">
-                        ( A small reflection )
-                      </p>
-                      <p className="font-instrument italic text-[20px] text-[#111]/85 leading-snug">
-                        {result.suggested_reflection}
-                      </p>
+                    <h2 className="font-instrument text-[34px] md:text-[44px] leading-[1.1] mb-5">
+                      {result.clarity_insight}
+                    </h2>
+                    <div
+                      className="rounded-[18px] p-[1px] mb-8"
+                      style={{
+                        background:
+                          "linear-gradient(135deg, rgba(180,200,235,0.5), rgba(220,200,235,0.5), rgba(0,0,0,0.05))",
+                      }}
+                    >
+                      <div className="bg-white/80 backdrop-blur-md rounded-[17px] p-5">
+                        <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45 mb-2">
+                          ( A small reflection )
+                        </p>
+                        <p className="font-instrument italic text-[20px] text-[#111]/85 leading-snug">
+                          {result.suggested_reflection}
+                        </p>
+                      </div>
                     </div>
-                  </div>
+                  </PremiumGate>
                   <div className="flex gap-3">
                     <button
                       onClick={() => {
