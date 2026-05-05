@@ -4,8 +4,16 @@ import NotFound from "@/pages/NotFound";
 import { requiredSeoPages } from "@/pages/seo/requiredSeoPages";
 import { seoPages } from "@/pages/seo/seoPages";
 import { programmaticSeoPages } from "@/pages/seo/programmatic";
+import { targetSeoPages } from "@/pages/seo/targetSeoPages";
 
-export const allSeoPages = [...requiredSeoPages, ...seoPages, ...programmaticSeoPages];
+// Order matters: target pages override programmatic ones if slugs collide.
+const merged = [...targetSeoPages, ...requiredSeoPages, ...seoPages, ...programmaticSeoPages];
+const seen = new Set<string>();
+export const allSeoPages = merged.filter((p) => {
+  if (seen.has(p.path)) return false;
+  seen.add(p.path);
+  return true;
+});
 
 const DynamicSeoPage = () => {
   const { slug } = useParams();
