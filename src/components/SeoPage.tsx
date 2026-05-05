@@ -1,8 +1,10 @@
+import { useEffect, useMemo, useState } from "react";
 import Seo from "@/components/Seo";
 import SeoLayout from "@/components/SeoLayout";
 
 type Section = { h2: string; body: string };
 type Related = { to: string; label: string; desc: string };
+type Faq = { q: string; a: string };
 
 export interface SeoPageConfig {
   path: string;
@@ -14,12 +16,110 @@ export interface SeoPageConfig {
   intro: string;
   sections: Section[];
   related: Related[];
+  /** 40–60 word definition shown at top — optimized for AI answer boxes (Perplexity, ChatGPT, Google AIO). */
+  answerBox?: string;
+  /** 3–5 FAQs — rendered as a section + emitted as FAQPage JSON-LD. */
+  faqs?: Faq[];
 }
 
+const slugify = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-");
+
+const wordCount = (s: string) => (s.match(/\S+/g) ?? []).length;
+
 const SeoPage = ({ config }: { config: SeoPageConfig }) => {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const h = document.documentElement;
+      const total = h.scrollHeight - h.clientHeight;
+      setProgress(total > 0 ? Math.min(100, (h.scrollTop / total) * 100) : 0);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const readingMinutes = useMemo(() => {
+    const total =
+      wordCount(config.intro) +
+      wordCount(config.answerBox ?? "") +
+      config.sections.reduce((n, s) => n + wordCount(s.h2) + wordCount(s.body), 0) +
+      (config.faqs?.reduce((n, f) => n + wordCount(f.q) + wordCount(f.a), 0) ?? 0);
+    return Math.max(1, Math.round(total / 220));
+  }, [config]);
+
+  const toc = useMemo(
+    () => config.sections.map((s) => ({ id: slugify(s.h2), label: s.h2 })),
+    [config.sections],
+  );
+
+  const jsonLd = useMemo(() => {
+    const url = `https://www.nexomind.ai${config.path}`;
+    const blobs: Record<string, unknown>[] = [
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: config.metaTitle,
+        description: config.metaDescription,
+        mainEntityOfPage: url,
+        url,
+        author: { "@type": "Organization", name: "NexoMind" },
+        publisher: {
+          "@type": "Organization",
+          name: "NexoMind",
+          logo: { "@type": "ImageObject", url: "https://www.nexomind.ai/og-image.jpg" },
+        },
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: "https://www.nexomind.ai/" },
+          { "@type": "ListItem", position: 2, name: config.eyebrow, item: url },
+        ],
+      },
+    ];
+    if (config.faqs && config.faqs.length > 0) {
+      blobs.push({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: config.faqs.map((f) => ({
+          "@type": "Question",
+          name: f.q,
+          acceptedAnswer: { "@type": "Answer", text: f.a },
+        })),
+      });
+    }
+    return blobs;
+  }, [config]);
+
   return (
     <>
-      <Seo title={config.metaTitle} description={config.metaDescription} />
+      <Seo
+        title={config.metaTitle}
+        description={config.metaDescription}
+        canonical={`https://www.nexomind.ai${config.path}`}
+        jsonLd={jsonLd}
+        type="article"
+      />
+
+      {/* Sticky reading progress bar */}
+      <div
+        aria-hidden
+        className="fixed top-0 left-0 right-0 h-[3px] z-[60] bg-transparent pointer-events-none"
+      >
+        <div
+          className="h-full bg-[#111] transition-[width] duration-150 ease-out"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+
       <SeoLayout
         eyebrow={config.eyebrow}
         title={config.title}
@@ -27,16 +127,98 @@ const SeoPage = ({ config }: { config: SeoPageConfig }) => {
         intro={config.intro}
         related={config.related}
       >
-        <div className="space-y-10 font-barlow text-[17px] leading-relaxed text-[#111]/75">
-          {config.sections.map((s) => (
-            <section key={s.h2}>
-              <h2 className="font-instrument text-[32px] md:text-[40px] leading-tight text-[#111] mb-4">
-                {s.h2}
-              </h2>
-              <p className="whitespace-pre-line">{s.body}</p>
-            </section>
-          ))}
+        {/* Reading time + answer box */}
+        <div className="mb-10">
+          <p className="font-barlow text-[12px] tracking-[0.18em] uppercase text-[#111]/45 mb-4">
+            {readingMinutes} min read
+          </p>
+
+          {config.answerBox && (
+            <aside
+              role="note"
+              aria-label="Quick answer"
+              className="bg-white/80 border border-black/5 rounded-[20px] p-6 md:p-7 shadow-[0_1px_0_rgba(0,0,0,0.02)]"
+            >
+              <p className="font-barlow font-medium text-[11px] tracking-[0.22em] uppercase text-[#111]/45 mb-3">
+                Quick answer
+              </p>
+              <p className="font-barlow text-[16px] md:text-[17px] leading-relaxed text-[#111]/85">
+                {config.answerBox}
+              </p>
+            </aside>
+          )}
         </div>
+
+        {/* Table of contents */}
+        {toc.length > 1 && (
+          <nav
+            aria-label="Table of contents"
+            className="mb-12 border-l border-black/10 pl-5"
+          >
+            <p className="font-barlow font-medium text-[11px] tracking-[0.22em] uppercase text-[#111]/45 mb-3">
+              On this page
+            </p>
+            <ol className="space-y-2 font-barlow text-[15px] text-[#111]/70">
+              {toc.map((item, i) => (
+                <li key={item.id}>
+                  <a
+                    href={`#${item.id}`}
+                    className="hover:text-[#111] transition-colors"
+                  >
+                    <span className="text-[#111]/40 mr-2">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )}
+
+        {/* Body sections */}
+        <div className="space-y-12 font-barlow text-[17px] leading-relaxed text-[#111]/75">
+          {config.sections.map((s) => {
+            const id = slugify(s.h2);
+            return (
+              <section key={s.h2} id={id} className="scroll-mt-28">
+                <h2 className="font-instrument text-[32px] md:text-[40px] leading-tight text-[#111] mb-4">
+                  <a href={`#${id}`} className="hover:underline underline-offset-4">
+                    {s.h2}
+                  </a>
+                </h2>
+                <p className="whitespace-pre-line">{s.body}</p>
+              </section>
+            );
+          })}
+        </div>
+
+        {/* FAQ */}
+        {config.faqs && config.faqs.length > 0 && (
+          <section id="faq" className="mt-20 scroll-mt-28">
+            <p className="font-barlow font-medium text-[12px] tracking-[0.2em] uppercase text-[#111]/50 mb-4">
+              ( FAQ )
+            </p>
+            <h2 className="font-instrument text-[32px] md:text-[44px] leading-tight text-[#111] mb-8">
+              Frequently asked questions
+            </h2>
+            <div className="divide-y divide-black/10 border-y border-black/10">
+              {config.faqs.map((f) => (
+                <details key={f.q} className="group py-5">
+                  <summary className="cursor-pointer list-none flex items-start justify-between gap-4 font-instrument text-[20px] md:text-[24px] leading-snug text-[#111]">
+                    <span>{f.q}</span>
+                    <span className="font-barlow text-[20px] text-[#111]/40 transition-transform group-open:rotate-45 mt-1">
+                      +
+                    </span>
+                  </summary>
+                  <p className="mt-3 font-barlow text-[16px] leading-relaxed text-[#111]/70">
+                    {f.a}
+                  </p>
+                </details>
+              ))}
+            </div>
+          </section>
+        )}
       </SeoLayout>
     </>
   );
