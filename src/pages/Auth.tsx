@@ -62,16 +62,18 @@ const Auth = () => {
 
   const google = async () => {
     setSubmitting(true);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/app`,
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/app`,
+        queryParams: { prompt: "select_account" },
+      },
     });
-    if (result.error) {
+    if (error) {
       toast.error("Google sign-in failed");
       setSubmitting(false);
-      return;
     }
-    if (result.redirected) return;
-    navigate("/app", { replace: true });
+    // Browser will redirect to Google
   };
 
   return (
