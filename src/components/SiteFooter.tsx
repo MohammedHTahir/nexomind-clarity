@@ -23,6 +23,8 @@ const SiteFooter = () => {
             <li><Link to="/how-to-stop-overthinking" className="hover:text-white transition-colors">How to stop overthinking</Link></li>
             <li><Link to="/mental-clarity" className="hover:text-white transition-colors">Mental clarity</Link></li>
             <li><Link to="/ai-journaling" className="hover:text-white transition-colors">AI journaling</Link></li>
+            <li><Link to="/ai-journaling-for-anxiety" className="hover:text-white transition-colors">AI journaling for anxiety</Link></li>
+            <li><Link to="/private-ai-journaling" className="hover:text-white transition-colors">Private AI journaling</Link></li>
           </ul>
         </div>
 

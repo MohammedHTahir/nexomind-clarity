@@ -6,6 +6,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 const requiredSeoFile = readFileSync(resolve(root, "src/pages/seo/requiredSeoPages.ts"), "utf8");
 const seoPagesFile = readFileSync(resolve(root, "src/pages/seo/seoPages.ts"), "utf8");
+const targetSeoFile = readFileSync(resolve(root, "src/pages/seo/targetSeoPages.ts"), "utf8");
 const programmaticFile = readFileSync(resolve(root, "src/pages/seo/programmatic.ts"), "utf8");
 
 const extractPaths = (source) =>
@@ -28,13 +29,19 @@ const programmaticPaths = intents.flatMap((intent) =>
   ),
 );
 
-const staticPaths = ["/", "/about", "/contact", "/privacy-policy", "/terms-of-service"];
+const staticPaths = ["/", "/about", "/contact", "/privacy-policy", "/terms-of-service", "/terms"];
 
 const paths = Array.from(
-  new Set([...staticPaths, ...extractPaths(requiredSeoFile), ...extractPaths(seoPagesFile), ...programmaticPaths]),
+  new Set([
+    ...staticPaths,
+    ...extractPaths(requiredSeoFile),
+    ...extractPaths(seoPagesFile),
+    ...extractPaths(targetSeoFile),
+    ...programmaticPaths,
+  ]),
 );
 
-const siteUrl = "https://nexomind.app";
+const siteUrl = "https://www.nexomind.ai";
 const today = new Date().toISOString().slice(0, 10);
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
