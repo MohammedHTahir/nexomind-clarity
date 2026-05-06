@@ -113,6 +113,9 @@ export const requiredSeoPages: SeoPageConfig[] = [
       "Mental clarity is not an empty mind. It is the moment your thoughts finally make sense.",
     answerBox:
       "Mental clarity is not the absence of thought — it is the ability to separate what happened, what you felt, and what your mind is protecting you from. AI journaling reaches it faster by externalizing the loop and naming the emotion underneath, in three minutes a day.",
+    hook: "Clarity isn't a quieter mind. It's a mind that knows where to put what it's holding.",
+    widget: "clarity-quiz",
+    ctaText: "Start your first reflection and feel the shift.",
     sections: [
       {
         h2: "What mental clarity really means",
@@ -245,34 +248,45 @@ export const requiredSeoPages: SeoPageConfig[] = [
   },
   {
     path: "/how-to-stop-overthinking",
-    metaTitle: "How to Stop Overthinking — A Calm Guide | NexoMind",
+    metaTitle: "How to Stop Overthinking (When Your Brain Won't Shut Off) | NexoMind",
     metaDescription:
-      "A calm, practical guide to stop overthinking. Learn what loops mean, how to interrupt them, and how AI reflection can help in seconds.",
+      "Stuck in a thought loop your brain won't release? Learn the calm, AI-guided way to stop overthinking and turn racing thoughts into clarity in minutes.",
     eyebrow: "How to Stop Overthinking",
-    title: "How to stop",
-    italic: "overthinking.",
+    title: "How to Stop Overthinking",
+    italic: "(When Your Brain Won't Shut Off)",
     intro:
-      "Overthinking isn't a flaw. It's a loop with nowhere to land. This is the calm, practical version of how to interrupt it — without forcing yourself to feel okay.",
+      "Overthinking isn't a flaw. It's a loop with nowhere to land. Below: why it happens, how to interrupt it, and a tool that does the structuring step your mind keeps skipping.",
     answerBox:
-      "To stop overthinking: write the loop down exactly as it sounds in your head, name the emotion underneath in one word, and let a short reflection close it. Most loops are unnamed feelings in disguise — and they release the moment they're identified.",
+      "Overthinking is a mental loop where unresolved thoughts repeat without reaching clarity. The most effective way to stop overthinking is to externalize your thoughts and process them into structured insights. AI journaling helps break this cycle by identifying patterns, reducing cognitive load, and guiding your mind toward resolution.",
+    hook: "If your mind keeps replaying conversations, imagining outcomes, or refusing to switch off at night — you're stuck in a loop your brain hasn't finished processing.",
+    widget: "overthinking-analyzer",
+    ctaText: "Start your first reflection and break the loop instantly.",
     sections: [
       {
-        h2: "Name what's underneath",
-        body: "Most loops aren't logical problems — they're emotions in disguise. Before trying to solve the thought, name the feeling: fear, guilt, pressure, resentment, uncertainty. Naming it gives the loop somewhere to land.",
+        h2: "Why your brain won't shut off",
+        body: "Overthinking is rarely about having too many thoughts. It's a sign that something emotional hasn't been processed yet. The mind keeps circling because the feeling underneath the thought hasn't been named — so the loop never closes.",
+      },
+      {
+        h2: "Name what's underneath the loop",
+        body: "Most loops aren't logical problems — they're emotions in disguise: fear, guilt, pressure, resentment, uncertainty. Naming the feeling in one word gives the loop somewhere to land. That single act usually softens it more than ten minutes of arguing with yourself.",
       },
       {
         h2: "Get the loop out of your head",
-        body: "Write the thought exactly as it sounds. Don't soften it, don't organize it. Once it's outside your head, it stops feeling infinite — it becomes a sentence you can actually look at.",
+        body: "Write the thought exactly as it sounds. Don't soften it. Don't organize it. Once it's outside your head, it stops feeling infinite — it becomes a sentence you can actually look at. This is the step free-form journaling almost gets right.",
       },
       {
         h2: "Let reflection do the structuring",
-        body: "NexoMind reads what you wrote and reflects it back as a short summary, emotional state, and one grounded takeaway — so the loop becomes something you understand instead of something you're stuck inside.",
+        body: "NexoMind reads what you wrote and reflects it back as a short summary, the emotional state underneath, the cognitive pattern, and one grounded takeaway. The loop becomes something you understand instead of something you're stuck inside. Most people feel a shift inside three minutes.",
+      },
+      {
+        h2: "Pair it with mental clarity practices",
+        body: "Stopping overthinking is short-term. Building mental clarity is long-term. Once the loop is broken, daily 3-minute reflection keeps your baseline calm — fewer spirals, faster decisions, quieter nights.",
       },
     ],
     faqs: [
       {
         q: "How long does it take to stop overthinking?",
-        a: "Individual loops often loosen in minutes once externalized. The baseline shifts within 1–2 weeks of daily reflection.",
+        a: "Individual loops often loosen within minutes once externalized and named. Your baseline shifts within 1–2 weeks of daily reflection.",
       },
       {
         q: "Is meditation or journaling better for overthinking?",
@@ -282,37 +296,52 @@ export const requiredSeoPages: SeoPageConfig[] = [
         q: "Can AI really help me think more clearly?",
         a: "When it's used for reflection rather than chat. NexoMind names the emotion and pattern, which is the step most overthinkers skip.",
       },
+      {
+        q: "Why does overthinking get worse at night?",
+        a: "Because daytime distractions disappear and your mind reaches for whatever wasn't processed earlier. A short reflection before bed closes the page.",
+      },
     ],
     related: [
-      { to: "/why-do-i-overthink", label: "Why do I overthink?", desc: "What recurring thoughts are really asking for." },
+      { to: "/mental-clarity", label: "Find mental clarity", desc: "What clarity actually feels like — and how to reach it." },
+      { to: "/ai-journaling", label: "AI journaling, explained", desc: "How structured reflection turns thoughts into clarity." },
       { to: "/overthinking-at-night", label: "Overthinking at night", desc: "Why thoughts get louder when the day goes quiet." },
-      { to: "/clear-your-mind", label: "Clear your mind", desc: "Simple, calm methods for quieter days." },
     ],
   },
   {
     path: "/ai-journaling",
-    metaTitle: "AI Journaling — A Calmer Way to Reflect | NexoMind",
+    metaTitle: "AI Journaling: Turn Thoughts Into Clarity Instantly | NexoMind",
     metaDescription:
-      "AI journaling turns messy thoughts into structured insight. Learn how it works and why NexoMind keeps it private, gentle, and fast.",
+      "AI journaling turns messy thoughts into structured insight in minutes. Private, gentle, fast — built for clarity, not streaks.",
     eyebrow: "AI Journaling",
-    title: "AI journaling,",
-    italic: "explained.",
+    title: "AI Journaling:",
+    italic: "Turn Thoughts Into Clarity Instantly",
     intro:
-      "AI journaling isn't a chatbot and it isn't a blank page. It's a quiet way to turn what you're already thinking into something you can actually see.",
+      "AI journaling isn't a chatbot and it isn't a blank page. It's a quiet way to turn what you're already thinking into something you can actually understand.",
     answerBox:
-      "AI journaling is a private practice where you write what's on your mind and an AI reflects it back as a calm summary, the emotion underneath, the pattern, and one grounded takeaway — so messy thoughts become understandable in three minutes, without performance or streaks.",
+      "AI journaling is a method of processing thoughts using artificial intelligence to generate structured insights. Unlike traditional journaling, it actively helps identify patterns, reduce overthinking, and guide users toward mental clarity through real-time reflection and analysis.",
+    hook: "Writing your thoughts down helps. But understanding them is what actually changes how you feel.",
+    widget: "instant-ai-demo",
+    ctaText: "Turn your next thought into clarity.",
     sections: [
       {
         h2: "What AI journaling actually is",
-        body: "You write the way you'd write to yourself — in fragments, full paragraphs, half-thoughts. The AI reads it and reflects back a summary, the emotion underneath, the pattern, and a single gentle takeaway.",
+        body: "You write the way you'd write to yourself — fragments, paragraphs, half-thoughts. The AI reads it and reflects back a calm summary, the emotion underneath, the recurring pattern, and one grounded takeaway. No advice. No performance.",
       },
       {
         h2: "Why it works when traditional journaling doesn't",
-        body: "Traditional journaling asks you to know what to write about. AI journaling doesn't. You bring the mess. The structure comes back to you — without advice, without performance, without streaks to maintain.",
+        body: "Traditional journaling asks you to know what to write about. AI journaling doesn't. You bring the mess; the structure comes back to you. That structuring step — naming what's underneath the words — is where clarity actually lives.",
+      },
+      {
+        h2: "How NexoMind reflects your thought",
+        body: "Every entry returns: a one-sentence summary of what you wrote, the dominant emotion, the cognitive pattern at play, and a gentle suggested reflection. It's the difference between writing into a void and writing into a mirror.",
+      },
+      {
+        h2: "Built for the moment, not the streak",
+        body: "There are no streaks to protect. No mood scores to game. AI journaling works in three honest minutes — even on the days you almost don't open the app.",
       },
       {
         h2: "Private by design",
-        body: "Your reflections aren't used to train public models. They're encrypted, only visible to you, and easy to delete. The point of journaling is honesty — and honesty needs privacy.",
+        body: "Entries are encrypted, never sold, and never used to train public AI models. Honest reflection requires privacy — that's the foundation, not a feature.",
       },
     ],
     faqs: [
@@ -334,9 +363,9 @@ export const requiredSeoPages: SeoPageConfig[] = [
       },
     ],
     related: [
-      { to: "/ai-journaling-app", label: "AI journaling app", desc: "How NexoMind structures your reflections." },
-      { to: "/ai-journaling-for-anxiety", label: "AI journaling for anxiety", desc: "How structured reflection lowers spirals." },
-      { to: "/private-ai-journaling", label: "Private AI journaling", desc: "Why privacy is the foundation, not a feature." },
+      { to: "/how-to-stop-overthinking", label: "How to stop overthinking", desc: "Break the loop with structured reflection." },
+      { to: "/mental-clarity", label: "Find mental clarity", desc: "Turn scattered thoughts into calm understanding." },
+      { to: "/private-ai-journaling", label: "Private AI journaling", desc: "Why privacy is the foundation here." },
     ],
   },
 ];
