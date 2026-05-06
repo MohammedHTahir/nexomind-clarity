@@ -162,6 +162,13 @@ const SeoPage = ({ config }: { config: SeoPageConfig }) => {
           )}
         </div>
 
+        {/* Hook */}
+        {config.hook && (
+          <p className="mb-12 font-instrument italic text-[24px] md:text-[30px] leading-snug text-[#111]/85 border-l-2 border-[#111]/15 pl-5">
+            {config.hook}
+          </p>
+        )}
+
         {/* Table of contents */}
         {toc.length > 1 && (
           <nav
@@ -206,6 +213,31 @@ const SeoPage = ({ config }: { config: SeoPageConfig }) => {
           })}
         </div>
 
+        {/* Interactive widget */}
+        {config.widget && (
+          <Suspense fallback={<div className="h-40" aria-hidden />}>
+            {config.widget === "overthinking-analyzer" && <OverthinkingAnalyzer />}
+            {config.widget === "instant-ai-demo" && (
+              <div className="my-16">
+                <InstantAiDemo />
+              </div>
+            )}
+            {config.widget === "clarity-quiz" && <ClarityQuiz />}
+          </Suspense>
+        )}
+
+        {/* Bottom CTA */}
+        <div className="mt-16 rounded-[24px] bg-[#111] text-white p-8 md:p-12 text-center">
+          <p className="font-instrument text-[28px] md:text-[36px] leading-tight mb-6">
+            {config.ctaText ?? "Start your first reflection and break the loop instantly."}
+          </p>
+          <Link
+            to="/auth"
+            className="inline-block bg-white text-[#111] rounded-full px-8 py-4 font-barlow font-medium text-[15px] hover:bg-white/90 transition"
+          >
+            Open NexoMind →
+          </Link>
+        </div>
         {/* FAQ */}
         {config.faqs && config.faqs.length > 0 && (
           <section id="faq" className="mt-20 scroll-mt-28">
