@@ -365,3 +365,4 @@ export const requiredSeoPages: SeoPageConfig[] = [
       { to: "/private-ai-journaling", label: "Private AI journaling", desc: "Why privacy is the foundation here." },
     ],
   },
+];
