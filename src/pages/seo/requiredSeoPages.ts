@@ -113,6 +113,9 @@ export const requiredSeoPages: SeoPageConfig[] = [
       "Mental clarity is not an empty mind. It is the moment your thoughts finally make sense.",
     answerBox:
       "Mental clarity is not the absence of thought — it is the ability to separate what happened, what you felt, and what your mind is protecting you from. AI journaling reaches it faster by externalizing the loop and naming the emotion underneath, in three minutes a day.",
+    hook: "Clarity isn't a quieter mind. It's a mind that knows where to put what it's holding.",
+    widget: "clarity-quiz",
+    ctaText: "Start your first reflection and feel the shift.",
     sections: [
       {
         h2: "What mental clarity really means",
