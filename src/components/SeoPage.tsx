@@ -1,10 +1,17 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, lazy, Suspense } from "react";
+import { Link } from "react-router-dom";
 import Seo from "@/components/Seo";
 import SeoLayout from "@/components/SeoLayout";
+
+const OverthinkingAnalyzer = lazy(() => import("@/components/seo/OverthinkingAnalyzer"));
+const InstantAiDemo = lazy(() => import("@/components/seo/InstantAiDemo"));
+const ClarityQuiz = lazy(() => import("@/components/seo/ClarityQuiz"));
 
 type Section = { h2: string; body: string };
 type Related = { to: string; label: string; desc: string };
 type Faq = { q: string; a: string };
+
+export type SeoWidget = "overthinking-analyzer" | "instant-ai-demo" | "clarity-quiz";
 
 export interface SeoPageConfig {
   path: string;
@@ -18,8 +25,14 @@ export interface SeoPageConfig {
   related: Related[];
   /** 40–60 word definition shown at top — optimized for AI answer boxes (Perplexity, ChatGPT, Google AIO). */
   answerBox?: string;
+  /** Optional hook — short emotional opening shown above the body content. */
+  hook?: string;
   /** 3–5 FAQs — rendered as a section + emitted as FAQPage JSON-LD. */
   faqs?: Faq[];
+  /** Optional interactive widget slug. Lazy-loaded. */
+  widget?: SeoWidget;
+  /** Optional CTA text shown after content. */
+  ctaText?: string;
 }
 
 const slugify = (s: string) =>
