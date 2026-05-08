@@ -42,7 +42,6 @@ const AppShell = ({ children }: { children: ReactNode }) => {
 
   return (
     <div className="min-h-screen bg-[#F3F4ED] text-[#111] relative overflow-hidden">
-      <PaymentTestModeBanner />
       {isPastDue && (
         <div className="w-full bg-amber-100 border-b border-amber-300 px-4 py-2 text-center text-[13px] text-amber-900 relative z-40">
           Your last payment failed. We're retrying — please update your card to keep your access.{" "}
