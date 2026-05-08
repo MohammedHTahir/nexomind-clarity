@@ -26,8 +26,21 @@ const PremiumGate = ({ children, title, subtitle, bypass }: PremiumGateProps) =>
   const { isPremium, loading } = useSubscription();
   const [paywallOpen, setPaywallOpen] = useState(false);
 
-  if (bypass || isPremium || loading) {
+  if (bypass || isPremium) {
     return <>{children}</>;
+  }
+
+  // While we don't yet know the subscription status, hide the gated content
+  // entirely (instead of flashing it through the blur) and show a quiet
+  // placeholder. The realtime + focus refetch in useSubscription will resolve
+  // this within a render or two.
+  if (loading) {
+    return (
+      <div
+        aria-hidden
+        className="rounded-[20px] border border-black/5 bg-white/40 backdrop-blur-sm h-[180px] animate-pulse"
+      />
+    );
   }
 
   return (
