@@ -4,7 +4,6 @@ import { ReactNode, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { useSubscription } from "@/hooks/useSubscription";
-import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { toast } from "sonner";
 
 const ease = [0.16, 1, 0.3, 1] as const;
