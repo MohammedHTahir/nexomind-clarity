@@ -244,10 +244,7 @@ const Dashboard = () => {
 
         <PaywallModal
           open={paywallOpen}
-          onUnlock={() => {
-            setPaywallOpen(false);
-            toast.info("Payment setup is ready to activate.");
-          }}
+          onUnlock={() => setPaywallOpen(false)}
           onContinue={() => setPaywallOpen(false)}
         />
 

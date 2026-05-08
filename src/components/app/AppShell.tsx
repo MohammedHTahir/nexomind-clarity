@@ -1,6 +1,10 @@
 import { NavLink, Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { getStripeEnvironment } from "@/lib/stripe";
+import { useSubscription } from "@/hooks/useSubscription";
+import { toast } from "sonner";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -13,9 +17,42 @@ const nav = [
 
 const AppShell = ({ children }: { children: ReactNode }) => {
   const { pathname } = useLocation();
+  const { isPastDue } = useSubscription();
+  const [openingPortal, setOpeningPortal] = useState(false);
+
+  const openPortal = async () => {
+    if (openingPortal) return;
+    setOpeningPortal(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-portal-session", {
+        body: {
+          environment: getStripeEnvironment(),
+          returnUrl: window.location.href,
+        },
+      });
+      if (error || !data?.url) throw new Error(error?.message || "Failed to open billing portal");
+      window.open(data.url, "_blank", "noopener,noreferrer");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not open billing portal");
+    } finally {
+      setOpeningPortal(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#F3F4ED] text-[#111] relative overflow-hidden">
+      {isPastDue && (
+        <div className="w-full bg-amber-100 border-b border-amber-300 px-4 py-2 text-center text-[13px] text-amber-900 relative z-40">
+          Your last payment failed. We're retrying — please update your card to keep your access.{" "}
+          <button
+            onClick={openPortal}
+            disabled={openingPortal}
+            className="underline font-medium hover:text-amber-950 disabled:opacity-60"
+          >
+            {openingPortal ? "Opening…" : "Update payment method"}
+          </button>
+        </div>
+      )}
       {/* Soft ambient gradients (subtle, matches landing calm) */}
       <div
         aria-hidden
