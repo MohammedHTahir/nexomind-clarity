@@ -1,5 +1,7 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-import Stripe from "https://esm.sh/stripe@17.5.0?target=deno";
+// Creates a Stripe Embedded Checkout session for NexoMind Premium.
+// Returns { clientSecret } for the EmbeddedCheckoutProvider on the frontend.
+
+import { type StripeEnv, createStripeClient } from "../_shared/stripe.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -7,82 +9,116 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+async function resolveOrCreateCustomer(
+  stripe: ReturnType<typeof createStripeClient>,
+  options: { email?: string; userId?: string },
+): Promise<string> {
+  if (options.userId && !/^[a-zA-Z0-9_-]+$/.test(options.userId)) {
+    throw new Error("Invalid userId");
+  }
+  if (options.userId) {
+    const found = await stripe.customers.search({
+      query: `metadata['userId']:'${options.userId}'`,
+      limit: 1,
+    });
+    if (found.data.length) return found.data[0].id;
+  }
+  if (options.email) {
+    const existing = await stripe.customers.list({ email: options.email, limit: 1 });
+    if (existing.data.length) {
+      const customer = existing.data[0];
+      if (options.userId && customer.metadata?.userId !== options.userId) {
+        await stripe.customers.update(customer.id, {
+          metadata: { ...customer.metadata, userId: options.userId },
+        });
+      }
+      return customer.id;
+    }
+  }
+  const created = await stripe.customers.create({
+    ...(options.email && { email: options.email }),
+    ...(options.userId && { metadata: { userId: options.userId } }),
+  });
+  return created.id;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method !== "POST") {
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
 
   try {
-    const STRIPE_SECRET_KEY = Deno.env.get("STRIPE_SECRET_KEY");
-    const STRIPE_PRICE_ID = Deno.env.get("STRIPE_PRICE_ID");
-    if (!STRIPE_SECRET_KEY) throw new Error("STRIPE_SECRET_KEY not configured");
-    if (!STRIPE_PRICE_ID) throw new Error("STRIPE_PRICE_ID not configured");
+    const body = await req.json();
+    const {
+      priceId,
+      quantity,
+      customerEmail,
+      userId,
+      returnUrl,
+      environment,
+    } = body ?? {};
 
-    // Authenticate caller
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
+    if (!priceId || !/^[a-zA-Z0-9_-]+$/.test(priceId)) {
+      return new Response(JSON.stringify({ error: "Invalid priceId" }), {
+        status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } },
-    );
-    const { data: userData, error: userErr } = await supabase.auth.getUser();
-    if (userErr || !userData?.user?.email) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
+    if (environment !== "sandbox" && environment !== "live") {
+      return new Response(JSON.stringify({ error: "Invalid environment" }), {
+        status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const user = userData.user;
-
-    const stripe = new Stripe(STRIPE_SECRET_KEY, { apiVersion: "2024-11-20.acacia" });
-
-    // Reuse existing customer if we have one
-    const admin = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-    );
-    const { data: existingSub } = await admin
-      .from("subscriptions")
-      .select("stripe_customer_id")
-      .eq("user_id", user.id)
-      .maybeSingle();
-
-    let customerId = existingSub?.stripe_customer_id ?? undefined;
-    if (!customerId) {
-      // Try to find by email (e.g. previous purchases)
-      const found = await stripe.customers.list({ email: user.email, limit: 1 });
-      customerId = found.data[0]?.id;
+    if (!returnUrl || typeof returnUrl !== "string") {
+      return new Response(JSON.stringify({ error: "Invalid returnUrl" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    const origin = req.headers.get("origin") ?? "https://nexomind.app";
+    const env: StripeEnv = environment;
+    const stripe = createStripeClient(env);
+
+    const prices = await stripe.prices.list({ lookup_keys: [priceId] });
+    if (!prices.data.length) {
+      return new Response(JSON.stringify({ error: "Price not found" }), {
+        status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const stripePrice = prices.data[0];
+    const isRecurring = stripePrice.type === "recurring";
+
+    const customerId = (customerEmail || userId)
+      ? await resolveOrCreateCustomer(stripe, { email: customerEmail, userId })
+      : undefined;
 
     const session = await stripe.checkout.sessions.create({
-      mode: "subscription",
-      customer: customerId,
-      customer_email: customerId ? undefined : user.email,
-      line_items: [{ price: STRIPE_PRICE_ID, quantity: 1 }],
-      client_reference_id: user.id,
-      metadata: { user_id: user.id },
-      subscription_data: { metadata: { user_id: user.id } },
-      allow_promotion_codes: true,
-      success_url: `${origin}/app?checkout=success`,
-      cancel_url: `${origin}/app?checkout=cancelled`,
+      line_items: [{ price: stripePrice.id, quantity: quantity || 1 }],
+      mode: isRecurring ? "subscription" : "payment",
+      ui_mode: "embedded_page",
+      return_url: returnUrl,
+      ...(customerId && { customer: customerId }),
+      managed_payments: { enabled: true },
+      ...(userId && {
+        metadata: { userId, managed_payments: "true" },
+        ...(isRecurring && { subscription_data: { metadata: { userId } } }),
+      }),
     });
 
-    return new Response(JSON.stringify({ url: session.url }), {
-      status: 200,
+    return new Response(JSON.stringify({ clientSecret: session.client_secret }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("create-checkout error", e);
-    const msg = e instanceof Error ? e.message : "Unknown error";
-    return new Response(JSON.stringify({ error: msg }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ error: e instanceof Error ? e.message : "Server error" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
   }
 });
