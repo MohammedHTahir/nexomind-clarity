@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { getStripeEnvironment } from "@/lib/stripe";
 
 type SubRow = {
   status: string;
@@ -9,7 +10,8 @@ type SubRow = {
   price_id: string | null;
 };
 
-const ACTIVE_STATUSES = ["active", "trialing"];
+// active / trialing / past_due → user keeps access (Stripe auto-retries past_due).
+const ACTIVE_STATUSES = ["active", "trialing", "past_due"];
 
 export const useSubscription = () => {
   const { user } = useAuth();
@@ -27,6 +29,9 @@ export const useSubscription = () => {
       .from("subscriptions")
       .select("status, current_period_end, cancel_at_period_end, price_id")
       .eq("user_id", user.id)
+      .eq("environment", getStripeEnvironment())
+      .order("created_at", { ascending: false })
+      .limit(1)
       .maybeSingle();
     if (error) console.error("useSubscription:", error);
     setSubscription((data as SubRow | null) ?? null);
@@ -37,7 +42,7 @@ export const useSubscription = () => {
     load();
   }, [load]);
 
-  // Realtime: auto-unlock when webhook updates the row
+  // Realtime: refetch (with env filter) when the row changes.
   useEffect(() => {
     if (!user) return;
     const channel = supabase
@@ -50,37 +55,48 @@ export const useSubscription = () => {
           table: "subscriptions",
           filter: `user_id=eq.${user.id}`,
         },
-        (payload) => {
-          const row = (payload.new ?? payload.old) as SubRow | null;
-          setSubscription(row ?? null);
+        () => {
+          load();
         },
       )
       .subscribe();
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, load]);
 
-  // Refresh on tab focus (user returning from Stripe Checkout)
+  // Refresh when the user comes back to the tab (e.g. from checkout).
   useEffect(() => {
     const onFocus = () => load();
     window.addEventListener("focus", onFocus);
     return () => window.removeEventListener("focus", onFocus);
   }, [load]);
 
+  const periodEnd = subscription?.current_period_end
+    ? new Date(subscription.current_period_end)
+    : null;
+  const withinPeriod = !periodEnd || periodEnd > new Date();
+
+  // Cancellation: keep access until current_period_end.
   const isActive = !!(
     subscription &&
-    ACTIVE_STATUSES.includes(subscription.status) &&
-    (!subscription.current_period_end ||
-      new Date(subscription.current_period_end) > new Date())
+    ((ACTIVE_STATUSES.includes(subscription.status) && withinPeriod) ||
+      (subscription.status === "canceled" && periodEnd && periodEnd > new Date()))
   );
+
+  const isPastDue = subscription?.status === "past_due";
+  const isCanceling =
+    !!subscription?.cancel_at_period_end || subscription?.status === "canceled";
 
   return {
     subscription,
     isPremium: isActive,
+    isPastDue,
+    isCanceling,
     loading,
     refresh: load,
   };
 };
 
 export default useSubscription;
+
