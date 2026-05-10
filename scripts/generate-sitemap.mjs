@@ -1,6 +1,7 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { execSync } from "node:child_process";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -29,7 +30,8 @@ const programmaticPaths = intents.flatMap((intent) =>
   ),
 );
 
-const staticPaths = ["/", "/about", "/contact", "/privacy-policy", "/terms-of-service", "/terms"];
+// Note: /terms removed (it's a duplicate of /terms-of-service and now 301-redirects to it)
+const staticPaths = ["/", "/about", "/founder", "/contact", "/privacy-policy", "/terms-of-service"];
 
 const paths = Array.from(
   new Set([
@@ -41,19 +43,52 @@ const paths = Array.from(
   ]),
 );
 
-const siteUrl = "https://www.nexomind.ai";
+// Real per-file lastmod from git history; fall back to today if git is unavailable.
 const today = new Date().toISOString().slice(0, 10);
+
+const gitLastMod = (filePath) => {
+  if (!existsSync(filePath)) return today;
+  try {
+    const out = execSync(`git log -1 --format=%cI -- "${filePath}"`, {
+      cwd: root,
+      stdio: ["ignore", "pipe", "ignore"],
+    })
+      .toString()
+      .trim();
+    return out ? out.slice(0, 10) : today;
+  } catch {
+    return today;
+  }
+};
+
+// Map a URL path to the source file most likely to determine its last modified date.
+const sourceFor = (path) => {
+  if (path === "/") return "src/pages/Index.tsx";
+  if (path === "/about") return "src/pages/About.tsx";
+  if (path === "/founder") return "src/pages/Founder.tsx";
+  if (path === "/contact") return "src/pages/Contact.tsx";
+  if (path === "/privacy-policy") return "src/pages/PrivacyPolicy.tsx";
+  if (path === "/terms-of-service") return "src/pages/TermsOfService.tsx";
+  if (path === "/stop-overthinking") return "src/pages/seo/StopOverthinking.tsx";
+  if (path === "/ai-journaling-app") return "src/pages/seo/AiJournalingApp.tsx";
+  if (path === "/mental-clarity") return "src/pages/seo/MentalClarity.tsx";
+  // Programmatic and dynamic SEO pages all derive from these data files
+  return "src/pages/seo/seoPages.ts";
+};
+
+const siteUrl = "https://www.nexomind.ai";
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${paths
-  .map(
-    (path) => `  <url>
+  .map((path) => {
+    const lastmod = gitLastMod(resolve(root, sourceFor(path)));
+    return `  <url>
     <loc>${siteUrl}${path}</loc>
-    <lastmod>${today}</lastmod>
+    <lastmod>${lastmod}</lastmod>
     <changefreq>${path === "/" ? "weekly" : "monthly"}</changefreq>
     <priority>${path === "/" ? "1.0" : "0.8"}</priority>
-  </url>`,
-  )
+  </url>`;
+  })
   .join("\n")}
 </urlset>
 `;
