@@ -51,6 +51,9 @@ const Settings = () => {
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [openingPortal, setOpeningPortal] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [confirmDeleteAccount, setConfirmDeleteAccount] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
 
   const planLabel =
     (subscription?.price_id && PLAN_LABEL[subscription.price_id]) ||
