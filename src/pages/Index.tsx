@@ -1,45 +1,48 @@
 import { lazy, Suspense } from "react";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import About from "@/components/About";
-import AiDemo from "@/components/AiDemo";
-import Features from "@/components/Features";
-import Testimonials from "@/components/Testimonials";
-import FAQ from "@/components/FAQ";
-import BlogPreview from "@/components/BlogPreview";
-import FooterCTA from "@/components/FooterCTA";
-import SiteFooter from "@/components/SiteFooter";
 
+// Below-the-fold — lazy load to slim the initial JS bundle
+const About = lazy(() => import("@/components/About"));
+const AiDemo = lazy(() => import("@/components/AiDemo"));
+const Features = lazy(() => import("@/components/Features"));
+const Testimonials = lazy(() => import("@/components/Testimonials"));
+const FAQ = lazy(() => import("@/components/FAQ"));
+const BlogPreview = lazy(() => import("@/components/BlogPreview"));
+const FooterCTA = lazy(() => import("@/components/FooterCTA"));
+const SiteFooter = lazy(() => import("@/components/SiteFooter"));
 const InstantAiDemo = lazy(() => import("@/components/seo/InstantAiDemo"));
+
+const Fallback = () => <div className="h-32" aria-hidden />;
 
 const Index = () => {
   return (
     <main className="min-h-screen bg-[#F3F4ED]">
       <Navbar />
       <Hero />
-      <About />
-      <AiDemo />
+      <Suspense fallback={<Fallback />}>
+        <About />
+        <AiDemo />
 
-      {/* Live AI demo — interactive, ranks for engagement signals */}
-      <section className="px-6 py-24 bg-[#F3F4ED]">
-        <div className="max-w-4xl mx-auto">
-          <Suspense fallback={<div className="h-64" aria-hidden />}>
+        {/* Live AI demo — interactive, ranks for engagement signals */}
+        <section className="px-6 py-24 bg-[#F3F4ED]">
+          <div className="max-w-4xl mx-auto">
             <InstantAiDemo
               variant="dark"
               heading="See it in real time."
               subheading="Type a thought. Watch NexoMind reflect it back as clarity."
               placeholder="What's looping in your head right now?"
             />
-          </Suspense>
-        </div>
-      </section>
+          </div>
+        </section>
 
-      <Features />
-      <Testimonials />
-      <FAQ />
-      <BlogPreview />
-      <FooterCTA />
-      <SiteFooter />
+        <Features />
+        <Testimonials />
+        <FAQ />
+        <BlogPreview />
+        <FooterCTA />
+        <SiteFooter />
+      </Suspense>
     </main>
   );
 };
