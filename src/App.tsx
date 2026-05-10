@@ -25,6 +25,7 @@ const TermsOfService = lazy(() => import("./pages/TermsOfService.tsx"));
 const CheckoutReturn = lazy(() => import("./pages/CheckoutReturn.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 const Blog = lazy(() => import("./pages/Blog.tsx"));
+const BlogPost = lazy(() => import("./pages/BlogPost.tsx"));
 const Pricing = lazy(() => import("./pages/Pricing.tsx"));
 
 const queryClient = new QueryClient();
