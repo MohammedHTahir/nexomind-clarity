@@ -176,6 +176,19 @@ const Settings = () => {
           ))}
         </div>
 
+        <GlassCard className="p-7 mb-4" delay={0.22}>
+          <h2 className="font-instrument text-[24px] mb-2">Analytics</h2>
+          <p className="font-barlow text-[14px] text-[#111]/60 leading-relaxed mb-5">
+            You control what data is shared. We only use privacy-friendly analytics to understand how people find clarity. No ads, no selling data.
+          </p>
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent("nm:show-consent"))}
+            className="bg-white/70 backdrop-blur-md border border-black/10 text-[#111] rounded-full px-6 py-2.5 font-barlow font-medium text-[13px] hover:bg-white transition-colors"
+          >
+            Manage analytics choices
+          </button>
+        </GlassCard>
+
         <GlassCard className="p-7 mb-4" delay={0.25}>
           <h2 className="font-instrument text-[24px] mb-2">Sign out</h2>
           <p className="font-barlow text-[14px] text-[#111]/60 leading-relaxed mb-5">
