@@ -8,6 +8,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import RequireAuth from "@/components/RequireAuth";
 import Index from "./pages/Index.tsx";
 import { PaymentTestModeBanner } from "./components/PaymentTestModeBanner";
+import ConsentBanner from "./components/ConsentBanner";
 
 const Auth = lazy(() => import("./pages/Auth.tsx"));
 const Onboarding = lazy(() => import("./pages/Onboarding.tsx"));
@@ -34,6 +35,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <PaymentTestModeBanner />
+          <ConsentBanner />
           <Suspense
             fallback={
               <div className="min-h-screen" style={{ backgroundColor: "#F3F4ED" }} />
