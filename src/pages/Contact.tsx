@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import SiteFooter from "@/components/SiteFooter";
 import Seo from "@/components/Seo";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const schema = z.object({
   name: z.string().trim().min(1, "Please enter your name").max(100),
@@ -15,7 +16,7 @@ const Contact = () => {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [sending, setSending] = useState(false);
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const parsed = schema.safeParse(form);
     if (!parsed.success) {
@@ -23,11 +24,29 @@ const Contact = () => {
       return;
     }
     setSending(true);
-    setTimeout(() => {
-      setSending(false);
+    try {
+      const id = crypto.randomUUID();
+      const { error: insertError } = await supabase
+        .from("contact_submissions")
+        .insert({ id, name: parsed.data.name, email: parsed.data.email, message: parsed.data.message });
+      if (insertError) throw insertError;
+
+      await supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "contact-confirmation",
+          recipientEmail: parsed.data.email,
+          idempotencyKey: `contact-confirm-${id}`,
+          templateData: { name: parsed.data.name, message: parsed.data.message },
+        },
+      });
+
       setForm({ name: "", email: "", message: "" });
-      toast.success("Thanks — we'll get back to you shortly.");
-    }, 600);
+      toast.success("Thanks — we'll get back to you shortly. Check your inbox for confirmation.");
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setSending(false);
+    }
   };
 
   return (

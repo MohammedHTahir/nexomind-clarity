@@ -28,6 +28,7 @@ const Blog = lazy(() => import("./pages/Blog.tsx"));
 const BlogPost = lazy(() => import("./pages/BlogPost.tsx"));
 const Pricing = lazy(() => import("./pages/Pricing.tsx"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword.tsx"));
+const Unsubscribe = lazy(() => import("./pages/Unsubscribe.tsx"));
 
 const queryClient = new QueryClient();
 const OAUTH_REDIRECT_KEY = "nexomind:oauth_redirect";
@@ -114,6 +115,7 @@ const App = () => (
               <Route path="/terms" element={<Navigate to="/terms-of-service" replace />} />
               <Route path="/checkout/return" element={<CheckoutReturn />} />
               <Route path="/pricing" element={<Pricing />} />
+              <Route path="/unsubscribe" element={<Unsubscribe />} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/:slug" element={<DynamicSeoPage />} />
