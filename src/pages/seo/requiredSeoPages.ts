@@ -204,6 +204,16 @@ export const requiredSeoPages: SeoPageConfig[] = [
         a: "Open writing can sometimes deepen rumination. Structured reflection — naming the feeling and closing the page — does the opposite.",
       },
     ],
+    howTo: {
+      name: "How to quiet overthinking at night",
+      description: "A 4-step bedtime method to release a thought loop so your mind can settle into sleep.",
+      steps: [
+        { name: "Get out of the loop, onto the page", text: "Keep a notebook or your phone nearby. Write the thought exactly as it sounds — unedited, even if it's messy." },
+        { name: "Name the emotion underneath", text: "In one word, name what the thought is really about: anxious, hurt, lonely, unsure. Don't justify or explain it." },
+        { name: "Give your mind a placeholder", text: "Write a single sentence: 'I'll come back to this tomorrow at [time].' This signals the brain that it doesn't need to keep guarding the thought." },
+        { name: "Lower the stimulation", text: "Dim the lights, slow your breathing (4 in, 6 out), and let the page hold the thought instead of your head. Sleep usually follows within 10–15 minutes." },
+      ],
+    },
     related: [
       { to: "/stop-overthinking", label: "How to stop overthinking", desc: "A calm approach to interrupting thought loops." },
       { to: "/how-to-stop-overthinking-at-night", label: "Stop overthinking at night", desc: "A 5-minute method for quieter nights." },
@@ -250,6 +260,16 @@ export const requiredSeoPages: SeoPageConfig[] = [
         a: "Probably not entirely — but you can dramatically reduce its grip. Daily reflection turns spirals into sentences.",
       },
     ],
+    howTo: {
+      name: "How to understand why you overthink",
+      description: "A 4-step reflection to decode what your overthinking is actually trying to tell you.",
+      steps: [
+        { name: "Catch the loop", text: "Notice the thought you keep returning to. Write it down word-for-word, without editing or making it sound reasonable." },
+        { name: "Look for the feeling, not the logic", text: "Ask: 'What emotion is this thought protecting?' Name it in one word — fear, guilt, pressure, sadness, uncertainty." },
+        { name: "Find the unmet need", text: "Underneath the feeling is usually a need: to be understood, to feel safe, to make the right choice. Write the need as a sentence: 'I need…' " },
+        { name: "Reframe with compassion", text: "Tell yourself: 'I overthink because I care, not because I'm broken.' Then close the page. The loop has been heard." },
+      ],
+    },
     related: [
       { to: "/overthinking-at-night", label: "Overthinking at night", desc: "Why loops often appear before sleep." },
       { to: "/ai-journaling-app", label: "AI journaling app", desc: "A private way to turn thoughts into insight." },
@@ -311,6 +331,17 @@ export const requiredSeoPages: SeoPageConfig[] = [
         a: "Because daytime distractions disappear and your mind reaches for whatever wasn't processed earlier. A short reflection before bed closes the page.",
       },
     ],
+    howTo: {
+      name: "How to stop overthinking when your brain won't shut off",
+      description: "A 5-step calm method to interrupt a runaway thought loop and turn it into clarity in minutes.",
+      steps: [
+        { name: "Externalize the loop", text: "Write the looping thought exactly as it sounds in your head — no softening, no organizing. Get it out so you can see it." },
+        { name: "Name the feeling underneath", text: "In one word, name the emotion the thought is hiding: fear, guilt, pressure, resentment, uncertainty. This is the step the mind keeps skipping." },
+        { name: "Identify the pattern", text: "Notice the shape of the loop: catastrophizing, replaying, future-tripping, mind-reading. Naming the pattern shrinks it." },
+        { name: "Reflect, don't argue", text: "Use NexoMind (or a structured prompt) to mirror the thought back as a summary, emotion, pattern, and one grounded takeaway. Reflection closes loops; arguing fuels them." },
+        { name: "Close the page", text: "Tell yourself: 'I've heard it. I'll come back if it matters tomorrow.' Then physically close the notebook or app. Most loops loosen within minutes." },
+      ],
+    },
     related: [
       { to: "/mental-clarity", label: "Find mental clarity", desc: "What clarity actually feels like — and how to reach it." },
       { to: "/ai-journaling", label: "AI journaling, explained", desc: "How structured reflection turns thoughts into clarity." },
