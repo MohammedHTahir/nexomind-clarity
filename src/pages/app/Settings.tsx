@@ -246,7 +246,21 @@ const Settings = () => {
           </button>
         </GlassCard>
 
-        <GlassCard className="p-7 mb-4" delay={0.25}>
+        <GlassCard className="p-7 mb-4" delay={0.24}>
+          <h2 className="font-instrument text-[24px] mb-2">Export your data</h2>
+          <p className="font-barlow text-[14px] text-[#111]/60 leading-relaxed mb-5">
+            Download a JSON file with everything tied to your account — your profile, every reflection, and every analysis. Yours to keep.
+          </p>
+          <button
+            onClick={handleExport}
+            disabled={exporting}
+            className="bg-white/70 backdrop-blur-md border border-black/10 text-[#111] rounded-full px-6 py-2.5 font-barlow font-medium text-[13px] hover:bg-white transition-colors disabled:opacity-50"
+          >
+            {exporting ? "Preparing…" : "Download my data"}
+          </button>
+        </GlassCard>
+
+        <GlassCard className="p-7 mb-4" delay={0.26}>
           <h2 className="font-instrument text-[24px] mb-2">Sign out</h2>
           <p className="font-barlow text-[14px] text-[#111]/60 leading-relaxed mb-5">
             End your session on this device. Your reflections stay safely in your account.
@@ -257,6 +271,79 @@ const Settings = () => {
           >
             Sign out
           </button>
+        </GlassCard>
+
+        <GlassCard className="p-7 mb-4 border-black/10" delay={0.3}>
+          <h2 className="font-instrument text-[24px] mb-2">Clear my reflections</h2>
+          <p className="font-barlow text-[14px] text-[#111]/60 leading-relaxed mb-5">
+            Removes every reflection and analysis from your account, but keeps the account itself.
+            {isPremium && !isCanceling
+              ? " Your subscription will also be set to cancel at the end of the current period — you won't be billed again."
+              : ""}{" "}
+            This can't be undone.
+          </p>
+          {!confirm ? (
+            <button
+              onClick={() => setConfirm(true)}
+              className="bg-white/70 backdrop-blur-md border border-black/10 text-[#111] rounded-full px-6 py-2.5 font-barlow font-medium text-[13px] hover:bg-white transition-colors"
+            >
+              Clear my reflections
+            </button>
+          ) : (
+            <div className="flex flex-wrap gap-3 items-center">
+              <span className="font-barlow text-[13px] text-[#111]/70">Are you sure?</span>
+              <button
+                onClick={handleDelete}
+                disabled={busy}
+                className="bg-[#111] text-white rounded-full px-5 py-2 font-barlow font-medium text-[13px] hover:bg-black transition-colors disabled:opacity-40"
+              >
+                {busy ? "Deleting…" : "Yes, delete"}
+              </button>
+              <button
+                onClick={() => setConfirm(false)}
+                className="text-[#111]/55 hover:text-[#111] font-barlow text-[13px] px-2 py-2 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
+        </GlassCard>
+
+        <GlassCard className="p-7 border-red-300/40" delay={0.34}>
+          <h2 className="font-instrument text-[24px] mb-2">Delete my account</h2>
+          <p className="font-barlow text-[14px] text-[#111]/60 leading-relaxed mb-5">
+            Permanently removes your account, every reflection, every analysis, and your profile.
+            {isPremium ? " Any active subscription will be canceled immediately — no further charges." : ""}{" "}
+            This is irreversible. Consider exporting your data first.
+          </p>
+          {!confirmDeleteAccount ? (
+            <button
+              onClick={() => setConfirmDeleteAccount(true)}
+              className="bg-white/70 backdrop-blur-md border border-red-300/60 text-red-700 rounded-full px-6 py-2.5 font-barlow font-medium text-[13px] hover:bg-white transition-colors"
+            >
+              Delete my account
+            </button>
+          ) : (
+            <div className="flex flex-wrap gap-3 items-center">
+              <span className="font-barlow text-[13px] text-[#111]/70">
+                This will erase everything forever. Continue?
+              </span>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deletingAccount}
+                className="bg-red-600 text-white rounded-full px-5 py-2 font-barlow font-medium text-[13px] hover:bg-red-700 transition-colors disabled:opacity-40"
+              >
+                {deletingAccount ? "Deleting…" : "Yes, delete forever"}
+              </button>
+              <button
+                onClick={() => setConfirmDeleteAccount(false)}
+                disabled={deletingAccount}
+                className="text-[#111]/55 hover:text-[#111] font-barlow text-[13px] px-2 py-2 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
         </GlassCard>
 
         <GlassCard className="p-7 border-black/10" delay={0.3}>
