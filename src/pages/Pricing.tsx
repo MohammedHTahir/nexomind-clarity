@@ -141,6 +141,7 @@ const Pricing = () => {
 
             <Link
               to="/auth"
+              onClick={() => trackEvent("cta_click_pricing", { plan: "free" })}
               className="mt-10 block text-center bg-[#F3F4ED] border border-black/10 text-[#111] rounded-full px-6 py-3.5 font-barlow font-medium text-[14px] hover:bg-black/5 transition-colors"
             >
               Start free
@@ -181,6 +182,7 @@ const Pricing = () => {
 
             <Link
               to="/auth"
+              onClick={() => trackEvent("cta_click_pricing", { plan: "premium" })}
               className="mt-10 block text-center bg-white text-[#111] rounded-full px-6 py-3.5 font-barlow font-medium text-[14px] hover:bg-white/90 transition-colors"
             >
               Start free, upgrade anytime
