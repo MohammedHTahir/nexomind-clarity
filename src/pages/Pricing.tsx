@@ -3,6 +3,7 @@ import { Check } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SiteFooter from "@/components/SiteFooter";
 import Seo from "@/components/Seo";
+import { trackEvent } from "@/lib/analytics";
 
 const SITE_URL = "https://www.nexomind.ai";
 
