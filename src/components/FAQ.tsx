@@ -8,7 +8,7 @@ import {
 const faqs = [
   { q: "Is my journal really private?", a: "Yes. Entries are encrypted on-device and we never read, train on, or sell your data." },
   { q: "Is NexoMind a replacement for therapy?", a: "No. It's a reflective companion. We encourage pairing it with professional support when you need it." },
-  { q: "What does it cost?", a: "There's a free tier for daily journaling. Premium reflections are $6/month, cancel anytime." },
+  { q: "What does it cost?", a: "Free includes 3 reflections per week. Premium is $9.99/month or $95/year (save ~20%) for unlimited reflections — cancel anytime." },
   { q: "Which devices is it on?", a: "iOS, Android and a quiet web app for late-night desktop writing." },
   { q: "Can I export my entries?", a: "Anytime — as Markdown or PDF. Your words belong to you." },
 ];

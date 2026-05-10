@@ -29,7 +29,7 @@ const TermsOfService = () => {
 
         <section>
           <h2 className="font-instrument text-[28px] md:text-[34px] text-[#111] mb-3">Subscription terms</h2>
-          <p>NexoMind Premium is billed at $59.99 per month and renews automatically until cancelled. You can cancel any time from your account settings — your subscription remains active through the end of the current billing period. Refunds are handled on a case-by-case basis within 14 days of purchase.</p>
+          <p>NexoMind offers a free tier with 3 reflections per rolling 7-day window. NexoMind Premium is billed at $9.99 per month or $95 per year and renews automatically until cancelled. You can cancel any time from your account settings — your subscription remains active through the end of the current billing period. Refunds are handled on a case-by-case basis within 14 days of purchase. Taxes (VAT, GST, sales tax) are calculated and collected at checkout where applicable.</p>
         </section>
 
         <section>
