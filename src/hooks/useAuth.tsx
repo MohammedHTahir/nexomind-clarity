@@ -22,9 +22,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     // Subscribe FIRST, then read existing session
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
       setSession(s);
       setLoading(false);
+      // Fire welcome email once per user (idempotency key dedupes server-side).
+      if (event === "SIGNED_IN" && s?.user) {
+        const u = s.user;
+        const name =
+          (u.user_metadata?.display_name as string | undefined) ||
+          (u.user_metadata?.full_name as string | undefined) ||
+          (u.user_metadata?.name as string | undefined) ||
+          undefined;
+        // Defer so we don't block auth state propagation.
+        setTimeout(() => {
+          supabase.functions
+            .invoke("send-transactional-email", {
+              body: {
+                templateName: "welcome",
+                recipientEmail: u.email,
+                idempotencyKey: `welcome-${u.id}`,
+                templateData: { name },
+              },
+            })
+            .catch(() => {});
+        }, 0);
+      }
     });
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
