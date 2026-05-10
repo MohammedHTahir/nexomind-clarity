@@ -38,6 +38,24 @@ const Seo = ({ title, description, canonical, jsonLd, ogImage, type = "website" 
     }
     link.href = href;
 
+    // Hreflang — single-locale baseline. Both `en` and `x-default` point at
+    // the canonical URL, which is correct for an English-only site and
+    // future-proofs adding localized variants later.
+    const setHreflang = (lang: string) => {
+      const sel = `link[rel="alternate"][hreflang="${lang}"]`;
+      let l = document.head.querySelector<HTMLLinkElement>(sel);
+      if (!l) {
+        l = document.createElement("link");
+        l.setAttribute("rel", "alternate");
+        l.setAttribute("hreflang", lang);
+        document.head.appendChild(l);
+      }
+      l.href = href;
+    };
+    setHreflang("en");
+    setHreflang("x-default");
+    document.documentElement.setAttribute("lang", "en");
+
     // OpenGraph
     const og = ogImage ?? DEFAULT_OG;
     setMeta("og:title", title, "property");
