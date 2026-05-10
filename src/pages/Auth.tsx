@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
 const ease = [0.16, 1, 0.3, 1] as const;
+const OAUTH_REDIRECT_KEY = "nexomind:oauth_redirect";
 
 const schema = z.object({
   email: z.string().trim().email("Enter a valid email").max(255),
@@ -62,16 +63,19 @@ const Auth = () => {
 
   const google = async () => {
     setSubmitting(true);
+    localStorage.setItem(OAUTH_REDIRECT_KEY, "app");
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/auth`,
+      redirect_uri: window.location.origin,
       extraParams: { prompt: "select_account" },
     });
     if (result.error) {
-      toast.error("Google sign-in failed");
+      localStorage.removeItem(OAUTH_REDIRECT_KEY);
+      toast.error(result.error.message || "Google sign-in failed");
       setSubmitting(false);
       return;
     }
     if (result.redirected) return;
+    localStorage.removeItem(OAUTH_REDIRECT_KEY);
     navigate("/app", { replace: true });
   };
 
