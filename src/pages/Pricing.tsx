@@ -1,8 +1,12 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Check } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SiteFooter from "@/components/SiteFooter";
 import Seo from "@/components/Seo";
+import PaywallModal from "@/components/PaywallModal";
+import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 import { trackEvent } from "@/lib/analytics";
 
 const SITE_URL = "https://www.nexomind.ai";
@@ -47,6 +51,24 @@ const faqs = [
 ];
 
 const Pricing = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { isPremium } = useSubscription();
+  const [paywallOpen, setPaywallOpen] = useState(false);
+
+  const handlePremiumClick = () => {
+    trackEvent("cta_click_pricing", { plan: "premium" });
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    if (isPremium) {
+      navigate("/app/settings");
+      return;
+    }
+    setPaywallOpen(true);
+  };
+
   const jsonLd = [
     {
       "@context": "https://schema.org",
@@ -180,13 +202,14 @@ const Pricing = () => {
               ))}
             </ul>
 
-            <Link
-              to="/auth"
-              onClick={() => trackEvent("cta_click_pricing", { plan: "premium" })}
-              className="mt-10 block text-center bg-white text-[#111] rounded-full px-6 py-3.5 font-barlow font-medium text-[14px] hover:bg-white/90 transition-colors"
+            <button
+              type="button"
+              onClick={handlePremiumClick}
+              className="mt-10 block w-full text-center bg-white text-[#111] rounded-full px-6 py-3.5 font-barlow font-medium text-[14px] hover:bg-white/90 transition-colors"
             >
-              Start free, upgrade anytime
-            </Link>
+              {isPremium ? "Manage subscription" : user ? "Upgrade to Premium" : "Start free, upgrade anytime"}
+            </button>
+
           </article>
         </div>
 
@@ -211,6 +234,10 @@ const Pricing = () => {
       </section>
 
       <SiteFooter />
+      <PaywallModal
+        open={paywallOpen}
+        onContinue={() => setPaywallOpen(false)}
+      />
     </main>
   );
 };

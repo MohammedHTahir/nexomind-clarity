@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppShell from "@/components/app/AppShell";
 import GlassCard from "@/components/app/GlassCard";
+import PaywallModal from "@/components/PaywallModal";
 import { deleteAllJournals } from "@/lib/journal";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -47,6 +48,7 @@ const Settings = () => {
   const { signOut, user } = useAuth();
   const { subscription, isPremium, isCanceling, isPastDue, loading } = useSubscription();
   const [confirm, setConfirm] = useState(false);
+  const [paywallOpen, setPaywallOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [openingPortal, setOpeningPortal] = useState(false);
 
@@ -153,7 +155,7 @@ const Settings = () => {
               </button>
             ) : (
               <button
-                onClick={() => navigate("/app")}
+                onClick={() => setPaywallOpen(true)}
                 className="bg-[#111] text-white rounded-full px-5 py-2.5 font-barlow font-medium text-[13px] hover:bg-black transition-colors"
               >
                 Upgrade
@@ -238,6 +240,7 @@ const Settings = () => {
           )}
         </GlassCard>
       </div>
+      <PaywallModal open={paywallOpen} onContinue={() => setPaywallOpen(false)} />
     </AppShell>
   );
 };
