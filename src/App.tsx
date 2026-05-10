@@ -8,6 +8,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import RequireAuth from "@/components/RequireAuth";
 import Index from "./pages/Index.tsx";
 import { PaymentTestModeBanner } from "./components/PaymentTestModeBanner";
+import ConsentBanner from "./components/ConsentBanner";
 
 const Auth = lazy(() => import("./pages/Auth.tsx"));
 const Onboarding = lazy(() => import("./pages/Onboarding.tsx"));
