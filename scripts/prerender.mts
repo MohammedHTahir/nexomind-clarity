@@ -18,7 +18,7 @@ import { marked } from "marked";
 
 import { allSeoPages } from "../src/pages/seo/DynamicSeoPage";
 import type { SeoPageConfig } from "../src/components/SeoPage";
-import { parseMarkdown, type BlogPost } from "../src/lib/blog";
+import { parseMarkdown, type BlogPost } from "../src/lib/blog-core";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const distDir = resolve(root, "dist");
