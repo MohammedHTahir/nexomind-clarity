@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { trackEvent } from "@/lib/analytics";
 
 interface NewsletterSignupProps {
   source?: string;

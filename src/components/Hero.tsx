@@ -92,6 +92,7 @@ const Hero = () => {
         >
           <Link
             to="/auth"
+            onClick={() => trackEvent("cta_click_hero", { location: "hero_primary" })}
             className="bg-white text-[#111] rounded-full px-8 py-4 font-barlow font-medium text-[15px] hover:bg-white/90 hover:scale-[1.02] transition-all duration-300"
           >
             Start your first reflection — free
