@@ -112,6 +112,58 @@ const Settings = () => {
     navigate("/");
   };
 
+  const handleExport = async () => {
+    if (exporting) return;
+    setExporting(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) throw new Error("Not signed in");
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/export-user-data`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        const t = await res.text();
+        throw new Error(t || "Export failed");
+      }
+      const blob = await res.blob();
+      const dlUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const date = new Date().toISOString().slice(0, 10);
+      a.href = dlUrl;
+      a.download = `nexomind-export-${date}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(dlUrl);
+      toast.success("Your data is downloading.");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not export data");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deletingAccount) return;
+    setDeletingAccount(true);
+    try {
+      const { error } = await supabase.functions.invoke("delete-account", {
+        body: { confirm: "DELETE" },
+      });
+      if (error) throw error;
+      try { localStorage.removeItem("nexomind:onboarding"); } catch {}
+      await supabase.auth.signOut();
+      toast.success("Your account has been permanently deleted.");
+      navigate("/");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not delete account");
+      setDeletingAccount(false);
+    }
+  };
+
   const statusLine = (() => {
     if (loading) return "Checking your plan…";
     if (!isPremium && !subscription) return "You're on the free plan.";
