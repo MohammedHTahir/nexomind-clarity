@@ -156,6 +156,7 @@ const Settings = () => {
             ) : (
               <button
                 onClick={() => setPaywallOpen(true)}
+                className="bg-[#111] text-white rounded-full px-5 py-2.5 font-barlow font-medium text-[13px] hover:bg-black transition-colors"
               >
                 Upgrade
               </button>
