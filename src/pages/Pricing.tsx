@@ -202,13 +202,14 @@ const Pricing = () => {
               ))}
             </ul>
 
-            <Link
-              to="/auth"
-              onClick={() => trackEvent("cta_click_pricing", { plan: "premium" })}
-              className="mt-10 block text-center bg-white text-[#111] rounded-full px-6 py-3.5 font-barlow font-medium text-[14px] hover:bg-white/90 transition-colors"
+            <button
+              type="button"
+              onClick={handlePremiumClick}
+              className="mt-10 block w-full text-center bg-white text-[#111] rounded-full px-6 py-3.5 font-barlow font-medium text-[14px] hover:bg-white/90 transition-colors"
             >
-              Start free, upgrade anytime
-            </Link>
+              {isPremium ? "Manage subscription" : user ? "Upgrade to Premium" : "Start free, upgrade anytime"}
+            </button>
+
           </article>
         </div>
 
