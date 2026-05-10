@@ -31,7 +31,7 @@ const programmaticPaths = intents.flatMap((intent) =>
 );
 
 // Note: /terms removed (it's a duplicate of /terms-of-service and now 301-redirects to it)
-const staticPaths = ["/", "/about", "/founder", "/contact", "/privacy-policy", "/terms-of-service", "/blog"];
+const staticPaths = ["/", "/about", "/founder", "/contact", "/privacy-policy", "/terms-of-service", "/pricing", "/blog"];
 
 // Blog posts
 const blogDir = resolve(root, "src/content/blog");
@@ -79,6 +79,7 @@ const sourceFor = (path) => {
   if (path === "/privacy-policy") return "src/pages/PrivacyPolicy.tsx";
   if (path === "/terms-of-service") return "src/pages/TermsOfService.tsx";
   if (path === "/blog") return "src/pages/Blog.tsx";
+  if (path === "/pricing") return "src/pages/Pricing.tsx";
   if (path.startsWith("/blog/")) {
     const slug = path.replace("/blog/", "");
     return `src/content/blog/${slug}.md`;

@@ -94,6 +94,7 @@ const App = () => (
               <Route path="/terms-of-service" element={<TermsOfService />} />
               <Route path="/terms" element={<Navigate to="/terms-of-service" replace />} />
               <Route path="/checkout/return" element={<CheckoutReturn />} />
+              <Route path="/pricing" element={<Pricing />} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/:slug" element={<DynamicSeoPage />} />
