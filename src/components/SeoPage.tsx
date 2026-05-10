@@ -10,6 +10,8 @@ const ClarityQuiz = lazy(() => import("@/components/seo/ClarityQuiz"));
 type Section = { h2: string; body: string };
 type Related = { to: string; label: string; desc: string };
 type Faq = { q: string; a: string };
+export type HowToStep = { name: string; text: string };
+export type HowTo = { name: string; description?: string; steps: HowToStep[] };
 
 export type SeoWidget = "overthinking-analyzer" | "instant-ai-demo" | "clarity-quiz";
 
@@ -29,6 +31,8 @@ export interface SeoPageConfig {
   hook?: string;
   /** 3–5 FAQs — rendered as a section + emitted as FAQPage JSON-LD. */
   faqs?: Faq[];
+  /** Optional HowTo steps — emitted as HowTo JSON-LD for step-based pages. */
+  howTo?: HowTo;
   /** Optional interactive widget slug. Lazy-loaded. */
   widget?: SeoWidget;
   /** Optional CTA text shown after content. */
@@ -106,6 +110,20 @@ const SeoPage = ({ config }: { config: SeoPageConfig }) => {
           "@type": "Question",
           name: f.q,
           acceptedAnswer: { "@type": "Answer", text: f.a },
+        })),
+      });
+    }
+    if (config.howTo && config.howTo.steps.length > 0) {
+      blobs.push({
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        name: config.howTo.name,
+        description: config.howTo.description ?? config.metaDescription,
+        step: config.howTo.steps.map((s, i) => ({
+          "@type": "HowToStep",
+          position: i + 1,
+          name: s.name,
+          text: s.text,
         })),
       });
     }

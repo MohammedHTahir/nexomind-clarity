@@ -148,6 +148,20 @@ function articleJsonLd(c: SeoPageConfig) {
       })),
     });
   }
+  if (c.howTo && c.howTo.steps.length > 0) {
+    blobs.push({
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      name: c.howTo.name,
+      description: c.howTo.description ?? c.metaDescription,
+      step: c.howTo.steps.map((s, i) => ({
+        "@type": "HowToStep",
+        position: i + 1,
+        name: s.name,
+        text: s.text,
+      })),
+    });
+  }
   return blobs;
 }
 
@@ -237,10 +251,10 @@ function buildPageHtml(template: string, p: PageInputs): string {
     `<meta name="description" content="${escapeHtml(p.description)}" />`,
   );
 
-  // 3. Replace canonical link
+  // 3. Replace canonical link + inject hreflang alternates after it
   html = html.replace(
     /<link rel="canonical"[^>]*>/,
-    `<link rel="canonical" href="${escapeHtml(url)}" />`,
+    `<link rel="canonical" href="${escapeHtml(url)}" />\n  <link rel="alternate" hreflang="en" href="${escapeHtml(url)}" />\n  <link rel="alternate" hreflang="x-default" href="${escapeHtml(url)}" />`,
   );
 
   // 4. Replace OG/Twitter title + description + url

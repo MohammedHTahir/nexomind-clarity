@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { trackEvent } from "@/lib/analytics";
 
 interface NewsletterSignupProps {
   source?: string;
@@ -37,6 +38,7 @@ const NewsletterSignup = ({ source = "footer" }: NewsletterSignupProps) => {
 
     setStatus("success");
     setEmail("");
+    trackEvent("newsletter_signup", { source });
   };
 
   return (
