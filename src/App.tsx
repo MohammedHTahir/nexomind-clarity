@@ -26,6 +26,7 @@ const CheckoutReturn = lazy(() => import("./pages/CheckoutReturn.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 const Blog = lazy(() => import("./pages/Blog.tsx"));
 const BlogPost = lazy(() => import("./pages/BlogPost.tsx"));
+const Pricing = lazy(() => import("./pages/Pricing.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -93,6 +94,7 @@ const App = () => (
               <Route path="/terms-of-service" element={<TermsOfService />} />
               <Route path="/terms" element={<Navigate to="/terms-of-service" replace />} />
               <Route path="/checkout/return" element={<CheckoutReturn />} />
+              <Route path="/pricing" element={<Pricing />} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/:slug" element={<DynamicSeoPage />} />
