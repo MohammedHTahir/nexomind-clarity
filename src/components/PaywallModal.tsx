@@ -16,15 +16,15 @@ type Plan = "monthly" | "yearly";
 const PLANS: Record<Plan, { priceId: string; price: string; cadence: string; note: string }> = {
   monthly: {
     priceId: "premium_monthly",
-    price: "$59.99",
+    price: "$9.99",
     cadence: "/month",
-    note: "Less than $2 a day for clarity",
+    note: "Cancel anytime",
   },
   yearly: {
     priceId: "premium_yearly",
-    price: "$599",
+    price: "$95",
     cadence: "/year",
-    note: "Save ~17% vs monthly",
+    note: "Save ~20% vs monthly",
   },
 };
 
