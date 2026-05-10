@@ -78,27 +78,9 @@ const Hero = () => {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.25, ease }}
-          className="font-barlow font-medium text-[16px] md:text-[18px] text-white/85 mt-8 max-w-xl mx-auto"
+          className="font-barlow font-medium text-[16px] md:text-[19px] text-white/85 mt-8 max-w-xl mx-auto leading-relaxed"
         >
-          Not journaling. Not therapy. Just clarity when your mind won't slow down.
-        </motion.p>
-
-        <motion.p
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.3, ease }}
-          className="font-barlow text-[15px] md:text-[16px] text-white/75 mt-5 max-w-2xl mx-auto leading-relaxed"
-        >
-          A private AI journaling app designed to help you stop overthinking and gain mental clarity.
-        </motion.p>
-
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.35, ease }}
-          className="font-barlow text-sm text-white/60 mt-4 max-w-xl mx-auto"
-        >
-          Used when your thoughts feel stuck, repetitive, or overwhelming.
+          A private AI journaling app that turns overthinking into clarity — in under 30 seconds.
         </motion.p>
 
         <motion.div
@@ -111,40 +93,40 @@ const Hero = () => {
             to="/auth"
             className="bg-white text-[#111] rounded-full px-8 py-4 font-barlow font-medium text-[15px] hover:bg-white/90 hover:scale-[1.02] transition-all duration-300"
           >
-            Start your first reflection
+            Try it free — no signup
           </Link>
           <p className="font-barlow text-sm text-white/60">
-            No signup required
+            Your first reflection in under 30 seconds.
           </p>
-          <p className="font-barlow text-sm text-white/50">
-            Takes less than 30 seconds.
-          </p>
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 font-barlow text-[12px] tracking-[0.12em] uppercase text-white/55">
-            <span>Private by design</span>
-            <span className="opacity-40">•</span>
-            <span>No data sold</span>
-            <span className="opacity-40">•</span>
-            <span>Encrypted reflections</span>
-          </div>
         </motion.div>
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.6 }}
-          transition={{ duration: 1, delay: 0.65, ease }}
-          className="font-barlow italic text-sm text-white mt-8"
+        {/* Social proof */}
+        <motion.figure
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.6, ease }}
+          className="mt-12 max-w-lg mx-auto"
         >
-          It starts with a thought you can't shake.
-        </motion.p>
+          <blockquote className="font-instrument italic text-[20px] md:text-[22px] text-white/90 leading-snug">
+            “I stopped spiraling at 1am. It just… listened, and made sense of it.”
+          </blockquote>
+          <figcaption className="font-barlow text-[12px] tracking-[0.14em] uppercase text-white/55 mt-3">
+            Maya · early user
+          </figcaption>
+        </motion.figure>
 
-        <motion.p
+        <motion.div
           initial={{ opacity: 0 }}
-          animate={{ opacity: 0.6 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.8, ease }}
-          className="font-barlow text-sm text-white mt-6 tracking-wide"
+          className="mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 font-barlow text-[12px] tracking-[0.12em] uppercase text-white/55"
         >
-          Private. Secure. Judgment-free.
-        </motion.p>
+          <span>Private by design</span>
+          <span className="opacity-40">•</span>
+          <span>Encrypted reflections</span>
+          <span className="opacity-40">•</span>
+          <span>No data sold</span>
+        </motion.div>
       </div>
     </section>
   );

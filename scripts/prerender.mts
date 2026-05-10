@@ -271,7 +271,7 @@ function buildPageHtml(template: string, p: PageInputs): string {
 
   // 7. Inject prerendered body content as a sibling of #root, hidden from
   //    sighted users but readable by non-JS crawlers.
-  const prerenderBlock = `<div id="__prerender" hidden aria-hidden="true">\n${p.body}\n</div>`;
+  const prerenderBlock = `<div id="__prerender" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden" aria-hidden="true">\n${p.body}\n</div>`;
   html = html.replace(
     '<script type="module" src="/src/main.tsx"></script>',
     `${prerenderBlock}\n    <script type="module" src="/src/main.tsx"></script>`,
