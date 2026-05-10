@@ -148,6 +148,20 @@ function articleJsonLd(c: SeoPageConfig) {
       })),
     });
   }
+  if (c.howTo && c.howTo.steps.length > 0) {
+    blobs.push({
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      name: c.howTo.name,
+      description: c.howTo.description ?? c.metaDescription,
+      step: c.howTo.steps.map((s, i) => ({
+        "@type": "HowToStep",
+        position: i + 1,
+        name: s.name,
+        text: s.text,
+      })),
+    });
+  }
   return blobs;
 }
 
