@@ -15,14 +15,14 @@ const Features = () => {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-20 max-w-2xl mx-auto">
           <p className="font-barlow font-medium text-[12px] tracking-[0.2em] uppercase text-white/40 mb-4">
-            ( NexoMind Premium · $59.99 / month )
+            ( NexoMind Premium · $9.99 / month )
           </p>
           <h2 className="font-instrument text-[44px] md:text-[64px] leading-[1]">
             See what your mind <br />
             is <span className="italic">actually</span> doing.
           </h2>
           <p className="font-barlow text-[15px] text-white/55 mt-6">
-            Less than $2 a day for clarity.
+            Unlimited reflections. Cancel anytime.
           </p>
         </div>
 
