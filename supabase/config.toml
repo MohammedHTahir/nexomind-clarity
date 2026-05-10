@@ -1,16 +1,15 @@
 project_id = "ltwnshkruuotjdcqikgf"
 
-[functions.seo-ai]
-verify_jwt = false
-
-[functions.create-checkout]
-verify_jwt = false
-
-[functions.payments-webhook]
-verify_jwt = false
-
-[functions.create-portal-session]
-verify_jwt = false
-
-[functions.cancel-subscription]
-verify_jwt = false
+[functions]
+  [functions.auth-email-hook]
+    verify_jwt = false
+  [functions.cancel-subscription]
+    verify_jwt = false
+  [functions.create-checkout]
+    verify_jwt = false
+  [functions.create-portal-session]
+    verify_jwt = false
+  [functions.payments-webhook]
+    verify_jwt = false
+  [functions.seo-ai]
+    verify_jwt = false
