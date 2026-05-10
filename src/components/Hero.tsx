@@ -93,10 +93,13 @@ const Hero = () => {
             to="/auth"
             className="bg-white text-[#111] rounded-full px-8 py-4 font-barlow font-medium text-[15px] hover:bg-white/90 hover:scale-[1.02] transition-all duration-300"
           >
-            Try it free — no signup
+            Start your first reflection — free
           </Link>
-          <p className="font-barlow text-sm text-white/60">
-            Your first reflection in under 30 seconds.
+          <p className="font-barlow text-sm text-white/65">
+            Free to start · <span className="text-white/85">$9.99/mo</span> for unlimited · cancel anytime
+          </p>
+          <p className="font-barlow text-xs text-white/45">
+            Takes under 30 seconds.
           </p>
         </motion.div>
 

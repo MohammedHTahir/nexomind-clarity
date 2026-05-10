@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
+import NewsletterSignup from "@/components/NewsletterSignup";
 
 const SiteFooter = () => {
   return (
     <footer className="bg-[#111] text-white border-t border-white/10">
-      <div className="max-w-6xl mx-auto px-6 py-20 grid md:grid-cols-3 gap-12">
+      <div className="max-w-6xl mx-auto px-6 py-20 grid md:grid-cols-4 gap-12">
         {/* Column 1 — Brand */}
         <div>
           <span className="font-instrument text-[28px] tracking-tight">
@@ -20,10 +21,10 @@ const SiteFooter = () => {
             Explore
           </p>
           <ul className="space-y-3 font-barlow text-[14px] text-white/70">
+            <li><Link to="/blog" className="hover:text-white transition-colors">Journal</Link></li>
             <li><Link to="/how-to-stop-overthinking" className="hover:text-white transition-colors">How to stop overthinking</Link></li>
             <li><Link to="/mental-clarity" className="hover:text-white transition-colors">Mental clarity</Link></li>
             <li><Link to="/ai-journaling" className="hover:text-white transition-colors">AI journaling</Link></li>
-            <li><Link to="/ai-journaling-for-anxiety" className="hover:text-white transition-colors">AI journaling for anxiety</Link></li>
             <li><Link to="/private-ai-journaling" className="hover:text-white transition-colors">Private AI journaling</Link></li>
           </ul>
         </div>
@@ -40,6 +41,9 @@ const SiteFooter = () => {
             <li><Link to="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</Link></li>
           </ul>
         </div>
+
+        {/* Column 4 — Newsletter */}
+        <NewsletterSignup source="footer" />
       </div>
 
       <div className="border-t border-white/10 px-6 py-8">
