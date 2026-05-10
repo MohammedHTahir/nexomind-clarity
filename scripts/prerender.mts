@@ -326,6 +326,112 @@ function main() {
     written.push(c.path);
   }
 
+  // Blog index + posts
+  const blogDir = resolve(root, "src/content/blog");
+  const posts: BlogPost[] = existsSync(blogDir)
+    ? readdirSync(blogDir)
+        .filter((f) => f.endsWith(".md"))
+        .map((f) => parseMarkdown(f.replace(/\.md$/, ""), readFileSync(resolve(blogDir, f), "utf8")))
+        .sort((a, b) => (a.date < b.date ? 1 : -1))
+    : [];
+
+  if (posts.length > 0) {
+    // /blog index
+    const indexBody = [
+      `<nav aria-label="Breadcrumb"><a href="/">Home</a> &rsaquo; <span>Journal</span></nav>`,
+      `<h1>Notes on clarity</h1>`,
+      `<p>Short, calm reads on overthinking, reflection, and the small shifts that change how you think.</p>`,
+      `<ul>`,
+      ...posts.map(
+        (p) =>
+          `<li><a href="/blog/${escapeHtml(p.slug)}">${escapeHtml(p.title)}</a> — ${escapeHtml(p.excerpt || p.description)}</li>`,
+      ),
+      `</ul>`,
+    ].join("\n");
+    const indexJsonLd = [
+      {
+        "@context": "https://schema.org",
+        "@type": "Blog",
+        name: "NexoMind Journal",
+        url: `${SITE_URL}/blog`,
+        blogPost: posts.map((p) => ({
+          "@type": "BlogPosting",
+          headline: p.title,
+          description: p.description,
+          datePublished: p.date,
+          url: `${SITE_URL}/blog/${p.slug}`,
+        })),
+      },
+    ];
+    const indexHtml = buildPageHtml(template, {
+      path: "/blog",
+      title: "Journal — NexoMind",
+      description:
+        "Calm, practical writing on overthinking, mental clarity, and AI-assisted reflection.",
+      body: indexBody,
+      jsonLd: indexJsonLd,
+    });
+    const indexOut = resolve(distDir, "blog");
+    mkdirSync(indexOut, { recursive: true });
+    writeFileSync(resolve(indexOut, "index.html"), indexHtml);
+    written.push("/blog");
+
+    // Each post
+    for (const p of posts) {
+      const url = `${SITE_URL}/blog/${p.slug}`;
+      const articleHtml = marked.parse(p.body, { async: false }) as string;
+      const body = [
+        `<nav aria-label="Breadcrumb"><a href="/">Home</a> &rsaquo; <a href="/blog">Journal</a> &rsaquo; <span>${escapeHtml(p.title)}</span></nav>`,
+        `<article>`,
+        `<p class="date">${escapeHtml(p.date)}</p>`,
+        `<h1>${escapeHtml(p.title)}</h1>`,
+        `<p class="lede">${escapeHtml(p.description)}</p>`,
+        articleHtml,
+        `</article>`,
+      ].join("\n");
+      const jsonLd = [
+        {
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          headline: p.title,
+          description: p.description,
+          datePublished: p.date,
+          dateModified: p.date,
+          mainEntityOfPage: url,
+          url,
+          author: { "@type": "Organization", name: "NexoMind" },
+          publisher: {
+            "@type": "Organization",
+            name: "NexoMind",
+            logo: { "@type": "ImageObject", url: `${SITE_URL}/og-image.jpg` },
+          },
+          keywords: p.tags.join(", "),
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: `${SITE_URL}/` },
+            { "@type": "ListItem", position: 2, name: "Journal", item: `${SITE_URL}/blog` },
+            { "@type": "ListItem", position: 3, name: p.title, item: url },
+          ],
+        },
+      ];
+      const html = buildPageHtml(template, {
+        path: `/blog/${p.slug}`,
+        title: `${p.title} — NexoMind`,
+        description: p.description,
+        body,
+        jsonLd,
+        ogType: "article",
+      });
+      const outDir = resolve(distDir, "blog", p.slug);
+      mkdirSync(outDir, { recursive: true });
+      writeFileSync(resolve(outDir, "index.html"), html);
+      written.push(`/blog/${p.slug}`);
+    }
+  }
+
   console.log(`[prerender] wrote ${written.length} static HTML files.`);
 }
 
