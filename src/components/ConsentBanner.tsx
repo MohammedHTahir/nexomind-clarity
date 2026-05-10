@@ -50,6 +50,15 @@ const ConsentBanner = () => {
     }
   }, []);
 
+  useEffect(() => {
+    const handler = () => {
+      try { localStorage.removeItem(STORAGE_KEY); } catch {/* no-op */}
+      setVisible(true);
+    };
+    window.addEventListener("nm:show-consent", handler);
+    return () => window.removeEventListener("nm:show-consent", handler);
+  }, []);
+
   const accept = () => {
     try {
       localStorage.setItem(STORAGE_KEY, "granted");
