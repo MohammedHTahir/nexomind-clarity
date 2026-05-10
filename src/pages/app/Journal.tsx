@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { analyzeAndStore, clarityBand, FreeLimitReachedError, type AnalysisRow } from "@/lib/journal";
 import PremiumGate from "@/components/PremiumGate";
 import { toast } from "sonner";
+import { trackEvent } from "@/lib/analytics";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -28,6 +29,10 @@ const Journal = () => {
       const { analysis } = await analyzeAndStore(text);
       setResult(analysis);
       setPhase("done");
+      trackEvent("journal_entry_created", {
+        source: "journal_mode",
+        word_count: text.trim().split(/\s+/).filter(Boolean).length,
+      });
     } catch (e) {
       if (e instanceof FreeLimitReachedError) {
         toast.error(`You've used all ${e.limit} free reflections this week.`);
