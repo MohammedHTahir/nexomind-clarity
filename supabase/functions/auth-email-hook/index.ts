@@ -36,7 +36,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "clarity-echo-calm"
+const SITE_NAME = "NexoMind"
 const SENDER_DOMAIN = "notify.nexomind.ai"
 const ROOT_DOMAIN = "nexomind.ai"
 const FROM_DOMAIN = "nexomind.ai" // Domain shown in From address (may be root or sender subdomain)
