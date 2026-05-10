@@ -61,6 +61,24 @@ const Auth = () => {
     }
   };
 
+  const forgotPassword = async () => {
+    const emailParse = z.string().trim().email().max(255).safeParse(email);
+    if (!emailParse.success) {
+      toast.error("Enter your email above first, then tap 'Forgot password'.");
+      return;
+    }
+    setSubmitting(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(emailParse.data, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setSubmitting(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Check your inbox for a reset link.");
+  };
+
   const google = async () => {
     setSubmitting(true);
     localStorage.setItem(OAUTH_REDIRECT_KEY, "app");
@@ -143,6 +161,16 @@ const Auth = () => {
             >
               {submitting ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
             </button>
+            {mode === "signin" && (
+              <button
+                type="button"
+                onClick={forgotPassword}
+                disabled={submitting}
+                className="block mx-auto pt-1 font-barlow text-[12px] text-[#111]/55 hover:text-[#111] transition-colors disabled:opacity-40"
+              >
+                Forgot password?
+              </button>
+            )}
           </form>
 
           <div className="flex items-center gap-3 my-5">
