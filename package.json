@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "postbuild": "node scripts/generate-sitemap.mjs"
+    "postbuild": "node scripts/generate-sitemap.mjs && tsx scripts/prerender.mts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
