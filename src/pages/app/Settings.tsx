@@ -51,6 +51,9 @@ const Settings = () => {
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [openingPortal, setOpeningPortal] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [confirmDeleteAccount, setConfirmDeleteAccount] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
 
   const planLabel =
     (subscription?.price_id && PLAN_LABEL[subscription.price_id]) ||
@@ -107,6 +110,58 @@ const Settings = () => {
   const handleSignOut = async () => {
     await signOut();
     navigate("/");
+  };
+
+  const handleExport = async () => {
+    if (exporting) return;
+    setExporting(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) throw new Error("Not signed in");
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/export-user-data`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        const t = await res.text();
+        throw new Error(t || "Export failed");
+      }
+      const blob = await res.blob();
+      const dlUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const date = new Date().toISOString().slice(0, 10);
+      a.href = dlUrl;
+      a.download = `nexomind-export-${date}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(dlUrl);
+      toast.success("Your data is downloading.");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not export data");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deletingAccount) return;
+    setDeletingAccount(true);
+    try {
+      const { error } = await supabase.functions.invoke("delete-account", {
+        body: { confirm: "DELETE" },
+      });
+      if (error) throw error;
+      try { localStorage.removeItem("nexomind:onboarding"); } catch {}
+      await supabase.auth.signOut();
+      toast.success("Your account has been permanently deleted.");
+      navigate("/");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not delete account");
+      setDeletingAccount(false);
+    }
   };
 
   const statusLine = (() => {
@@ -191,7 +246,21 @@ const Settings = () => {
           </button>
         </GlassCard>
 
-        <GlassCard className="p-7 mb-4" delay={0.25}>
+        <GlassCard className="p-7 mb-4" delay={0.24}>
+          <h2 className="font-instrument text-[24px] mb-2">Export your data</h2>
+          <p className="font-barlow text-[14px] text-[#111]/60 leading-relaxed mb-5">
+            Download a JSON file with everything tied to your account — your profile, every reflection, and every analysis. Yours to keep.
+          </p>
+          <button
+            onClick={handleExport}
+            disabled={exporting}
+            className="bg-white/70 backdrop-blur-md border border-black/10 text-[#111] rounded-full px-6 py-2.5 font-barlow font-medium text-[13px] hover:bg-white transition-colors disabled:opacity-50"
+          >
+            {exporting ? "Preparing…" : "Download my data"}
+          </button>
+        </GlassCard>
+
+        <GlassCard className="p-7 mb-4" delay={0.26}>
           <h2 className="font-instrument text-[24px] mb-2">Sign out</h2>
           <p className="font-barlow text-[14px] text-[#111]/60 leading-relaxed mb-5">
             End your session on this device. Your reflections stay safely in your account.
@@ -204,10 +273,10 @@ const Settings = () => {
           </button>
         </GlassCard>
 
-        <GlassCard className="p-7 border-black/10" delay={0.3}>
-          <h2 className="font-instrument text-[24px] mb-2">Delete everything</h2>
+        <GlassCard className="p-7 mb-4 border-black/10" delay={0.3}>
+          <h2 className="font-instrument text-[24px] mb-2">Clear my reflections</h2>
           <p className="font-barlow text-[14px] text-[#111]/60 leading-relaxed mb-5">
-            Removes every reflection and analysis from your account.
+            Removes every reflection and analysis from your account, but keeps the account itself.
             {isPremium && !isCanceling
               ? " Your subscription will also be set to cancel at the end of the current period — you won't be billed again."
               : ""}{" "}
@@ -218,7 +287,7 @@ const Settings = () => {
               onClick={() => setConfirm(true)}
               className="bg-white/70 backdrop-blur-md border border-black/10 text-[#111] rounded-full px-6 py-2.5 font-barlow font-medium text-[13px] hover:bg-white transition-colors"
             >
-              Delete all my data
+              Clear my reflections
             </button>
           ) : (
             <div className="flex flex-wrap gap-3 items-center">
@@ -239,6 +308,44 @@ const Settings = () => {
             </div>
           )}
         </GlassCard>
+
+        <GlassCard className="p-7 border-red-300/40" delay={0.34}>
+          <h2 className="font-instrument text-[24px] mb-2">Delete my account</h2>
+          <p className="font-barlow text-[14px] text-[#111]/60 leading-relaxed mb-5">
+            Permanently removes your account, every reflection, every analysis, and your profile.
+            {isPremium ? " Any active subscription will be canceled immediately — no further charges." : ""}{" "}
+            This is irreversible. Consider exporting your data first.
+          </p>
+          {!confirmDeleteAccount ? (
+            <button
+              onClick={() => setConfirmDeleteAccount(true)}
+              className="bg-white/70 backdrop-blur-md border border-red-300/60 text-red-700 rounded-full px-6 py-2.5 font-barlow font-medium text-[13px] hover:bg-white transition-colors"
+            >
+              Delete my account
+            </button>
+          ) : (
+            <div className="flex flex-wrap gap-3 items-center">
+              <span className="font-barlow text-[13px] text-[#111]/70">
+                This will erase everything forever. Continue?
+              </span>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deletingAccount}
+                className="bg-red-600 text-white rounded-full px-5 py-2 font-barlow font-medium text-[13px] hover:bg-red-700 transition-colors disabled:opacity-40"
+              >
+                {deletingAccount ? "Deleting…" : "Yes, delete forever"}
+              </button>
+              <button
+                onClick={() => setConfirmDeleteAccount(false)}
+                disabled={deletingAccount}
+                className="text-[#111]/55 hover:text-[#111] font-barlow text-[13px] px-2 py-2 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
+        </GlassCard>
+
       </div>
       <PaywallModal open={paywallOpen} onContinue={() => setPaywallOpen(false)} />
     </AppShell>
