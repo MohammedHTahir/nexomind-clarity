@@ -30,7 +30,7 @@ const Journal = () => {
       setPhase("done");
     } catch (e) {
       if (e instanceof FreeLimitReachedError) {
-        toast.error(`You've used all ${e.limit} free analyses this month.`);
+        toast.error(`You've used all ${e.limit} free reflections this week.`);
       } else {
         const msg = e instanceof Error ? e.message : "Analysis failed";
         toast.error(msg);
