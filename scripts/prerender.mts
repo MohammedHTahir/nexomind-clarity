@@ -98,6 +98,15 @@ const staticRoutes: StaticRoute[] = [
     description: "The terms governing your use of NexoMind, our private AI journaling app.",
     h1: "Terms of Service",
   },
+  {
+    path: "/pricing",
+    title: "Pricing — NexoMind",
+    description:
+      "Simple pricing for NexoMind. Start free with 3 reflections a week. Upgrade to unlimited for $9.99/month. Cancel anytime.",
+    h1: "One price. Total clarity.",
+    intro:
+      "Start free. Upgrade when you're ready. Cancel anytime — one click, no friction. $9.99/month for unlimited reflections, deep pattern analysis, and emotional trend tracking.",
+  },
 ];
 
 // ---------- JSON-LD builders ---------------------------------------------
