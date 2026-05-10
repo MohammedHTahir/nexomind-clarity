@@ -240,6 +240,7 @@ const Settings = () => {
           )}
         </GlassCard>
       </div>
+      <PaywallModal open={paywallOpen} onContinue={() => setPaywallOpen(false)} />
     </AppShell>
   );
 };
