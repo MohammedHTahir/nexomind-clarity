@@ -35,6 +35,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <PaymentTestModeBanner />
+          <ConsentBanner />
           <Suspense
             fallback={
               <div className="min-h-screen" style={{ backgroundColor: "#F3F4ED" }} />
