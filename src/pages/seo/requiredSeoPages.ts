@@ -260,6 +260,16 @@ export const requiredSeoPages: SeoPageConfig[] = [
         a: "Probably not entirely — but you can dramatically reduce its grip. Daily reflection turns spirals into sentences.",
       },
     ],
+    howTo: {
+      name: "How to understand why you overthink",
+      description: "A 4-step reflection to decode what your overthinking is actually trying to tell you.",
+      steps: [
+        { name: "Catch the loop", text: "Notice the thought you keep returning to. Write it down word-for-word, without editing or making it sound reasonable." },
+        { name: "Look for the feeling, not the logic", text: "Ask: 'What emotion is this thought protecting?' Name it in one word — fear, guilt, pressure, sadness, uncertainty." },
+        { name: "Find the unmet need", text: "Underneath the feeling is usually a need: to be understood, to feel safe, to make the right choice. Write the need as a sentence: 'I need…' " },
+        { name: "Reframe with compassion", text: "Tell yourself: 'I overthink because I care, not because I'm broken.' Then close the page. The loop has been heard." },
+      ],
+    },
     related: [
       { to: "/overthinking-at-night", label: "Overthinking at night", desc: "Why loops often appear before sleep." },
       { to: "/ai-journaling-app", label: "AI journaling app", desc: "A private way to turn thoughts into insight." },
