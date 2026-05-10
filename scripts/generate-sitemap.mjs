@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync, existsSync, readdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execSync } from "node:child_process";
@@ -31,11 +31,20 @@ const programmaticPaths = intents.flatMap((intent) =>
 );
 
 // Note: /terms removed (it's a duplicate of /terms-of-service and now 301-redirects to it)
-const staticPaths = ["/", "/about", "/founder", "/contact", "/privacy-policy", "/terms-of-service"];
+const staticPaths = ["/", "/about", "/founder", "/contact", "/privacy-policy", "/terms-of-service", "/blog"];
+
+// Blog posts
+const blogDir = resolve(root, "src/content/blog");
+const blogPaths = existsSync(blogDir)
+  ? readdirSync(blogDir)
+      .filter((f) => f.endsWith(".md"))
+      .map((f) => `/blog/${f.replace(/\.md$/, "")}`)
+  : [];
 
 const paths = Array.from(
   new Set([
     ...staticPaths,
+    ...blogPaths,
     ...extractPaths(requiredSeoFile),
     ...extractPaths(seoPagesFile),
     ...extractPaths(targetSeoFile),
@@ -69,6 +78,11 @@ const sourceFor = (path) => {
   if (path === "/contact") return "src/pages/Contact.tsx";
   if (path === "/privacy-policy") return "src/pages/PrivacyPolicy.tsx";
   if (path === "/terms-of-service") return "src/pages/TermsOfService.tsx";
+  if (path === "/blog") return "src/pages/Blog.tsx";
+  if (path.startsWith("/blog/")) {
+    const slug = path.replace("/blog/", "");
+    return `src/content/blog/${slug}.md`;
+  }
   if (path === "/stop-overthinking") return "src/pages/seo/StopOverthinking.tsx";
   if (path === "/ai-journaling-app") return "src/pages/seo/AiJournalingApp.tsx";
   if (path === "/mental-clarity") return "src/pages/seo/MentalClarity.tsx";
