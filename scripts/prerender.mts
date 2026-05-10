@@ -11,12 +11,14 @@
  * On Lovable hosting, requesting /<slug> serves the prerendered file directly
  * because it exists on disk; deep refreshes still hit the SPA fallback.
  */
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync, readdirSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { marked } from "marked";
 
 import { allSeoPages } from "../src/pages/seo/DynamicSeoPage";
 import type { SeoPageConfig } from "../src/components/SeoPage";
+import { parseMarkdown, type BlogPost } from "../src/lib/blog";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const distDir = resolve(root, "dist");
