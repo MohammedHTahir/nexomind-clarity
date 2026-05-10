@@ -346,41 +346,6 @@ const Settings = () => {
           )}
         </GlassCard>
 
-        <GlassCard className="p-7 border-black/10" delay={0.3}>
-          <h2 className="font-instrument text-[24px] mb-2">Delete everything</h2>
-          <p className="font-barlow text-[14px] text-[#111]/60 leading-relaxed mb-5">
-            Removes every reflection and analysis from your account.
-            {isPremium && !isCanceling
-              ? " Your subscription will also be set to cancel at the end of the current period — you won't be billed again."
-              : ""}{" "}
-            This can't be undone.
-          </p>
-          {!confirm ? (
-            <button
-              onClick={() => setConfirm(true)}
-              className="bg-white/70 backdrop-blur-md border border-black/10 text-[#111] rounded-full px-6 py-2.5 font-barlow font-medium text-[13px] hover:bg-white transition-colors"
-            >
-              Delete all my data
-            </button>
-          ) : (
-            <div className="flex flex-wrap gap-3 items-center">
-              <span className="font-barlow text-[13px] text-[#111]/70">Are you sure?</span>
-              <button
-                onClick={handleDelete}
-                disabled={busy}
-                className="bg-[#111] text-white rounded-full px-5 py-2 font-barlow font-medium text-[13px] hover:bg-black transition-colors disabled:opacity-40"
-              >
-                {busy ? "Deleting…" : "Yes, delete"}
-              </button>
-              <button
-                onClick={() => setConfirm(false)}
-                className="text-[#111]/55 hover:text-[#111] font-barlow text-[13px] px-2 py-2 transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          )}
-        </GlassCard>
       </div>
       <PaywallModal open={paywallOpen} onContinue={() => setPaywallOpen(false)} />
     </AppShell>
