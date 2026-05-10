@@ -1,11 +1,24 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
+import { trackEvent } from "@/lib/analytics";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
 const CheckoutReturn = () => {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get("session_id");
+
+  useEffect(() => {
+    if (!sessionId) return;
+    try {
+      const flagKey = `nexomind:sub_tracked:${sessionId}`;
+      if (!sessionStorage.getItem(flagKey)) {
+        trackEvent("subscription_started", { session_id: sessionId });
+        sessionStorage.setItem(flagKey, "1");
+      }
+    } catch {}
+  }, [sessionId]);
 
   return (
     <div className="min-h-screen bg-[#F3F4ED] text-[#111] flex items-center justify-center px-6">

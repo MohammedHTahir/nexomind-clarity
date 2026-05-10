@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import Seo from "@/components/Seo";
 import SeoLayout from "@/components/SeoLayout";
+import { trackEvent } from "@/lib/analytics";
 
 const OverthinkingAnalyzer = lazy(() => import("@/components/seo/OverthinkingAnalyzer"));
 const InstantAiDemo = lazy(() => import("@/components/seo/InstantAiDemo"));
@@ -156,6 +157,7 @@ const SeoPage = ({ config }: { config: SeoPageConfig }) => {
         <Link
           to="/auth"
           aria-label="Start your first reflection"
+          onClick={() => trackEvent("cta_click_seo_page", { path: config.path, location: "sticky" })}
           className="hidden md:inline-flex fixed bottom-6 right-6 z-[55] items-center gap-2 rounded-full bg-[#111] text-white px-5 py-3 font-barlow text-[14px] font-medium shadow-[0_10px_30px_rgba(0,0,0,0.18)] hover:bg-black transition-all"
         >
           Begin reflection <span aria-hidden>→</span>
@@ -262,6 +264,7 @@ const SeoPage = ({ config }: { config: SeoPageConfig }) => {
           </p>
           <Link
             to="/auth"
+            onClick={() => trackEvent("cta_click_seo_page", { path: config.path, location: "bottom" })}
             className="inline-block bg-white text-[#111] rounded-full px-8 py-4 font-barlow font-medium text-[15px] hover:bg-white/90 transition"
           >
             Open NexoMind →

@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { trackEvent } from "@/lib/analytics";
 
 type AuthCtx = {
   user: User | null;
@@ -28,6 +29,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // Fire welcome email once per user (idempotency key dedupes server-side).
       if (event === "SIGNED_IN" && s?.user) {
         const u = s.user;
+        // Fire signup_completed exactly once per user (first sign-in).
+        try {
+          const flagKey = `nexomind:signup_tracked:${u.id}`;
+          if (!localStorage.getItem(flagKey)) {
+            trackEvent("signup_completed", {
+              provider: u.app_metadata?.provider ?? "email",
+            });
+            localStorage.setItem(flagKey, "1");
+          }
+        } catch {}
         const name =
           (u.user_metadata?.display_name as string | undefined) ||
           (u.user_metadata?.full_name as string | undefined) ||

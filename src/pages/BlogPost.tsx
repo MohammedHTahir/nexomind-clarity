@@ -1,10 +1,11 @@
 import { Link, useParams } from "react-router-dom";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import Navbar from "@/components/Navbar";
 import SiteFooter from "@/components/SiteFooter";
 import Seo from "@/components/Seo";
 import NotFound from "@/pages/NotFound";
 import { allPosts, getPost, renderMarkdown } from "@/lib/blog";
+import { trackEvent } from "@/lib/analytics";
 
 const SITE_URL = "https://www.nexomind.ai";
 
@@ -12,6 +13,10 @@ const BlogPost = () => {
   const { slug } = useParams();
   const post = slug ? getPost(slug) : undefined;
   const html = useMemo(() => (post ? renderMarkdown(post.body) : ""), [post]);
+
+  useEffect(() => {
+    if (post) trackEvent("blog_post_view", { slug: post.slug, title: post.title });
+  }, [post?.slug]);
 
   if (!post) return <NotFound />;
 

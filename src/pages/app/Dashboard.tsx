@@ -17,6 +17,7 @@ import PremiumGate from "@/components/PremiumGate";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { toast } from "sonner";
+import { trackEvent } from "@/lib/analytics";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -60,6 +61,10 @@ const Dashboard = () => {
     try {
       const { analysis } = await analyzeAndStore(text);
       setResult(analysis);
+      trackEvent("journal_entry_created", {
+        source: "dashboard",
+        word_count: text.trim().split(/\s+/).filter(Boolean).length,
+      });
       if (!isPremium) {
         window.setTimeout(() => setPaywallOpen(true), 650);
       }
