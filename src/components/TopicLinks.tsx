@@ -4,11 +4,11 @@ const topics = [
   { to: "/stop-overthinking", label: "Stop overthinking", desc: "Break the loop in seconds" },
   { to: "/ai-journaling-app", label: "AI journaling app", desc: "How NexoMind reflects with you" },
   { to: "/mental-clarity", label: "Find mental clarity", desc: "Turn fog into focus" },
-  { to: "/overthinking-at-night", label: "Overthinking at night", desc: "Quiet the 3 a.m. mind" },
+  { to: "/how-to-stop-overthinking-at-night", label: "Overthinking at night", desc: "Quiet the 3 a.m. mind" },
   { to: "/why-do-i-overthink", label: "Why do I overthink?", desc: "Understand the pattern" },
-  { to: "/how-to-journal", label: "How to journal", desc: "A gentle starting point" },
-  { to: "/anxiety-journal", label: "Anxiety journaling", desc: "Process worries safely" },
-  { to: "/private-journal-app", label: "Private journal app", desc: "End-to-end private by design" },
+  { to: "/how-to-journal-for-mental-health", label: "How to journal", desc: "A gentle starting point" },
+  { to: "/ai-journaling-for-anxiety", label: "Anxiety journaling", desc: "Process worries safely" },
+  { to: "/private-ai-journaling", label: "Private journal app", desc: "End-to-end private by design" },
 ];
 
 const TopicLinks = () => (
