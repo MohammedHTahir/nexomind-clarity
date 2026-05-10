@@ -331,6 +331,17 @@ export const requiredSeoPages: SeoPageConfig[] = [
         a: "Because daytime distractions disappear and your mind reaches for whatever wasn't processed earlier. A short reflection before bed closes the page.",
       },
     ],
+    howTo: {
+      name: "How to stop overthinking when your brain won't shut off",
+      description: "A 5-step calm method to interrupt a runaway thought loop and turn it into clarity in minutes.",
+      steps: [
+        { name: "Externalize the loop", text: "Write the looping thought exactly as it sounds in your head — no softening, no organizing. Get it out so you can see it." },
+        { name: "Name the feeling underneath", text: "In one word, name the emotion the thought is hiding: fear, guilt, pressure, resentment, uncertainty. This is the step the mind keeps skipping." },
+        { name: "Identify the pattern", text: "Notice the shape of the loop: catastrophizing, replaying, future-tripping, mind-reading. Naming the pattern shrinks it." },
+        { name: "Reflect, don't argue", text: "Use NexoMind (or a structured prompt) to mirror the thought back as a summary, emotion, pattern, and one grounded takeaway. Reflection closes loops; arguing fuels them." },
+        { name: "Close the page", text: "Tell yourself: 'I've heard it. I'll come back if it matters tomorrow.' Then physically close the notebook or app. Most loops loosen within minutes." },
+      ],
+    },
     related: [
       { to: "/mental-clarity", label: "Find mental clarity", desc: "What clarity actually feels like — and how to reach it." },
       { to: "/ai-journaling", label: "AI journaling, explained", desc: "How structured reflection turns thoughts into clarity." },
