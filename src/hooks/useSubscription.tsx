@@ -45,9 +45,8 @@ export const useSubscription = () => {
   // Realtime: refetch (with env filter) when the row changes.
   useEffect(() => {
     if (!user) return;
-    const channel = supabase
-      .channel(`subscriptions:${user.id}`)
-      .on(
+    const channel = supabase.channel(`subscriptions:${user.id}:${Math.random().toString(36).slice(2)}`);
+    channel.on(
         "postgres_changes",
         {
           event: "*",
