@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      email_leads: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          source: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          source?: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          source?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       journal_analysis: {
         Row: {
           clarity_insight: string | null
