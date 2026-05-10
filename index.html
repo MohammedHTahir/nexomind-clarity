@@ -90,13 +90,14 @@
         "inLanguage": "en"
       },
       {
-        "@type": "WebApplication",
-        "@id": "https://www.nexomind.ai/#webapp",
+        "@type": "SoftwareApplication",
+        "@id": "https://www.nexomind.ai/#softwareapp",
         "name": "NexoMind",
         "url": "https://www.nexomind.ai",
         "applicationCategory": "HealthApplication",
-        "operatingSystem": "Web",
-        "description": "Private AI journaling platform for stopping overthinking and gaining mental clarity through structured AI reflection.",
+        "applicationSubCategory": "AI Journaling",
+        "operatingSystem": "Web, iOS, Android",
+        "description": "Private AI journaling platform that helps users stop overthinking and gain mental clarity through structured AI reflection.",
         "publisher": { "@id": "https://www.nexomind.ai/#organization" },
         "featureList": [
           "AI journaling",
@@ -108,42 +109,17 @@
         ],
         "offers": {
           "@type": "Offer",
-          "price": "0",
+          "price": "9.99",
           "priceCurrency": "USD",
-          "availability": "https://schema.org/InStock"
-        }
-      },
-      {
-        "@type": "SoftwareApplication",
-        "@id": "https://www.nexomind.ai/#softwareapp",
-        "name": "NexoMind",
-        "url": "https://www.nexomind.ai",
-        "applicationCategory": "HealthApplication",
-        "applicationSubCategory": "AI Journaling",
-        "operatingSystem": "Web, iOS, Android",
-        "description": "Private AI journaling platform that helps users stop overthinking and gain mental clarity through structured AI reflection.",
-        "publisher": { "@id": "https://www.nexomind.ai/#organization" },
-        "offers": [
-          {
-            "@type": "Offer",
-            "price": "59.99",
+          "availability": "https://schema.org/InStock",
+          "url": "https://www.nexomind.ai/auth",
+          "priceSpecification": {
+            "@type": "UnitPriceSpecification",
+            "price": "9.99",
             "priceCurrency": "USD",
-            "category": "subscription",
-            "url": "https://www.nexomind.ai/auth"
-          },
-          {
-            "@type": "Offer",
-            "price": "599",
-            "priceCurrency": "USD",
-            "category": "subscription",
-            "url": "https://www.nexomind.ai/auth"
+            "billingDuration": "P1M",
+            "unitText": "month"
           }
-        ],
-        "aggregateRating": {
-          "@type": "AggregateRating",
-          "ratingValue": "4.9",
-          "ratingCount": "428",
-          "bestRating": "5"
         }
       },
       {
