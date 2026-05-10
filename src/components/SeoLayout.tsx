@@ -22,6 +22,16 @@ const SeoLayout = ({ eyebrow, title, italic, intro, children, related }: SeoLayo
 
       {/* Hero */}
       <section className="px-6 pt-40 pb-20 max-w-5xl mx-auto">
+        {/* Visible breadcrumbs (matches BreadcrumbList JSON-LD) */}
+        <nav aria-label="Breadcrumb" className="mb-8">
+          <ol className="flex flex-wrap items-center gap-2 font-barlow text-[12px] tracking-[0.12em] uppercase text-[#111]/45">
+            <li>
+              <Link to="/" className="hover:text-[#111] transition-colors">Home</Link>
+            </li>
+            <li aria-hidden className="text-[#111]/30">/</li>
+            <li className="text-[#111]/70">{eyebrow}</li>
+          </ol>
+        </nav>
         <motion.p
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}

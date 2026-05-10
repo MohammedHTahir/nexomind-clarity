@@ -17,6 +17,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/barlow/v13/7cHpv4kjgoGqM7E_DMs5ynghnQ.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/instrumentserif/v4/jizDREVItHgc8qDIbSTKq4XIRQXfBPHr.woff2" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@100..900&family=Barlow:wght@300;400;500;600;700;800&display=swap" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@100..900&family=Barlow:wght@300;400;500;600;700;800&display=swap" /></noscript>
     <meta property="og:title" content="NexoMind — Clarity, one thought at a time">
@@ -89,13 +90,14 @@
         "inLanguage": "en"
       },
       {
-        "@type": "WebApplication",
-        "@id": "https://www.nexomind.ai/#webapp",
+        "@type": "SoftwareApplication",
+        "@id": "https://www.nexomind.ai/#softwareapp",
         "name": "NexoMind",
         "url": "https://www.nexomind.ai",
         "applicationCategory": "HealthApplication",
-        "operatingSystem": "Web",
-        "description": "Private AI journaling platform for stopping overthinking and gaining mental clarity through structured AI reflection.",
+        "applicationSubCategory": "AI Journaling",
+        "operatingSystem": "Web, iOS, Android",
+        "description": "Private AI journaling platform that helps users stop overthinking and gain mental clarity through structured AI reflection.",
         "publisher": { "@id": "https://www.nexomind.ai/#organization" },
         "featureList": [
           "AI journaling",
@@ -107,42 +109,17 @@
         ],
         "offers": {
           "@type": "Offer",
-          "price": "0",
+          "price": "9.99",
           "priceCurrency": "USD",
-          "availability": "https://schema.org/InStock"
-        }
-      },
-      {
-        "@type": "SoftwareApplication",
-        "@id": "https://www.nexomind.ai/#softwareapp",
-        "name": "NexoMind",
-        "url": "https://www.nexomind.ai",
-        "applicationCategory": "HealthApplication",
-        "applicationSubCategory": "AI Journaling",
-        "operatingSystem": "Web, iOS, Android",
-        "description": "Private AI journaling platform that helps users stop overthinking and gain mental clarity through structured AI reflection.",
-        "publisher": { "@id": "https://www.nexomind.ai/#organization" },
-        "offers": [
-          {
-            "@type": "Offer",
-            "price": "59.99",
+          "availability": "https://schema.org/InStock",
+          "url": "https://www.nexomind.ai/auth",
+          "priceSpecification": {
+            "@type": "UnitPriceSpecification",
+            "price": "9.99",
             "priceCurrency": "USD",
-            "category": "subscription",
-            "url": "https://www.nexomind.ai/auth"
-          },
-          {
-            "@type": "Offer",
-            "price": "599",
-            "priceCurrency": "USD",
-            "category": "subscription",
-            "url": "https://www.nexomind.ai/auth"
+            "billingDuration": "P1M",
+            "unitText": "month"
           }
-        ],
-        "aggregateRating": {
-          "@type": "AggregateRating",
-          "ratingValue": "4.9",
-          "ratingCount": "428",
-          "bestRating": "5"
         }
       },
       {
@@ -214,11 +191,11 @@
       }
     </style>
     <div id="root">
-      <section class="lcp-hero">
-        <h1>
+      <section class="lcp-hero" aria-hidden="true">
+        <div>
           <span class="lcp-line1">Understand your thoughts</span>
           <span class="lcp-line2">in seconds.</span>
-        </h1>
+        </div>
       </section>
     </div>
     <script type="module" src="/src/main.tsx"></script>
