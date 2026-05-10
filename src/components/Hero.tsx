@@ -1,24 +1,46 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
 const Hero = () => {
+  const [showVideo, setShowVideo] = useState(false);
+
+  useEffect(() => {
+    // Defer video mount until after first paint so it doesn't compete with LCP
+    const w = window as any;
+    const idle = w.requestIdleCallback || ((cb: () => void) => setTimeout(cb, 200));
+    const handle = idle(() => setShowVideo(true));
+    return () => {
+      const cancel = w.cancelIdleCallback || clearTimeout;
+      cancel(handle);
+    };
+  }, []);
+
   return (
     <section className="relative min-h-[90vh] w-full overflow-hidden flex items-center justify-center">
-      {/* Video bg */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="absolute inset-0 w-full h-full object-cover z-0"
-      >
-        <source
-          src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260228_065522_522e2295-ba22-457e-8fdb-fbcd68109c73.mp4"
-          type="video/mp4"
-        />
-      </video>
+      {/* Placeholder backdrop — paints instantly, replaced by video once idle */}
+      <div
+        aria-hidden
+        className="absolute inset-0 z-0 bg-gradient-to-br from-[#1a1a2a] via-[#2a2a3a] to-[#1a1a2a]"
+      />
+      {/* Video bg (lazy-mounted) */}
+      {showVideo && (
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="none"
+          className="absolute inset-0 w-full h-full object-cover z-0"
+        >
+          <source
+            src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260228_065522_522e2295-ba22-457e-8fdb-fbcd68109c73.mp4"
+            type="video/mp4"
+          />
+        </video>
+      )}
 
       {/* Readability overlay — dark scrim for light video */}
       <div className="absolute inset-0 z-[1] bg-black/45" aria-hidden />
