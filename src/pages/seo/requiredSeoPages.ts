@@ -204,6 +204,16 @@ export const requiredSeoPages: SeoPageConfig[] = [
         a: "Open writing can sometimes deepen rumination. Structured reflection — naming the feeling and closing the page — does the opposite.",
       },
     ],
+    howTo: {
+      name: "How to quiet overthinking at night",
+      description: "A 4-step bedtime method to release a thought loop so your mind can settle into sleep.",
+      steps: [
+        { name: "Get out of the loop, onto the page", text: "Keep a notebook or your phone nearby. Write the thought exactly as it sounds — unedited, even if it's messy." },
+        { name: "Name the emotion underneath", text: "In one word, name what the thought is really about: anxious, hurt, lonely, unsure. Don't justify or explain it." },
+        { name: "Give your mind a placeholder", text: "Write a single sentence: 'I'll come back to this tomorrow at [time].' This signals the brain that it doesn't need to keep guarding the thought." },
+        { name: "Lower the stimulation", text: "Dim the lights, slow your breathing (4 in, 6 out), and let the page hold the thought instead of your head. Sleep usually follows within 10–15 minutes." },
+      ],
+    },
     related: [
       { to: "/stop-overthinking", label: "How to stop overthinking", desc: "A calm approach to interrupting thought loops." },
       { to: "/how-to-stop-overthinking-at-night", label: "Stop overthinking at night", desc: "A 5-minute method for quieter nights." },
