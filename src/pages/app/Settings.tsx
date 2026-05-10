@@ -48,6 +48,7 @@ const Settings = () => {
   const { signOut, user } = useAuth();
   const { subscription, isPremium, isCanceling, isPastDue, loading } = useSubscription();
   const [confirm, setConfirm] = useState(false);
+  const [paywallOpen, setPaywallOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [openingPortal, setOpeningPortal] = useState(false);
 
