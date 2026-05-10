@@ -1,10 +1,10 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AuthProvider } from "@/hooks/useAuth";
+import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import RequireAuth from "@/components/RequireAuth";
 import Index from "./pages/Index.tsx";
 import { PaymentTestModeBanner } from "./components/PaymentTestModeBanner";
@@ -29,6 +29,22 @@ const BlogPost = lazy(() => import("./pages/BlogPost.tsx"));
 const Pricing = lazy(() => import("./pages/Pricing.tsx"));
 
 const queryClient = new QueryClient();
+const OAUTH_REDIRECT_KEY = "nexomind:oauth_redirect";
+
+const OAuthRedirectHandler = () => {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (loading || !user) return;
+    if (localStorage.getItem(OAUTH_REDIRECT_KEY) !== "app") return;
+    localStorage.removeItem(OAUTH_REDIRECT_KEY);
+    if (location.pathname !== "/app") navigate("/app", { replace: true });
+  }, [loading, user, location.pathname, navigate]);
+
+  return null;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -37,6 +53,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <OAuthRedirectHandler />
           <PaymentTestModeBanner />
           <ConsentBanner />
           <Suspense
