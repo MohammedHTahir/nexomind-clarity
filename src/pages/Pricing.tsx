@@ -234,6 +234,10 @@ const Pricing = () => {
       </section>
 
       <SiteFooter />
+      <PaywallModal
+        open={paywallOpen}
+        onContinue={() => setPaywallOpen(false)}
+      />
     </main>
   );
 };
