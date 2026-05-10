@@ -24,12 +24,41 @@
   <meta property="og:description" content="NexoMind is an AI-powered journaling app that listens, understands, and helps you make sense of what&#39;s on your mind — privately, every day.">
   <meta name="twitter:description" content="NexoMind is an AI-powered journaling app that listens, understands, and helps you make sense of what&#39;s on your mind — privately, every day.">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GHRSKGB302"></script>
   <script>
+    // Google Consent Mode v2 — default denied until user consents
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
+    window.gtag = gtag;
+    gtag('consent', 'default', {
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      analytics_storage: 'denied',
+      functionality_storage: 'denied',
+      personalization_storage: 'denied',
+      security_storage: 'granted',
+      wait_for_update: 500
+    });
     gtag('js', new Date());
-    gtag('config', 'G-GHRSKGB302');
+
+    (function () {
+      try {
+        var stored = localStorage.getItem('nm_consent'); // 'granted' | 'denied'
+        var dnt = navigator.doNotTrack === '1' || window.doNotTrack === '1' || navigator.msDoNotTrack === '1';
+        if (stored === 'granted' && !dnt) {
+          gtag('consent', 'update', {
+            analytics_storage: 'granted',
+            functionality_storage: 'granted',
+            personalization_storage: 'granted'
+          });
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = 'https://www.googletagmanager.com/gtag/js?id=G-GHRSKGB302';
+          document.head.appendChild(s);
+          gtag('config', 'G-GHRSKGB302', { anonymize_ip: true });
+        }
+      } catch (e) {}
+    })();
   </script>
   <link rel="canonical" href="https://www.nexomind.ai/" />
   <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/575ec7bf-39fc-447b-a91f-d03263ae552d">
