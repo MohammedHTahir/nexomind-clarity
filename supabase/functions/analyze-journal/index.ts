@@ -154,12 +154,12 @@ Deno.serve(async (req) => {
       if (countErr) throw countErr;
       const used = count ?? 0;
 
-      if (used >= FREE_MONTHLY_LIMIT) {
+      if (used >= FREE_WEEKLY_LIMIT) {
         return new Response(
           JSON.stringify({
             error: "Free limit reached. Upgrade to Premium for unlimited analyses.",
             code: "FREE_LIMIT_REACHED",
-            limit: FREE_MONTHLY_LIMIT,
+            limit: FREE_WEEKLY_LIMIT,
             used,
             remaining: 0,
           }),
@@ -283,7 +283,7 @@ Deno.serve(async (req) => {
         .eq("user_id", userId)
         .gte("created_at", since);
       const used = count ?? 0;
-      usage = { limit: FREE_MONTHLY_LIMIT, used, remaining: Math.max(FREE_MONTHLY_LIMIT - used, 0) };
+      usage = { limit: FREE_WEEKLY_LIMIT, used, remaining: Math.max(FREE_WEEKLY_LIMIT - used, 0) };
     }
 
     return new Response(JSON.stringify({ journal, analysis, usage, isPremium }), {
