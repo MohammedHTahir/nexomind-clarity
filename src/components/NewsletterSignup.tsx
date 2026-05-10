@@ -38,6 +38,7 @@ const NewsletterSignup = ({ source = "footer" }: NewsletterSignupProps) => {
 
     setStatus("success");
     setEmail("");
+    trackEvent("newsletter_signup", { source });
   };
 
   return (
