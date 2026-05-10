@@ -45,6 +45,16 @@ export const requiredSeoPages: SeoPageConfig[] = [
         a: "They overlap. Overthinking is the loop; anxiety is often the fuel. Naming the emotion underneath separates them — and tends to release both.",
       },
     ],
+    howTo: {
+      name: "How to stop overthinking",
+      description: "A 4-step calm method to interrupt a thought loop and release the emotional tension underneath.",
+      steps: [
+        { name: "Externalize the thought", text: "Write the looping thought exactly as it sounds in your head — unedited. Putting it on paper turns a loop into a line." },
+        { name: "Name the feeling underneath", text: "In one word, name the emotion the thought is protecting you from. Anxious. Hurt. Tired. Don't justify it." },
+        { name: "Ask one honest question", text: "Not 'why am I like this?' Ask: 'What is this thought trying to protect me from right now?' Write the first answer that comes." },
+        { name: "Close the loop", text: "Tell yourself: 'I've heard it. I'll come back to it tomorrow.' Mean it. Most loops loosen once they've been seen and named." },
+      ],
+    },
     related: [
       { to: "/overthinking-at-night", label: "Overthinking at night", desc: "Why thoughts get louder when the day goes quiet." },
       { to: "/why-do-i-overthink", label: "Why do I overthink?", desc: "A calmer explanation for recurring mental loops." },
