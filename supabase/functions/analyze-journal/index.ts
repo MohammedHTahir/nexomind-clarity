@@ -130,9 +130,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Free-tier enforcement: 3 analyses / rolling 30 days for non-premium users.
+    // Free-tier enforcement: 3 analyses / rolling 7 days for non-premium users.
     // Uses the service role client for an authoritative count that bypasses RLS.
-    const FREE_MONTHLY_LIMIT = 3;
+    const FREE_WEEKLY_LIMIT = 3;
     const admin = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
@@ -145,7 +145,7 @@ Deno.serve(async (req) => {
     const isPremium = !!isPremiumData;
 
     if (!isPremium) {
-      const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
       const { count, error: countErr } = await admin
         .from("journal_analysis")
         .select("id", { count: "exact", head: true })
