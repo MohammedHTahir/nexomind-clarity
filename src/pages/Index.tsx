@@ -13,6 +13,7 @@ const FooterCTA = lazy(() => import("@/components/FooterCTA"));
 const WhatIsNexoMind = lazy(() => import("@/components/WhatIsNexoMind"));
 const SiteFooter = lazy(() => import("@/components/SiteFooter"));
 const InstantAiDemo = lazy(() => import("@/components/seo/InstantAiDemo"));
+const TopicLinks = lazy(() => import("@/components/TopicLinks"));
 
 const Fallback = () => <div className="h-32" aria-hidden />;
 
@@ -41,6 +42,7 @@ const Index = () => {
         <Testimonials />
         <FAQ />
         <BlogPreview />
+        <TopicLinks />
         <WhatIsNexoMind />
         <FooterCTA />
         <SiteFooter />
