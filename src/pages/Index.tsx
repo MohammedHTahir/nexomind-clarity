@@ -10,6 +10,7 @@ const Testimonials = lazy(() => import("@/components/Testimonials"));
 const FAQ = lazy(() => import("@/components/FAQ"));
 const BlogPreview = lazy(() => import("@/components/BlogPreview"));
 const FooterCTA = lazy(() => import("@/components/FooterCTA"));
+const WhatIsNexoMind = lazy(() => import("@/components/WhatIsNexoMind"));
 const SiteFooter = lazy(() => import("@/components/SiteFooter"));
 const InstantAiDemo = lazy(() => import("@/components/seo/InstantAiDemo"));
 
@@ -40,6 +41,7 @@ const Index = () => {
         <Testimonials />
         <FAQ />
         <BlogPreview />
+        <WhatIsNexoMind />
         <FooterCTA />
         <SiteFooter />
       </Suspense>

@@ -17,6 +17,7 @@ const Insights = lazy(() => import("./pages/app/Insights.tsx"));
 const Settings = lazy(() => import("./pages/app/Settings.tsx"));
 const DynamicSeoPage = lazy(() => import("./pages/seo/DynamicSeoPage.tsx"));
 const About = lazy(() => import("./pages/About.tsx"));
+const Founder = lazy(() => import("./pages/Founder.tsx"));
 const Contact = lazy(() => import("./pages/Contact.tsx"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy.tsx"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService.tsx"));
@@ -82,6 +83,7 @@ const App = () => (
                 }
               />
               <Route path="/about" element={<About />} />
+              <Route path="/founder" element={<Founder />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms-of-service" element={<TermsOfService />} />
