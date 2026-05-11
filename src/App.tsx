@@ -30,6 +30,7 @@ const Pricing = lazy(() => import("./pages/Pricing.tsx"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword.tsx"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe.tsx"));
 const AdminAnalytics = lazy(() => import("./pages/app/AdminAnalytics.tsx"));
+const AdminUsers = lazy(() => import("./pages/app/AdminUsers.tsx"));
 
 const queryClient = new QueryClient();
 const OAUTH_REDIRECT_KEY = "nexomind:oauth_redirect";
