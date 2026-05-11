@@ -29,3 +29,5 @@ project_id = "ltwnshkruuotjdcqikgf"
     verify_jwt = false
   [functions.admin-funnel-metrics]
     verify_jwt = false
+  [functions.admin-manage-roles]
+    verify_jwt = false
