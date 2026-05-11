@@ -117,6 +117,17 @@ const App = () => (
                   </RequireAuth>
                 }
               />
+              <Route
+                path="/app/admin/users"
+                element={
+                  <RequireAuth>
+                    <AdminUsers />
+                  </RequireAuth>
+                }
+              />
+                  </RequireAuth>
+                }
+              />
               <Route path="/about" element={<About />} />
               <Route path="/founder" element={<Founder />} />
               <Route path="/contact" element={<Contact />} />
