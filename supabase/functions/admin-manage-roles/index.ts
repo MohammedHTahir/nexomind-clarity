@@ -132,6 +132,8 @@ Deno.serve(async (req) => {
     }
 
     if (body.type === "revoke") {
+      const reauthErr = await requireReauth(body.password);
+      if (reauthErr) return reauthErr;
       if (!body.user_id) return json({ error: "user_id required" }, 400);
       if (body.user_id === userData.user.id) {
         return json({ error: "You cannot revoke your own admin role" }, 400);
