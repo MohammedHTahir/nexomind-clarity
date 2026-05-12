@@ -1,6 +1,9 @@
 // Creates a Stripe Embedded Checkout session for NexoMind Premium.
 // Returns { clientSecret } for the EmbeddedCheckoutProvider on the frontend.
+// Auth is enforced in-function: the caller must present a valid user JWT,
+// and userId/customerEmail are derived from that JWT — never from the body.
 
+import { createClient } from "npm:@supabase/supabase-js@2";
 import { type StripeEnv, createStripeClient } from "../_shared/stripe.ts";
 
 const corsHeaders = {
@@ -11,23 +14,22 @@ const corsHeaders = {
 
 async function resolveOrCreateCustomer(
   stripe: ReturnType<typeof createStripeClient>,
-  options: { email?: string; userId?: string },
+  options: { email?: string; userId: string },
 ): Promise<string> {
-  if (options.userId && !/^[a-zA-Z0-9_-]+$/.test(options.userId)) {
+  if (!/^[a-zA-Z0-9_-]+$/.test(options.userId)) {
     throw new Error("Invalid userId");
   }
-  if (options.userId) {
-    const found = await stripe.customers.search({
-      query: `metadata['userId']:'${options.userId}'`,
-      limit: 1,
-    });
-    if (found.data.length) return found.data[0].id;
-  }
+  const found = await stripe.customers.search({
+    query: `metadata['userId']:'${options.userId}'`,
+    limit: 1,
+  });
+  if (found.data.length) return found.data[0].id;
+
   if (options.email) {
     const existing = await stripe.customers.list({ email: options.email, limit: 1 });
     if (existing.data.length) {
       const customer = existing.data[0];
-      if (options.userId && customer.metadata?.userId !== options.userId) {
+      if (customer.metadata?.userId !== options.userId) {
         await stripe.customers.update(customer.id, {
           metadata: { ...customer.metadata, userId: options.userId },
         });
@@ -37,7 +39,7 @@ async function resolveOrCreateCustomer(
   }
   const created = await stripe.customers.create({
     ...(options.email && { email: options.email }),
-    ...(options.userId && { metadata: { userId: options.userId } }),
+    metadata: { userId: options.userId },
   });
   return created.id;
 }
@@ -52,15 +54,32 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // ---- Auth: require a valid user JWT ----
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } },
+    );
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsErr } = await supabase.auth.getClaims(token);
+    if (claimsErr || !claimsData?.claims?.sub) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const userId = claimsData.claims.sub as string;
+    const customerEmail = (claimsData.claims.email as string | undefined) ?? undefined;
+
     const body = await req.json();
-    const {
-      priceId,
-      quantity,
-      customerEmail,
-      userId,
-      returnUrl,
-      environment,
-    } = body ?? {};
+    const { priceId, quantity, returnUrl, environment } = body ?? {};
 
     if (!priceId || !/^[a-zA-Z0-9_-]+$/.test(priceId)) {
       return new Response(JSON.stringify({ error: "Invalid priceId" }), {
@@ -80,6 +99,34 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    // Restrict returnUrl to known app origins to prevent open-redirect abuse.
+    const ALLOWED_ORIGINS = [
+      "https://nexomind.ai",
+      "https://www.nexomind.ai",
+      "https://clarity-echo-calm.lovable.app",
+      "https://id-preview--ee448f32-3498-4b9f-81d4-2a971af9887d.lovable.app",
+      "http://localhost:3000",
+      "http://localhost:5173",
+      "http://localhost:8080",
+    ];
+    try {
+      const parsed = new URL(returnUrl);
+      const isAllowed =
+        ALLOWED_ORIGINS.includes(parsed.origin) ||
+        /\.lovable\.app$/.test(parsed.hostname) ||
+        /\.lovableproject\.com$/.test(parsed.hostname);
+      if (!isAllowed) {
+        return new Response(JSON.stringify({ error: "Invalid returnUrl origin" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    } catch {
+      return new Response(JSON.stringify({ error: "Invalid returnUrl" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const env: StripeEnv = environment;
     const stripe = createStripeClient(env);
@@ -94,21 +141,20 @@ Deno.serve(async (req) => {
     const stripePrice = prices.data[0];
     const isRecurring = stripePrice.type === "recurring";
 
-    const customerId = (customerEmail || userId)
-      ? await resolveOrCreateCustomer(stripe, { email: customerEmail, userId })
-      : undefined;
+    const customerId = await resolveOrCreateCustomer(stripe, {
+      email: customerEmail,
+      userId,
+    });
 
     const session = await stripe.checkout.sessions.create({
       line_items: [{ price: stripePrice.id, quantity: quantity || 1 }],
       mode: isRecurring ? "subscription" : "payment",
       ui_mode: "embedded_page",
       return_url: returnUrl,
-      ...(customerId && { customer: customerId }),
+      customer: customerId,
       managed_payments: { enabled: true },
-      ...(userId && {
-        metadata: { userId, managed_payments: "true" },
-        ...(isRecurring && { subscription_data: { metadata: { userId } } }),
-      }),
+      metadata: { userId, managed_payments: "true" },
+      ...(isRecurring && { subscription_data: { metadata: { userId } } }),
     });
 
     return new Response(JSON.stringify({ clientSecret: session.client_secret }), {
