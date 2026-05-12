@@ -42,6 +42,41 @@ Deno.serve(async (req) => {
 
     const body = (await req.json().catch(() => ({}))) as Action;
 
+    // Reauth helper: require the admin's current password for any mutation,
+    // OR a session that was issued within REAUTH_MAX_AGE_MS.
+    const requireReauth = async (password?: string) => {
+      const issuedAtSec = (userData.user as unknown as { last_sign_in_at?: string })
+        .last_sign_in_at;
+      const sessionFresh =
+        issuedAtSec &&
+        Date.now() - new Date(issuedAtSec).getTime() < REAUTH_MAX_AGE_MS;
+
+      if (sessionFresh && !password) return null;
+
+      if (!password) {
+        return json(
+          { error: "reauth_required", message: "Please confirm your password." },
+          401,
+        );
+      }
+      const email = userData.user.email;
+      if (!email) return json({ error: "Account has no email" }, 400);
+
+      const verify = createClient(supabaseUrl, anonKey);
+      const { error: signErr } = await verify.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (signErr) {
+        return json(
+          { error: "invalid_password", message: "Incorrect password." },
+          401,
+        );
+      }
+      return null;
+    };
+
+
     if (body.type === "list") {
       const search = (body.search ?? "").trim().toLowerCase();
       let q = admin
