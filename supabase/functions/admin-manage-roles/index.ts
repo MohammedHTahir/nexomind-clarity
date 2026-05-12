@@ -111,6 +111,8 @@ Deno.serve(async (req) => {
     }
 
     if (body.type === "grant") {
+      const reauthErr = await requireReauth(body.password);
+      if (reauthErr) return reauthErr;
       const email = body.email?.trim().toLowerCase();
       if (!email) return json({ error: "Email required" }, 400);
       const { data: profile, error: pErr } = await admin
