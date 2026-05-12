@@ -8,8 +8,11 @@ const corsHeaders = {
 
 type Action =
   | { type: "list"; search?: string }
-  | { type: "grant"; email: string }
-  | { type: "revoke"; user_id: string };
+  | { type: "grant"; email: string; password?: string }
+  | { type: "revoke"; user_id: string; password?: string };
+
+// Mutations require a password reauth performed within this window.
+const REAUTH_MAX_AGE_MS = 5 * 60 * 1000;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
