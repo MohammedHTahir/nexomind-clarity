@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Navigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -15,6 +15,12 @@ type UserRow = {
   roles: string[];
 };
 
+type PendingAction =
+  | { type: "grant"; email: string; label: string }
+  | { type: "revoke"; user_id: string; label: string };
+
+const REAUTH_TTL_MS = 5 * 60 * 1000;
+
 const AdminUsers = () => {
   const { user, loading: authLoading } = useAuth();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
@@ -22,8 +28,14 @@ const AdminUsers = () => {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [grantEmail, setGrantEmail] = useState("");
-  const [granting, setGranting] = useState(false);
   const [pendingId, setPendingId] = useState<string | null>(null);
+
+  // Reauth modal state
+  const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
+  const [password, setPassword] = useState("");
+  const [confirming, setConfirming] = useState(false);
+  const reauthCachedAt = useRef<number>(0);
+  const reauthCachedPwd = useRef<string>("");
 
   useEffect(() => {
     if (!user) return;
@@ -60,40 +72,106 @@ const AdminUsers = () => {
   }
   if (!isAdmin) return <Navigate to="/app" replace />;
 
-  const grant = async () => {
-    const email = grantEmail.trim();
-    if (!email) return;
-    setGranting(true);
+  // Run a mutation, transparently injecting cached password if recent.
+  const runMutation = async (
+    action: PendingAction,
+    pwd?: string,
+  ): Promise<{ ok: boolean; needsReauth?: boolean; error?: string }> => {
+    const body: Record<string, unknown> =
+      action.type === "grant"
+        ? { type: "grant", email: action.email }
+        : { type: "revoke", user_id: action.user_id };
+    if (pwd) body.password = pwd;
+
     const { data, error } = await supabase.functions.invoke("admin-manage-roles", {
-      body: { type: "grant", email },
+      body,
     });
-    setGranting(false);
-    if (error || data?.error) {
-      toast.error(error?.message ?? data?.error ?? "Failed to grant");
-      return;
+    const errCode = (data?.error as string | undefined) ?? undefined;
+    if (errCode === "reauth_required" || errCode === "invalid_password") {
+      return { ok: false, needsReauth: true, error: data?.message };
     }
-    toast.success(`Admin granted to ${data.email}`);
-    setGrantEmail("");
-    load(search);
+    if (error || data?.error) {
+      return { ok: false, error: error?.message ?? data?.error ?? "Failed" };
+    }
+    return { ok: true };
   };
 
-  const revoke = async (u: UserRow) => {
+  const startAction = async (action: PendingAction) => {
+    const cacheFresh =
+      reauthCachedPwd.current &&
+      Date.now() - reauthCachedAt.current < REAUTH_TTL_MS;
+
+    if (action.type === "revoke") setPendingId(action.user_id);
+    const res = await runMutation(
+      action,
+      cacheFresh ? reauthCachedPwd.current : undefined,
+    );
+    if (res.ok) {
+      setPendingId(null);
+      toast.success(action.type === "grant" ? "Admin granted" : "Admin revoked");
+      if (action.type === "grant") setGrantEmail("");
+      load(search);
+      return;
+    }
+    if (res.needsReauth) {
+      // Cached password no longer valid
+      reauthCachedPwd.current = "";
+      setPendingId(null);
+      setPassword("");
+      setPendingAction(action);
+      return;
+    }
+    setPendingId(null);
+    toast.error(res.error ?? "Failed");
+  };
+
+  const confirmReauth = async () => {
+    if (!pendingAction || !password) return;
+    setConfirming(true);
+    const res = await runMutation(pendingAction, password);
+    setConfirming(false);
+    if (res.ok) {
+      reauthCachedPwd.current = password;
+      reauthCachedAt.current = Date.now();
+      toast.success(
+        pendingAction.type === "grant" ? "Admin granted" : "Admin revoked",
+      );
+      if (pendingAction.type === "grant") setGrantEmail("");
+      setPendingAction(null);
+      setPassword("");
+      load(search);
+      return;
+    }
+    if (res.needsReauth) {
+      toast.error(res.error ?? "Incorrect password.");
+      return;
+    }
+    toast.error(res.error ?? "Failed");
+    setPendingAction(null);
+  };
+
+  const requestGrantByEmail = () => {
+    const email = grantEmail.trim();
+    if (!email) return;
+    startAction({ type: "grant", email, label: email });
+  };
+
+  const requestRowGrant = (u: UserRow) => {
+    if (!u.email) {
+      toast.error("User has no email on file.");
+      return;
+    }
+    setPendingId(u.id);
+    startAction({ type: "grant", email: u.email, label: u.email });
+  };
+
+  const requestRevoke = (u: UserRow) => {
     if (u.id === user?.id) {
       toast.error("You cannot revoke your own admin role.");
       return;
     }
     if (!confirm(`Revoke admin from ${u.email ?? u.id}?`)) return;
-    setPendingId(u.id);
-    const { error, data } = await supabase.functions.invoke("admin-manage-roles", {
-      body: { type: "revoke", user_id: u.id },
-    });
-    setPendingId(null);
-    if (error || data?.error) {
-      toast.error(error?.message ?? data?.error ?? "Failed to revoke");
-      return;
-    }
-    toast.success("Admin revoked");
-    load(search);
+    startAction({ type: "revoke", user_id: u.id, label: u.email ?? u.id });
   };
 
   return (
@@ -128,15 +206,15 @@ const AdminUsers = () => {
                 className="flex-1 rounded-full bg-white/80 border border-black/10 px-5 py-2.5 font-barlow text-[14px] focus:outline-none focus:border-black/40"
               />
               <button
-                onClick={grant}
-                disabled={granting || !grantEmail.trim()}
+                onClick={requestGrantByEmail}
+                disabled={!grantEmail.trim()}
                 className="rounded-full bg-[#111] text-white px-6 py-2.5 font-barlow text-[14px] font-medium hover:bg-black disabled:opacity-50 transition-colors"
               >
-                {granting ? "Granting…" : "Grant admin"}
+                Grant admin
               </button>
             </div>
             <p className="font-barlow text-[12px] text-[#111]/50 mt-2">
-              The user must already have an account.
+              You'll be asked to re-confirm your password. The user must already have an account.
             </p>
           </GlassCard>
 
@@ -188,7 +266,7 @@ const AdminUsers = () => {
                       {isUserAdmin ? (
                         <button
                           disabled={self || pendingId === u.id}
-                          onClick={() => revoke(u)}
+                          onClick={() => requestRevoke(u)}
                           className="rounded-full border border-black/15 px-3 py-1 font-barlow text-[12px] hover:bg-black/5 disabled:opacity-40"
                           title={self ? "You can't revoke your own admin role" : ""}
                         >
@@ -197,20 +275,7 @@ const AdminUsers = () => {
                       ) : (
                         <button
                           disabled={pendingId === u.id}
-                          onClick={async () => {
-                            setPendingId(u.id);
-                            const { error, data } = await supabase.functions.invoke(
-                              "admin-manage-roles",
-                              { body: { type: "grant", email: u.email } },
-                            );
-                            setPendingId(null);
-                            if (error || data?.error) {
-                              toast.error(error?.message ?? data?.error ?? "Failed");
-                              return;
-                            }
-                            toast.success("Admin granted");
-                            load(search);
-                          }}
+                          onClick={() => requestRowGrant(u)}
                           className="rounded-full bg-[#111] text-white px-3 py-1 font-barlow text-[12px] hover:bg-black disabled:opacity-50"
                         >
                           {pendingId === u.id ? "…" : "Make admin"}
@@ -224,6 +289,57 @@ const AdminUsers = () => {
           </GlassCard>
         </motion.div>
       </div>
+
+      {/* Reauth modal */}
+      {pendingAction && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="bg-[#f6f4ef] rounded-2xl border border-black/10 max-w-md w-full p-6 shadow-xl"
+          >
+            <p className="font-barlow text-[12px] uppercase tracking-[0.2em] text-[#111]/50 mb-2">
+              Confirm your password
+            </p>
+            <h2 className="font-instrument text-[26px] leading-tight mb-3">
+              {pendingAction.type === "grant" ? "Grant admin to" : "Revoke admin from"}{" "}
+              <span className="italic">{pendingAction.label}</span>
+            </h2>
+            <p className="font-barlow text-[13px] text-[#111]/60 mb-4">
+              For your account's security, please re-enter your password to confirm this
+              admin role change.
+            </p>
+            <input
+              type="password"
+              autoFocus
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && confirmReauth()}
+              placeholder="Your password"
+              className="w-full rounded-xl bg-white border border-black/15 px-4 py-2.5 font-barlow text-[14px] focus:outline-none focus:border-black/40 mb-4"
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setPendingAction(null);
+                  setPassword("");
+                }}
+                disabled={confirming}
+                className="rounded-full border border-black/15 px-4 py-2 font-barlow text-[13px] hover:bg-black/5"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmReauth}
+                disabled={confirming || !password}
+                className="rounded-full bg-[#111] text-white px-5 py-2 font-barlow text-[13px] font-medium hover:bg-black disabled:opacity-50"
+              >
+                {confirming ? "Confirming…" : "Confirm"}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </AppShell>
   );
 };

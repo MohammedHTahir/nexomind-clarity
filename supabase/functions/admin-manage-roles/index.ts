@@ -8,8 +8,11 @@ const corsHeaders = {
 
 type Action =
   | { type: "list"; search?: string }
-  | { type: "grant"; email: string }
-  | { type: "revoke"; user_id: string };
+  | { type: "grant"; email: string; password?: string }
+  | { type: "revoke"; user_id: string; password?: string };
+
+// Mutations require a password reauth performed within this window.
+const REAUTH_MAX_AGE_MS = 5 * 60 * 1000;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -38,6 +41,41 @@ Deno.serve(async (req) => {
     if (!isAdmin) return json({ error: "Forbidden" }, 403);
 
     const body = (await req.json().catch(() => ({}))) as Action;
+
+    // Reauth helper: require the admin's current password for any mutation,
+    // OR a session that was issued within REAUTH_MAX_AGE_MS.
+    const requireReauth = async (password?: string) => {
+      const issuedAtSec = (userData.user as unknown as { last_sign_in_at?: string })
+        .last_sign_in_at;
+      const sessionFresh =
+        issuedAtSec &&
+        Date.now() - new Date(issuedAtSec).getTime() < REAUTH_MAX_AGE_MS;
+
+      if (sessionFresh && !password) return null;
+
+      if (!password) {
+        return json(
+          { error: "reauth_required", message: "Please confirm your password." },
+          401,
+        );
+      }
+      const email = userData.user.email;
+      if (!email) return json({ error: "Account has no email" }, 400);
+
+      const verify = createClient(supabaseUrl, anonKey);
+      const { error: signErr } = await verify.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (signErr) {
+        return json(
+          { error: "invalid_password", message: "Incorrect password." },
+          401,
+        );
+      }
+      return null;
+    };
+
 
     if (body.type === "list") {
       const search = (body.search ?? "").trim().toLowerCase();
@@ -73,6 +111,8 @@ Deno.serve(async (req) => {
     }
 
     if (body.type === "grant") {
+      const reauthErr = await requireReauth(body.password);
+      if (reauthErr) return reauthErr;
       const email = body.email?.trim().toLowerCase();
       if (!email) return json({ error: "Email required" }, 400);
       const { data: profile, error: pErr } = await admin
@@ -92,6 +132,8 @@ Deno.serve(async (req) => {
     }
 
     if (body.type === "revoke") {
+      const reauthErr = await requireReauth(body.password);
+      if (reauthErr) return reauthErr;
       if (!body.user_id) return json({ error: "user_id required" }, 400);
       if (body.user_id === userData.user.id) {
         return json({ error: "You cannot revoke your own admin role" }, 400);
