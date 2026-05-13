@@ -8,6 +8,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const requiredSeoFile = readFileSync(resolve(root, "src/pages/seo/requiredSeoPages.ts"), "utf8");
 const seoPagesFile = readFileSync(resolve(root, "src/pages/seo/seoPages.ts"), "utf8");
 const targetSeoFile = readFileSync(resolve(root, "src/pages/seo/targetSeoPages.ts"), "utf8");
+const comparisonSeoFile = readFileSync(resolve(root, "src/pages/seo/comparisonSeoPages.ts"), "utf8");
 const programmaticFile = readFileSync(resolve(root, "src/pages/seo/programmatic.ts"), "utf8");
 
 const extractPaths = (source) =>
@@ -48,6 +49,7 @@ const paths = Array.from(
     ...extractPaths(requiredSeoFile),
     ...extractPaths(seoPagesFile),
     ...extractPaths(targetSeoFile),
+    ...extractPaths(comparisonSeoFile),
     ...programmaticPaths,
   ]),
 );
