@@ -1,5 +1,5 @@
 import { AbsoluteFill, useCurrentFrame, interpolate } from "remotion";
-import { COLORS } from "./theme";
+import { COLORS } from "../theme";
 
 export const Background: React.FC = () => {
   const frame = useCurrentFrame();
