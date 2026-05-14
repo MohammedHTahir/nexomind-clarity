@@ -1,0 +1,32 @@
+# NexoMind
+
+> A quieter way to think — private AI journaling with no streaks, no scores. One calm reflection when your head is loud.
+
+NexoMind is an AI journaling app that helps you process thoughts in the moment. Write whatever's on your mind and AI gently reflects it back as emotional patterns, themes, and a single grounded takeaway. Private by design — entries are encrypted, never sold, never used to train models.
+
+## Pages
+
+- [Home](/): What NexoMind is and who it's for.
+- [About](/about): The philosophy behind a calmer journaling practice.
+- [Founder](/founder): Why NexoMind was built.
+- [Pricing](/pricing): Plans and pricing.
+- [Compare](/compare): How NexoMind compares to other journaling and mental clarity tools.
+- [Contact](/contact): Get in touch.
+
+## Topics
+
+- [AI journaling app](/ai-journaling-app): What AI journaling is and how it works.
+- [Stop overthinking](/stop-overthinking): A calm AI approach to quieting thought loops.
+- [Mental clarity](/mental-clarity): Daily reflection practice for a clearer mind.
+
+## Blog
+
+- [Blog index](/blog): Essays on journaling, overthinking, and mental clarity.
+- [How to stop overthinking at night](/blog/how-to-stop-overthinking-at-night): Why your mind gets louder after dark and a 4-step practice to quiet it.
+- [AI journaling vs therapy](/blog/ai-journaling-vs-therapy): When each tool helps, and why they're not competitors.
+- [Morning pages with AI](/blog/morning-pages-with-ai): A modern take on the classic morning pages practice.
+
+## Optional
+
+- [Privacy policy](/privacy-policy)
+- [Terms of service](/terms-of-service)

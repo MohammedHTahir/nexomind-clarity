@@ -94,7 +94,7 @@ const sourceFor = (path) => {
   return "src/pages/seo/seoPages.ts";
 };
 
-const siteUrl = "https://www.nexomind.ai";
+const siteUrl = "https://nexomind.ai";
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${paths
