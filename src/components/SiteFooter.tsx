@@ -22,6 +22,11 @@ const SiteFooter = () => {
           </p>
           <ul className="space-y-3 font-barlow text-[14px] text-white/70">
             <li><Link to="/blog" className="hover:text-white transition-colors">Journal</Link></li>
+            <li><Link to="/compare" className="hover:text-white transition-colors">Compare</Link></li>
+            <li><Link to="/nexomind-vs-day-one" className="hover:text-white transition-colors">vs Day One</Link></li>
+            <li><Link to="/nexomind-vs-reflectly" className="hover:text-white transition-colors">vs Reflectly</Link></li>
+            <li><Link to="/nexomind-vs-stoic" className="hover:text-white transition-colors">vs Stoic</Link></li>
+            <li><Link to="/nexomind-vs-apple-journal" className="hover:text-white transition-colors">vs Apple Journal</Link></li>
             <li><Link to="/how-to-stop-overthinking" className="hover:text-white transition-colors">How to stop overthinking</Link></li>
             <li><Link to="/mental-clarity" className="hover:text-white transition-colors">Mental clarity</Link></li>
             <li><Link to="/ai-journaling" className="hover:text-white transition-colors">AI journaling</Link></li>
