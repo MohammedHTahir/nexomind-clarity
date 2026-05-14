@@ -105,9 +105,10 @@ Deno.serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
-    console.error(e);
+    const msg = e instanceof Error ? e.message : (typeof e === "string" ? e : JSON.stringify(e));
+    console.error("backfill error:", msg, e);
     return new Response(
-      JSON.stringify({ error: e instanceof Error ? e.message : String(e) }),
+      JSON.stringify({ error: msg }),
       { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
