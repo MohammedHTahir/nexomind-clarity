@@ -53,14 +53,14 @@ const PaywallModal = ({ open, onUnlock, onContinue }: PaywallModalProps) => {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.35, ease }}
-          className="fixed inset-0 z-[80] flex items-center justify-center bg-[#111]/35 backdrop-blur-md px-5 py-8 overflow-y-auto"
+          className="fixed inset-0 z-[80] flex items-start md:items-center justify-center bg-[#111]/35 backdrop-blur-md px-3 sm:px-5 py-6 sm:py-8 overflow-y-auto overscroll-contain"
         >
           <motion.div
             initial={{ opacity: 0, y: 18, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.98 }}
             transition={{ duration: 0.65, ease }}
-            className={`w-full ${showCheckout ? "max-w-2xl" : "max-w-md"} rounded-[24px] border border-white/50 bg-white/85 backdrop-blur-xl p-6 md:p-8 text-center shadow-[0_30px_90px_rgba(0,0,0,0.18)]`}
+            className={`w-full ${showCheckout ? "max-w-2xl" : "max-w-md"} rounded-[24px] border border-white/50 bg-white/85 backdrop-blur-xl p-4 sm:p-6 md:p-8 text-center shadow-[0_30px_90px_rgba(0,0,0,0.18)] my-auto`}
           >
             {!showCheckout ? (
               <>
