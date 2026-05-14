@@ -19,6 +19,7 @@ Deno.serve(async (req) => {
 
     const { email } = await req.json();
     if (!email) throw new Error("email required");
+    if (!ALLOWED.has(email.toLowerCase())) throw new Error("Email not in allowlist");
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
