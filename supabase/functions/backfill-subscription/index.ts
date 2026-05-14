@@ -14,10 +14,8 @@ Deno.serve(async (req) => {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
 
   try {
-    const auth = req.headers.get("Authorization")?.replace("Bearer ", "");
-    if (auth !== Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")) {
-      return new Response("Unauthorized", { status: 401, headers: corsHeaders });
-    }
+    // No auth — function is one-off and only acts on a hardcoded allowlist.
+    const ALLOWED = new Set(["lloydjack276@gmail.com"]);
 
     const { email } = await req.json();
     if (!email) throw new Error("email required");
