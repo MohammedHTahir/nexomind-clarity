@@ -5,6 +5,7 @@ import Hero from "@/components/Hero";
 // Below-the-fold — lazy load to slim the initial JS bundle
 const About = lazy(() => import("@/components/About"));
 const AiDemo = lazy(() => import("@/components/AiDemo"));
+const DemoVideo = lazy(() => import("@/components/DemoVideo"));
 const Features = lazy(() => import("@/components/Features"));
 const Testimonials = lazy(() => import("@/components/Testimonials"));
 const FAQ = lazy(() => import("@/components/FAQ"));
@@ -24,6 +25,7 @@ const Index = () => {
       <Hero />
       <Suspense fallback={<Fallback />}>
         <About />
+        <DemoVideo />
         <AiDemo />
 
         {/* Live AI demo — interactive, ranks for engagement signals */}
