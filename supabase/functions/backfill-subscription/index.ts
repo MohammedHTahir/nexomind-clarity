@@ -90,7 +90,7 @@ Deno.serve(async (req) => {
         environment: "live",
         updated_at: new Date().toISOString(),
       },
-      { onConflict: "stripe_subscription_id" },
+      { onConflict: "user_id" },
     );
     if (upsertErr) throw upsertErr;
 
