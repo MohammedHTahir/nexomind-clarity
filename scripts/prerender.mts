@@ -113,8 +113,34 @@ const staticRoutes: StaticRoute[] = [
 
 function articleJsonLd(c: SeoPageConfig) {
   const url = `${SITE_URL}${c.path}`;
-  const blobs: Record<string, unknown>[] = [
-    {
+  const isTool = c.pageType === "tool";
+  const blobs: Record<string, unknown>[] = [];
+
+  if (isTool) {
+    // Tool pages emit WebApplication so non-JS crawlers (Bing, Perplexity,
+    // ChatGPT) read the page as an interactive utility, matching the
+    // hydrated React JSON-LD in src/components/SeoPage.tsx.
+    blobs.push({
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: c.metaTitle,
+      description: c.metaDescription,
+      url,
+      applicationCategory: "HealthApplication",
+      operatingSystem: "Any",
+      browserRequirements: "Requires JavaScript.",
+      isAccessibleForFree: true,
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      inLanguage: "en",
+      publisher: {
+        "@type": "Organization",
+        name: "NexoMind",
+        url: SITE_URL,
+        logo: { "@type": "ImageObject", url: `${SITE_URL}/og-image.jpg` },
+      },
+    });
+  } else {
+    blobs.push({
       "@context": "https://schema.org",
       "@type": "Article",
       headline: c.metaTitle,
@@ -127,16 +153,17 @@ function articleJsonLd(c: SeoPageConfig) {
         name: "NexoMind",
         logo: { "@type": "ImageObject", url: `${SITE_URL}/og-image.jpg` },
       },
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: `${SITE_URL}/` },
-        { "@type": "ListItem", position: 2, name: c.eyebrow, item: url },
-      ],
-    },
-  ];
+    });
+  }
+
+  blobs.push({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${SITE_URL}/` },
+      { "@type": "ListItem", position: 2, name: c.eyebrow, item: url },
+    ],
+  });
   if (c.faqs && c.faqs.length > 0) {
     blobs.push({
       "@context": "https://schema.org",
@@ -341,7 +368,7 @@ function main() {
       description: c.metaDescription,
       body: renderSeoBody(c),
       jsonLd: articleJsonLd(c),
-      ogType: "article",
+      ogType: c.pageType === "tool" ? "website" : "article",
     });
     const outDir = resolve(distDir, c.path.replace(/^\//, ""));
     mkdirSync(outDir, { recursive: true });

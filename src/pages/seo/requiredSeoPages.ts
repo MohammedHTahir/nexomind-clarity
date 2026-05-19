@@ -409,4 +409,74 @@ export const requiredSeoPages: SeoPageConfig[] = [
       { to: "/private-ai-journaling", label: "Private AI journaling", desc: "Why privacy is the foundation here." },
     ],
   },
+  {
+    path: "/overthinking-analyzer",
+    pageType: "tool",
+    metaTitle: "Overthinking Analyzer — Free AI Tool to Name the Loop | NexoMind",
+    metaDescription:
+      "Paste what's looping in your head. The Overthinking Analyzer names the trigger, the loop, the distortion, and the path to clarity — free, private, no signup.",
+    eyebrow: "Overthinking Analyzer",
+    title: "The overthinking",
+    italic: "analyzer.",
+    intro:
+      "Write the thought that won't switch off. In one read, NexoMind names the trigger, the loop, the distortion underneath, and a path back to clarity. Free, private, no signup.",
+    answerBox:
+      "The Overthinking Analyzer is a free AI tool that reads a looping thought and reflects it back as four parts — Trigger, Thought loop, Distortion, and Clarity. It's designed to release the cognitive tension overthinking creates by naming the parts the mind hasn't finished sorting yet.",
+    widget: "overthinking-analyzer",
+    ctaText: "Want to do this every day, privately? Open NexoMind.",
+    sections: [
+      {
+        h2: "What the analyzer reveals",
+        body: "Overthinking is rarely random. It usually has the same four parts hiding inside it: something that triggered the loop, the loop itself, a distortion the loop is feeding on, and a calmer thought that resolves it. The analyzer surfaces all four in one read so the loop has somewhere to land.",
+      },
+      {
+        h2: "How it works",
+        body: "Type the thought exactly as it sounds in your head — unedited, unfiltered. The model reads it once and returns four short reflections, each labeled. It doesn't argue with the thought, give advice, or psychoanalyze you. It names what's there, which is usually enough for the loop to loosen.",
+      },
+      {
+        h2: "How your input is handled",
+        body: "Your text is sent to a serverless function, processed once to generate the reflection, and returned. It is not stored, not associated with an account, and not used to train models. If you want a record of your reflections over time, that lives behind a private signed-in journal — never on this public tool.",
+      },
+      {
+        h2: "When this tool helps most",
+        body: "Use it when a thought has been replaying for hours and won't move. Use it after a difficult conversation. Use it at night when the day goes quiet and the mind gets loud. The goal is not to fix the thought — the goal is to name it clearly enough that you can put it down.",
+      },
+    ],
+    howTo: {
+      name: "How to use the Overthinking Analyzer",
+      description: "A 3-step way to name a thought loop and release the tension underneath.",
+      steps: [
+        { name: "Write it raw", text: "Type the thought exactly as it sounds in your head. Don't organize it. Don't make it sound calm. The messier, the better." },
+        { name: "Read the four parts", text: "The analyzer returns the trigger, the loop, the distortion, and a calmer clarity. Read each one slowly. You're looking for the line that lands." },
+        { name: "Put it down", text: "You don't have to act on the result. Naming the parts is the work. Most loops loosen just from being seen — that's the closing motion the mind needed." },
+      ],
+    },
+    faqs: [
+      {
+        q: "Is the Overthinking Analyzer free?",
+        a: "Yes. The analyzer is free to use, with no signup, account, or payment required. It runs in your browser and returns a reflection in seconds.",
+      },
+      {
+        q: "Is what I write private?",
+        a: "Yes. Your text is processed once to generate the reflection, then discarded. It is not stored, not linked to an identity, and not used to train models.",
+      },
+      {
+        q: "How is this different from journaling in NexoMind?",
+        a: "The analyzer is a single, anonymous reflection — useful when you need clarity right now. NexoMind's full journal keeps your private reflections over time so you can see emotional patterns and themes return. One is a moment; one is a practice.",
+      },
+      {
+        q: "Will the analyzer give me advice?",
+        a: "No. It deliberately names what's in the thought instead of telling you what to do. Naming is usually enough for the loop to loosen — advice tends to add noise to a mind that's already loud.",
+      },
+      {
+        q: "Can I share my result?",
+        a: "Yes. Use the Copy or Share button below your result. The shared text includes your four reflections plus a link back here so anyone can try it.",
+      },
+    ],
+    related: [
+      { to: "/how-to-stop-overthinking", label: "How to stop overthinking", desc: "The calm, practical version of breaking the loop." },
+      { to: "/ai-journaling-app", label: "AI journaling app", desc: "What this looks like as a daily, private practice." },
+      { to: "/mental-clarity", label: "Find mental clarity", desc: "Turn scattered thoughts into calm understanding." },
+    ],
+  },
 ];
