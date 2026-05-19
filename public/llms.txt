@@ -19,6 +19,10 @@ NexoMind is an AI journaling app that helps you process thoughts in the moment. 
 - [Stop overthinking](/stop-overthinking): A calm AI approach to quieting thought loops.
 - [Mental clarity](/mental-clarity): Daily reflection practice for a clearer mind.
 
+## Tools
+
+- [Overthinking Analyzer](/overthinking-analyzer): Free interactive tool. Paste a looping thought and get a four-part reflection — Trigger, Thought loop, Distortion, Clarity. No signup, not stored, runs in the browser.
+
 ## Blog
 
 - [Blog index](/blog): Essays on journaling, overthinking, and mental clarity.

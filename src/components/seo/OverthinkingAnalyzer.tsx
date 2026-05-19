@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
+import { trackEvent } from "@/lib/analytics";
 
 type Result = {
   trigger: string;
@@ -10,6 +12,7 @@ type Result = {
 };
 
 const FN_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/seo-ai`;
+const SHARE_URL = "https://www.nexomind.ai/overthinking-analyzer";
 
 const fields: { key: keyof Result; label: string }[] = [
   { key: "trigger", label: "Trigger" },
@@ -17,6 +20,18 @@ const fields: { key: keyof Result; label: string }[] = [
   { key: "distortion", label: "Distortion" },
   { key: "clarity", label: "Clarity" },
 ];
+
+const formatShareText = (r: Result) =>
+  [
+    "I just analyzed an overthinking loop with NexoMind:",
+    "",
+    `· Trigger — ${r.trigger}`,
+    `· Thought loop — ${r.thought_loop}`,
+    `· Distortion — ${r.distortion}`,
+    `· Clarity — ${r.clarity}`,
+    "",
+    `Try it free → ${SHARE_URL}`,
+  ].join("\n");
 
 const OverthinkingAnalyzer = () => {
   const [text, setText] = useState("");
@@ -41,11 +56,45 @@ const OverthinkingAnalyzer = () => {
       const data = await r.json();
       if (!r.ok) throw new Error(data?.error ?? "Something went wrong");
       setResult(data as Result);
+      trackEvent("overthinking_analyzer_result", { word_count: text.trim().split(/\s+/).filter(Boolean).length });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong");
     } finally {
       setLoading(false);
     }
+  };
+
+  const copyResult = async (current: Result) => {
+    const payload = formatShareText(current);
+    try {
+      await navigator.clipboard.writeText(payload);
+      toast.success("Copied — paste anywhere.");
+      trackEvent("overthinking_analyzer_copy", { method: "clipboard" });
+    } catch {
+      toast.error("Couldn't copy. Long-press the result to select it instead.");
+    }
+  };
+
+  const shareResult = async (current: Result) => {
+    const payload = formatShareText(current);
+    // Web Share API on mobile / supported browsers — falls back to copy.
+    if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+      try {
+        await navigator.share({
+          title: "NexoMind — Overthinking Analyzer",
+          text: payload,
+          url: SHARE_URL,
+        });
+        trackEvent("overthinking_analyzer_share", { method: "web_share" });
+        return;
+      } catch (err) {
+        // User cancelled the share sheet — silent return.
+        if (err instanceof Error && err.name === "AbortError") return;
+        // Real failure — fall through to clipboard fallback.
+      }
+    }
+    await copyResult(current);
+    trackEvent("overthinking_analyzer_share", { method: "clipboard_fallback" });
   };
 
   return (
@@ -110,13 +159,29 @@ const OverthinkingAnalyzer = () => {
                 </p>
               </div>
             ))}
-            <div className="md:col-span-2 mt-2">
+            <div className="md:col-span-2 mt-2 flex flex-wrap items-center gap-3">
               <Link
                 to="/auth"
                 className="inline-block bg-[#111] text-white rounded-full px-7 py-3 font-barlow font-medium text-[14px] hover:bg-black transition"
               >
                 Go deeper — start your first reflection
               </Link>
+              <button
+                type="button"
+                onClick={() => copyResult(result)}
+                className="inline-flex items-center gap-2 bg-transparent border border-[#111]/15 text-[#111] rounded-full px-5 py-3 font-barlow font-medium text-[14px] hover:bg-[#111]/5 transition"
+                aria-label="Copy result to clipboard"
+              >
+                Copy result
+              </button>
+              <button
+                type="button"
+                onClick={() => shareResult(result)}
+                className="inline-flex items-center gap-2 bg-transparent border border-[#111]/15 text-[#111] rounded-full px-5 py-3 font-barlow font-medium text-[14px] hover:bg-[#111]/5 transition"
+                aria-label="Share result"
+              >
+                Share
+              </button>
             </div>
           </motion.div>
         )}

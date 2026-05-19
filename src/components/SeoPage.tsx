@@ -16,6 +16,15 @@ export type HowTo = { name: string; description?: string; steps: HowToStep[] };
 
 export type SeoWidget = "overthinking-analyzer" | "instant-ai-demo" | "clarity-quiz";
 
+/**
+ * Page type discriminator.
+ * - "article" (default) — long-form SEO content. Emits Article JSON-LD.
+ * - "tool" — interactive utility page where the widget is the hero. Emits
+ *   WebApplication JSON-LD instead of Article, hides the reading-time line,
+ *   and renders the widget above the body sections.
+ */
+export type SeoPageType = "article" | "tool";
+
 export interface SeoPageConfig {
   path: string;
   metaTitle: string;
@@ -38,6 +47,10 @@ export interface SeoPageConfig {
   widget?: SeoWidget;
   /** Optional CTA text shown after content. */
   ctaText?: string;
+  /** Page type — "article" (default) or "tool". Controls JSON-LD type and widget placement. */
+  pageType?: SeoPageType;
+  /** Absolute or root-relative OG image URL for this page. Falls back to /og-image.jpg. */
+  ogImage?: string;
 }
 
 const slugify = (s: string) =>
@@ -79,8 +92,40 @@ const SeoPage = ({ config }: { config: SeoPageConfig }) => {
 
   const jsonLd = useMemo(() => {
     const url = `https://www.nexomind.ai${config.path}`;
-    const blobs: Record<string, unknown>[] = [
-      {
+    const isTool = config.pageType === "tool";
+    const blobs: Record<string, unknown>[] = [];
+
+    if (isTool) {
+      // Tool pages emit WebApplication so AI assistants and search engines
+      // identify the page as an interactive utility (not an article).
+      blobs.push({
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        name: config.metaTitle,
+        description: config.metaDescription,
+        url,
+        applicationCategory: "HealthApplication",
+        operatingSystem: "Any",
+        browserRequirements: "Requires JavaScript.",
+        isAccessibleForFree: true,
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "USD",
+        },
+        inLanguage: "en",
+        publisher: {
+          "@type": "Organization",
+          name: "NexoMind",
+          url: "https://www.nexomind.ai",
+          logo: {
+            "@type": "ImageObject",
+            url: "https://www.nexomind.ai/og-image.jpg",
+          },
+        },
+      });
+    } else {
+      blobs.push({
         "@context": "https://schema.org",
         "@type": "Article",
         headline: config.metaTitle,
@@ -93,16 +138,18 @@ const SeoPage = ({ config }: { config: SeoPageConfig }) => {
           name: "NexoMind",
           logo: { "@type": "ImageObject", url: "https://www.nexomind.ai/og-image.jpg" },
         },
-      },
-      {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Home", item: "https://www.nexomind.ai/" },
-          { "@type": "ListItem", position: 2, name: config.eyebrow, item: url },
-        ],
-      },
-    ];
+      });
+    }
+
+    blobs.push({
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://www.nexomind.ai/" },
+        { "@type": "ListItem", position: 2, name: config.eyebrow, item: url },
+      ],
+    });
+
     if (config.faqs && config.faqs.length > 0) {
       blobs.push({
         "@context": "https://schema.org",
@@ -138,7 +185,8 @@ const SeoPage = ({ config }: { config: SeoPageConfig }) => {
         description={config.metaDescription}
         canonical={`https://www.nexomind.ai${config.path}`}
         jsonLd={jsonLd}
-        type="article"
+        ogImage={config.ogImage}
+        type={config.pageType === "tool" ? "website" : "article"}
       />
 
       {/* Sticky reading progress bar */}
@@ -171,131 +219,145 @@ const SeoPage = ({ config }: { config: SeoPageConfig }) => {
         intro={config.intro}
         related={config.related}
       >
-        {/* Reading time + answer box */}
-        <div className="mb-10">
-          <p className="font-barlow text-[12px] tracking-[0.18em] uppercase text-[#111]/45 mb-4">
-            {readingMinutes} min read
-          </p>
+        {(() => {
+          const isTool = config.pageType === "tool";
+          const widgetSlot = config.widget ? (
+            <Suspense fallback={<div className="h-40" aria-hidden />}>
+              {config.widget === "overthinking-analyzer" && <OverthinkingAnalyzer />}
+              {config.widget === "instant-ai-demo" && (
+                <div className="my-16">
+                  <InstantAiDemo />
+                </div>
+              )}
+              {config.widget === "clarity-quiz" && <ClarityQuiz />}
+            </Suspense>
+          ) : null;
 
-          {config.answerBox && (
-            <aside
-              role="note"
-              aria-label="Quick answer"
-              className="bg-white/80 border border-black/5 rounded-[20px] p-6 md:p-7 shadow-[0_1px_0_rgba(0,0,0,0.02)]"
-            >
-              <p className="font-barlow font-medium text-[11px] tracking-[0.22em] uppercase text-[#111]/45 mb-3">
-                Quick answer
-              </p>
-              <p className="font-barlow text-[16px] md:text-[17px] leading-relaxed text-[#111]/85">
-                {config.answerBox}
-              </p>
-            </aside>
-          )}
-        </div>
-
-        {/* Hook */}
-        {config.hook && (
-          <p className="mb-12 font-instrument italic text-[24px] md:text-[30px] leading-snug text-[#111]/85 border-l-2 border-[#111]/15 pl-5">
-            {config.hook}
-          </p>
-        )}
-
-        {/* Table of contents */}
-        {toc.length > 1 && (
-          <nav
-            aria-label="Table of contents"
-            className="mb-12 border-l border-black/10 pl-5"
-          >
-            <p className="font-barlow font-medium text-[11px] tracking-[0.22em] uppercase text-[#111]/45 mb-3">
-              On this page
-            </p>
-            <ol className="space-y-2 font-barlow text-[15px] text-[#111]/70">
-              {toc.map((item, i) => (
-                <li key={item.id}>
-                  <a
-                    href={`#${item.id}`}
-                    className="hover:text-[#111] transition-colors"
-                  >
-                    <span className="text-[#111]/40 mr-2">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ol>
-          </nav>
-        )}
-
-        {/* Body sections */}
-        <div className="space-y-12 font-barlow text-[17px] leading-relaxed text-[#111]/75">
-          {config.sections.map((s) => {
-            const id = slugify(s.h2);
-            return (
-              <section key={s.h2} id={id} className="scroll-mt-28">
-                <h2 className="font-instrument text-[32px] md:text-[40px] leading-tight text-[#111] mb-4">
-                  <a href={`#${id}`} className="hover:underline underline-offset-4">
-                    {s.h2}
-                  </a>
-                </h2>
-                <p className="whitespace-pre-line">{s.body}</p>
-              </section>
-            );
-          })}
-        </div>
-
-        {/* Interactive widget */}
-        {config.widget && (
-          <Suspense fallback={<div className="h-40" aria-hidden />}>
-            {config.widget === "overthinking-analyzer" && <OverthinkingAnalyzer />}
-            {config.widget === "instant-ai-demo" && (
-              <div className="my-16">
-                <InstantAiDemo />
-              </div>
-            )}
-            {config.widget === "clarity-quiz" && <ClarityQuiz />}
-          </Suspense>
-        )}
-
-        {/* Bottom CTA */}
-        <div className="mt-16 rounded-[24px] bg-[#111] text-white p-8 md:p-12 text-center">
-          <p className="font-instrument text-[28px] md:text-[36px] leading-tight mb-6">
-            {config.ctaText ?? "Start your first reflection and break the loop instantly."}
-          </p>
-          <Link
-            to="/auth"
-            onClick={() => trackEvent("cta_click_seo_page", { path: config.path, location: "bottom" })}
-            className="inline-block bg-white text-[#111] rounded-full px-8 py-4 font-barlow font-medium text-[15px] hover:bg-white/90 transition"
-          >
-            Open NexoMind →
-          </Link>
-        </div>
-        {/* FAQ */}
-        {config.faqs && config.faqs.length > 0 && (
-          <section id="faq" className="mt-20 scroll-mt-28">
-            <p className="font-barlow font-medium text-[12px] tracking-[0.2em] uppercase text-[#111]/50 mb-4">
-              ( FAQ )
-            </p>
-            <h2 className="font-instrument text-[32px] md:text-[44px] leading-tight text-[#111] mb-8">
-              Frequently asked questions
-            </h2>
-            <div className="divide-y divide-black/10 border-y border-black/10">
-              {config.faqs.map((f) => (
-                <details key={f.q} className="group py-5">
-                  <summary className="cursor-pointer list-none flex items-start justify-between gap-4 font-instrument text-[20px] md:text-[24px] leading-snug text-[#111]">
-                    <span>{f.q}</span>
-                    <span className="font-barlow text-[20px] text-[#111]/40 transition-transform group-open:rotate-45 mt-1">
-                      +
-                    </span>
-                  </summary>
-                  <p className="mt-3 font-barlow text-[16px] leading-relaxed text-[#111]/70">
-                    {f.a}
+          return (
+            <>
+              {/* Reading time + answer box (reading time hidden for tool pages) */}
+              <div className="mb-10">
+                {!isTool && (
+                  <p className="font-barlow text-[12px] tracking-[0.18em] uppercase text-[#111]/45 mb-4">
+                    {readingMinutes} min read
                   </p>
-                </details>
-              ))}
-            </div>
-          </section>
-        )}
+                )}
+
+                {config.answerBox && (
+                  <aside
+                    role="note"
+                    aria-label="Quick answer"
+                    className="bg-white/80 border border-black/5 rounded-[20px] p-6 md:p-7 shadow-[0_1px_0_rgba(0,0,0,0.02)]"
+                  >
+                    <p className="font-barlow font-medium text-[11px] tracking-[0.22em] uppercase text-[#111]/45 mb-3">
+                      Quick answer
+                    </p>
+                    <p className="font-barlow text-[16px] md:text-[17px] leading-relaxed text-[#111]/85">
+                      {config.answerBox}
+                    </p>
+                  </aside>
+                )}
+              </div>
+
+              {/* For tool pages, the widget is the hero — show it before any body content. */}
+              {isTool && widgetSlot}
+
+              {/* Hook */}
+              {config.hook && (
+                <p className="mb-12 font-instrument italic text-[24px] md:text-[30px] leading-snug text-[#111]/85 border-l-2 border-[#111]/15 pl-5">
+                  {config.hook}
+                </p>
+              )}
+
+              {/* Table of contents */}
+              {toc.length > 1 && (
+                <nav
+                  aria-label="Table of contents"
+                  className="mb-12 border-l border-black/10 pl-5"
+                >
+                  <p className="font-barlow font-medium text-[11px] tracking-[0.22em] uppercase text-[#111]/45 mb-3">
+                    On this page
+                  </p>
+                  <ol className="space-y-2 font-barlow text-[15px] text-[#111]/70">
+                    {toc.map((item, i) => (
+                      <li key={item.id}>
+                        <a
+                          href={`#${item.id}`}
+                          className="hover:text-[#111] transition-colors"
+                        >
+                          <span className="text-[#111]/40 mr-2">
+                            {String(i + 1).padStart(2, "0")}
+                          </span>
+                          {item.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ol>
+                </nav>
+              )}
+
+              {/* Body sections */}
+              <div className="space-y-12 font-barlow text-[17px] leading-relaxed text-[#111]/75">
+                {config.sections.map((s) => {
+                  const id = slugify(s.h2);
+                  return (
+                    <section key={s.h2} id={id} className="scroll-mt-28">
+                      <h2 className="font-instrument text-[32px] md:text-[40px] leading-tight text-[#111] mb-4">
+                        <a href={`#${id}`} className="hover:underline underline-offset-4">
+                          {s.h2}
+                        </a>
+                      </h2>
+                      <p className="whitespace-pre-line">{s.body}</p>
+                    </section>
+                  );
+                })}
+              </div>
+
+              {/* For article pages, the widget appears after the body content. */}
+              {!isTool && widgetSlot}
+
+              {/* Bottom CTA */}
+              <div className="mt-16 rounded-[24px] bg-[#111] text-white p-8 md:p-12 text-center">
+                <p className="font-instrument text-[28px] md:text-[36px] leading-tight mb-6">
+                  {config.ctaText ?? "Start your first reflection and break the loop instantly."}
+                </p>
+                <Link
+                  to="/auth"
+                  onClick={() => trackEvent("cta_click_seo_page", { path: config.path, location: "bottom" })}
+                  className="inline-block bg-white text-[#111] rounded-full px-8 py-4 font-barlow font-medium text-[15px] hover:bg-white/90 transition"
+                >
+                  Open NexoMind →
+                </Link>
+              </div>
+              {/* FAQ */}
+              {config.faqs && config.faqs.length > 0 && (
+                <section id="faq" className="mt-20 scroll-mt-28">
+                  <p className="font-barlow font-medium text-[12px] tracking-[0.2em] uppercase text-[#111]/50 mb-4">
+                    ( FAQ )
+                  </p>
+                  <h2 className="font-instrument text-[32px] md:text-[44px] leading-tight text-[#111] mb-8">
+                    Frequently asked questions
+                  </h2>
+                  <div className="divide-y divide-black/10 border-y border-black/10">
+                    {config.faqs.map((f) => (
+                      <details key={f.q} className="group py-5">
+                        <summary className="cursor-pointer list-none flex items-start justify-between gap-4 font-instrument text-[20px] md:text-[24px] leading-snug text-[#111]">
+                          <span>{f.q}</span>
+                          <span className="font-barlow text-[20px] text-[#111]/40 transition-transform group-open:rotate-45 mt-1">
+                            +
+                          </span>
+                        </summary>
+                        <p className="mt-3 font-barlow text-[16px] leading-relaxed text-[#111]/70">
+                          {f.a}
+                        </p>
+                      </details>
+                    ))}
+                  </div>
+                </section>
+              )}
+            </>
+          );
+        })()}
       </SeoLayout>
     </>
   );
