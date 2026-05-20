@@ -3,9 +3,11 @@ HASHNODE PUBLISHING CHECKLIST
 ─────────────────────────────
 1. Paste the body below into a new Hashnode post.
 2. Open the post settings (right sidebar) and:
-   - Set "Original URL" to your published Medium URL. This is Hashnode's
-     canonical_url field. Without it the post is treated as duplicate
-     content and won't rank.
+   - Set "Original URL" to https://medium.com/p/8b91794f9b9d
+     This is Hashnode's canonical_url field. Without it the post is treated
+     as duplicate content and won't rank.
+     (If you prefer the slug-based Medium URL, copy it from your published
+     post's address bar and use that instead — both work.)
    - Set the cover image (1200x630).
    - Tags: ai-tools, mental-health, indie-hacking, building-in-public, journaling.
 3. Publish.

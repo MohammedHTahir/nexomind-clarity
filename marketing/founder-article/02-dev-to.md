@@ -3,11 +3,11 @@ title: "I built an AI journal that doesn't try to fix you"
 published: false
 description: "A small founder note on building NexoMind — and why subtraction beat addition every single time."
 tags: ai, mentalhealth, building, indiehackers
-canonical_url: https://medium.com/@YOUR_HANDLE/YOUR_MEDIUM_SLUG
+canonical_url: https://medium.com/p/8b91794f9b9d
 cover_image:
 ---
 
-> Before publishing on DEV: change `published` to `true` and update `canonical_url` to your live Medium URL. Leaving the canonical pointing to Medium consolidates SEO equity at one URL while still earning a real DEV.to backlink.
+> Before publishing on DEV: change `published` to `true`. The `canonical_url` is already set to your Medium permalink (`https://medium.com/p/8b91794f9b9d`). If you want the slug-based URL instead (e.g. `https://medium.com/@yourhandle/i-built-an-ai-journal-...`), open your published Medium post, copy the URL from the address bar, and swap it in. Both work — slug form is slightly preferred for SEO clarity.
 
 It was 2:47 AM when I gave up trying to sleep.
 
