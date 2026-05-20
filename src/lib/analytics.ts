@@ -21,7 +21,11 @@ export type ConversionEvent =
   | "signup_completed"
   | "subscription_started"
   | "journal_entry_created"
-  | "blog_post_view";
+  | "journal_entry_created"
+  | "blog_post_view"
+  | "overthinking_analyzer_result"
+  | "overthinking_analyzer_copy"
+  | "overthinking_analyzer_share";
 
 export function trackEvent(
   event: ConversionEvent,
