@@ -16,13 +16,16 @@ const browser = await openBrowser("chrome", {
   chromeMode: "chrome-for-testing",
 });
 
-const composition = await selectComposition({ serveUrl: bundled, id: "main", puppeteerInstance: browser });
+const compId = process.env.COMP_ID ?? "main";
+const outFile = process.env.OUT_FILE ?? `/mnt/documents/nexomind-${compId}.mp4`;
+
+const composition = await selectComposition({ serveUrl: bundled, id: compId, puppeteerInstance: browser });
 
 await renderMedia({
   composition,
   serveUrl: bundled,
   codec: "h264",
-  outputLocation: "/mnt/documents/nexomind-demo.mp4",
+  outputLocation: outFile,
   puppeteerInstance: browser,
   muted: true,
   concurrency: 1,
