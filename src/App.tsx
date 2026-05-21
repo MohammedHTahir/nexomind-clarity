@@ -16,6 +16,8 @@ const Dashboard = lazy(() => import("./pages/app/Dashboard.tsx"));
 const Journal = lazy(() => import("./pages/app/Journal.tsx"));
 const Insights = lazy(() => import("./pages/app/Insights.tsx"));
 const Settings = lazy(() => import("./pages/app/Settings.tsx"));
+const MindMap = lazy(() => import("./pages/app/MindMap.tsx"));
+
 const DynamicSeoPage = lazy(() => import("./pages/seo/DynamicSeoPage.tsx"));
 const About = lazy(() => import("./pages/About.tsx"));
 const Founder = lazy(() => import("./pages/Founder.tsx"));
@@ -110,6 +112,15 @@ const App = () => (
                   </RequireAuth>
                 }
               />
+              <Route
+                path="/app/mind-map"
+                element={
+                  <RequireAuth>
+                    <MindMap />
+                  </RequireAuth>
+                }
+              />
+
               <Route
                 path="/app/admin/analytics"
                 element={

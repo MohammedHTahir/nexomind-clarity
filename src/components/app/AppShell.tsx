@@ -11,9 +11,11 @@ const ease = [0.16, 1, 0.3, 1] as const;
 const nav = [
   { to: "/app", label: "Reflect" },
   { to: "/app/journal", label: "Write" },
+  { to: "/app/mind-map", label: "Mind Map" },
   { to: "/app/insights", label: "Insights" },
   { to: "/app/settings", label: "Settings" },
 ];
+
 
 const AppShell = ({ children }: { children: ReactNode }) => {
   const { pathname } = useLocation();
