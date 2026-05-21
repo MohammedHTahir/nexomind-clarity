@@ -5,8 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Sparkles, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
-// @ts-expect-error - no types shipped
 import ForceGraph2D from "react-force-graph-2d";
+
 
 type NodeType = "theme" | "emotion" | "person" | "distortion" | "trigger";
 
