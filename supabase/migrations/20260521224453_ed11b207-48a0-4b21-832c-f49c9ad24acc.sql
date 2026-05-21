@@ -1,0 +1,1 @@
+revoke execute on function public.match_mind_node(uuid, public.mind_node_type, vector, float) from public, anon, authenticated;
