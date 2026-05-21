@@ -269,6 +269,33 @@ Deno.serve(async (req) => {
       .single();
     if (aErr) throw aErr;
 
+    // Fire-and-forget: update the user's Mind Map graph
+    try {
+      const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+      const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+      fetch(`${SUPABASE_URL}/functions/v1/update-mind-map`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${SERVICE_KEY}`,
+          apikey: SERVICE_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          journal_id: journal.id,
+          analysis: {
+            summary: parsed.summary,
+            emotional_state: parsed.emotional_state,
+            cognitive_patterns: parsed.cognitive_patterns,
+            key_thoughts: parsed.key_thoughts,
+            distortions_or_biases: parsed.distortions_or_biases,
+            clarity_insight: parsed.clarity_insight,
+          },
+        }),
+      }).catch((err) => console.warn("mind map fire-and-forget failed", err));
+    } catch (e) { console.warn("mind map dispatch err", e); }
+
+
     // Recompute usage post-insert so the client can show "X of 3 left"
     let usage: { limit: number | null; used: number; remaining: number | null } = {
       limit: null,
