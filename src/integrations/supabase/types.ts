@@ -226,6 +226,128 @@ export type Database = {
         }
         Relationships: []
       }
+      mind_edges: {
+        Row: {
+          created_at: string
+          id: string
+          last_co_occurred_at: string
+          source_id: string
+          target_id: string
+          user_id: string
+          weight: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_co_occurred_at?: string
+          source_id: string
+          target_id: string
+          user_id: string
+          weight?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_co_occurred_at?: string
+          source_id?: string
+          target_id?: string
+          user_id?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mind_edges_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "mind_nodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mind_edges_target_id_fkey"
+            columns: ["target_id"]
+            isOneToOne: false
+            referencedRelation: "mind_nodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mind_node_entries: {
+        Row: {
+          created_at: string
+          id: string
+          journal_id: string
+          node_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          journal_id: string
+          node_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          journal_id?: string
+          node_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mind_node_entries_node_id_fkey"
+            columns: ["node_id"]
+            isOneToOne: false
+            referencedRelation: "mind_nodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mind_nodes: {
+        Row: {
+          created_at: string
+          embedding: string | null
+          first_seen_at: string
+          frequency: number
+          id: string
+          label: string
+          label_normalized: string
+          last_seen_at: string
+          metadata: Json
+          type: Database["public"]["Enums"]["mind_node_type"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          embedding?: string | null
+          first_seen_at?: string
+          frequency?: number
+          id?: string
+          label: string
+          label_normalized: string
+          last_seen_at?: string
+          metadata?: Json
+          type: Database["public"]["Enums"]["mind_node_type"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          embedding?: string | null
+          first_seen_at?: string
+          frequency?: number
+          id?: string
+          label?: string
+          label_normalized?: string
+          last_seen_at?: string
+          metadata?: Json
+          type?: Database["public"]["Enums"]["mind_node_type"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -368,6 +490,18 @@ export type Database = {
         Returns: boolean
       }
       is_premium: { Args: { _user_id: string }; Returns: boolean }
+      match_mind_node: {
+        Args: {
+          _embedding: string
+          _threshold?: number
+          _type: Database["public"]["Enums"]["mind_node_type"]
+          _user_id: string
+        }
+        Returns: {
+          id: string
+          similarity: number
+        }[]
+      }
       move_to_dlq: {
         Args: {
           dlq_name: string
@@ -388,6 +522,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      mind_node_type: "theme" | "emotion" | "person" | "distortion" | "trigger"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -516,6 +651,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      mind_node_type: ["theme", "emotion", "person", "distortion", "trigger"],
     },
   },
 } as const
