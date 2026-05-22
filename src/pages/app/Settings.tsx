@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppShell from "@/components/app/AppShell";
 import GlassCard from "@/components/app/GlassCard";
+import PatternInterruptsCard from "@/components/app/PatternInterruptsCard";
 import PaywallModal from "@/components/PaywallModal";
 import { deleteAllJournals } from "@/lib/journal";
 import { useAuth } from "@/hooks/useAuth";
@@ -224,7 +225,10 @@ const Settings = () => {
           )}
         </GlassCard>
 
+        <PatternInterruptsCard delay={0.08} />
+
         <div className="space-y-4 mb-10">
+
           {sections.map((s, i) => (
             <GlassCard key={s.title} delay={0.1 + i * 0.05} className="p-7">
               <h2 className="font-instrument text-[26px] mb-2">{s.title}</h2>
