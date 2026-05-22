@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Mic, ArrowRight, ChevronDown } from "lucide-react";
 import AppShell from "@/components/app/AppShell";
 import GlassCard from "@/components/app/GlassCard";
+import PatternsCard from "@/components/app/PatternsCard";
 import {
   analyzeAndStore,
   fetchJournals,
@@ -320,6 +321,9 @@ const Dashboard = () => {
             </div>
           </GlassCard>
         </div>
+
+        <PatternsCard />
+
 
         <div className="mt-14">
           <div className="flex items-end justify-between mb-6">

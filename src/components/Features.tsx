@@ -1,12 +1,36 @@
-import { Lock, Sparkles, Moon, Waves, NotebookPen, HeartPulse } from "lucide-react";
+import { Lock, Sparkles, Moon, Waves, Network, BellRing } from "lucide-react";
 
 const features = [
-  { icon: Sparkles, t: "Unlimited AI reflections", d: "Reflect as often as your mind needs. No caps, no limits." },
-  { icon: Waves, t: "Pattern recognition over time", d: "See the loops, triggers, and themes that quietly shape your days." },
-  { icon: HeartPulse, t: "Personalized clarity", d: "Every session is tuned to what you're actually going through." },
-  { icon: Moon, t: "It gets clearer over time", d: "You tend to overthink more at night. This pattern has appeared 6 times." },
-  { icon: NotebookPen, t: "Small clarity, every day", d: "One thought. One reflection. That's enough." },
-  { icon: Lock, t: "Private. Secure. No data shared.", d: "Your reflections stay yours. We never sell, train on, or read them." },
+  {
+    icon: Network,
+    t: "Mind Map of You",
+    d: "A living graph of your psyche — themes, emotions, triggers, and the threads between them. Built silently from every entry.",
+  },
+  {
+    icon: BellRing,
+    t: "Pattern Interrupts",
+    d: "NexoMind learns when your loops open — Sunday 8pm, Tuesday 11pm — and quietly nudges you before they grip.",
+  },
+  {
+    icon: Waves,
+    t: "Pattern recognition over time",
+    d: "See the loops, triggers, and themes that quietly shape your days.",
+  },
+  {
+    icon: Sparkles,
+    t: "Unlimited AI reflections",
+    d: "Reflect as often as your mind needs. No caps, no limits.",
+  },
+  {
+    icon: Moon,
+    t: "It gets clearer over time",
+    d: "The longer you write, the sharper the picture of your own mind becomes.",
+  },
+  {
+    icon: Lock,
+    t: "Private. Secure. No data shared.",
+    d: "Your reflections stay yours. We never sell, train on, or read them.",
+  },
 ];
 
 const Features = () => {
