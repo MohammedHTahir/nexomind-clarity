@@ -348,6 +348,33 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          created_at: string
+          email_for_interrupts: string | null
+          pattern_interrupts_enabled: boolean
+          timezone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_for_interrupts?: string | null
+          pattern_interrupts_enabled?: boolean
+          timezone?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email_for_interrupts?: string | null
+          pattern_interrupts_enabled?: boolean
+          timezone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -441,6 +468,51 @@ export type Database = {
           id?: string
           metadata?: Json | null
           reason?: string
+        }
+        Relationships: []
+      }
+      user_patterns: {
+        Row: {
+          computed_at: string
+          confidence: number
+          created_at: string
+          day_of_week: number
+          hour_of_day: number
+          id: string
+          last_fired_at: string | null
+          pattern_type: string
+          sample_size: number
+          theme_label: string | null
+          theme_node_id: string | null
+          user_id: string
+        }
+        Insert: {
+          computed_at?: string
+          confidence?: number
+          created_at?: string
+          day_of_week: number
+          hour_of_day: number
+          id?: string
+          last_fired_at?: string | null
+          pattern_type?: string
+          sample_size?: number
+          theme_label?: string | null
+          theme_node_id?: string | null
+          user_id: string
+        }
+        Update: {
+          computed_at?: string
+          confidence?: number
+          created_at?: string
+          day_of_week?: number
+          hour_of_day?: number
+          id?: string
+          last_fired_at?: string | null
+          pattern_type?: string
+          sample_size?: number
+          theme_label?: string | null
+          theme_node_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
