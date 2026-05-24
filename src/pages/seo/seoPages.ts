@@ -3,7 +3,7 @@ import { SeoPageConfig } from "@/components/SeoPage";
 export const seoPages: SeoPageConfig[] = [
   {
     path: "/daily-journal-prompts",
-    metaTitle: "Daily Journal Prompts for Clarity & Calm | NexoMind",
+    metaTitle: "Daily Journal Prompts for Clarity & Calm",
     metaDescription:
       "30+ daily journal prompts to help you reflect, reduce overthinking, and find emotional clarity. Use them with NexoMind's AI journaling app.",
     eyebrow: "Daily Journal Prompts",
@@ -36,7 +36,7 @@ export const seoPages: SeoPageConfig[] = [
   },
   {
     path: "/how-to-journal-for-mental-health",
-    metaTitle: "How to Journal for Mental Health — A Gentle Guide | NexoMind",
+    metaTitle: "How to Journal for Mental Health — A Gentle Guide",
     metaDescription:
       "A calm, practical guide to journaling for mental health. Learn how to start, what to write, and how AI can make reflection sustainable.",
     eyebrow: "Journaling for Mental Health",
@@ -69,7 +69,7 @@ export const seoPages: SeoPageConfig[] = [
   },
   {
     path: "/how-to-clear-your-mind",
-    metaTitle: "How to Clear Your Mind — Simple, Calm Methods | NexoMind",
+    metaTitle: "How to Clear Your Mind — Simple, Calm Methods",
     metaDescription:
       "Practical, calm methods to clear your mind when thoughts feel loud. Use journaling, reflection, and AI to find quiet — fast.",
     eyebrow: "Clear Your Mind",
@@ -102,7 +102,7 @@ export const seoPages: SeoPageConfig[] = [
   },
   {
     path: "/signs-of-overthinking",
-    metaTitle: "10 Signs of Overthinking (and What to Do) | NexoMind",
+    metaTitle: "10 Signs of Overthinking (and What to Do)",
     metaDescription:
       "Recognize the signs of overthinking — and learn calm, practical ways to break the loop. Reflection-based, judgment-free.",
     eyebrow: "Signs of Overthinking",
@@ -135,7 +135,7 @@ export const seoPages: SeoPageConfig[] = [
   },
   {
     path: "/self-reflection-questions",
-    metaTitle: "50 Self-Reflection Questions for Clarity | NexoMind",
+    metaTitle: "50 Self-Reflection Questions for Clarity",
     metaDescription:
       "Honest, gentle self-reflection questions to help you understand yourself better. Use them with NexoMind to find clarity, fast.",
     eyebrow: "Self-Reflection",
@@ -168,7 +168,7 @@ export const seoPages: SeoPageConfig[] = [
   },
   {
     path: "/why-do-i-feel-overwhelmed",
-    metaTitle: "Why Do I Feel Overwhelmed? — A Calmer Answer | NexoMind",
+    metaTitle: "Why Do I Feel Overwhelmed? — A Calmer Answer",
     metaDescription:
       "Understand why you feel overwhelmed and what your mind is actually asking for. A gentle, reflective approach with NexoMind.",
     eyebrow: "Feeling Overwhelmed",
@@ -201,7 +201,7 @@ export const seoPages: SeoPageConfig[] = [
   },
   {
     path: "/organize-your-thoughts",
-    metaTitle: "How to Organize Your Thoughts | NexoMind",
+    metaTitle: "How to Organize Your Thoughts",
     metaDescription:
       "Turn scattered thinking into structured clarity. A simple, calm method for organizing your thoughts — supported by AI reflection.",
     eyebrow: "Organize Your Thoughts",
@@ -234,7 +234,7 @@ export const seoPages: SeoPageConfig[] = [
   },
   {
     path: "/mental-reset",
-    metaTitle: "How to Do a Mental Reset (in 5 Minutes) | NexoMind",
+    metaTitle: "How to Do a Mental Reset (in 5 Minutes)",
     metaDescription:
       "A calm, 5-minute mental reset to clear your head and reset your day. Reflection-based, judgment-free, supported by AI.",
     eyebrow: "Mental Reset",
@@ -267,7 +267,7 @@ export const seoPages: SeoPageConfig[] = [
   },
   {
     path: "/understand-your-emotions",
-    metaTitle: "Understand Your Emotions — A Calm Guide | NexoMind",
+    metaTitle: "Understand Your Emotions — A Calm Guide",
     metaDescription:
       "Learn to name, read, and understand your emotions with NexoMind. AI-powered reflection that helps you feel more clearly.",
     eyebrow: "Understand Your Emotions",
@@ -300,7 +300,7 @@ export const seoPages: SeoPageConfig[] = [
   },
   {
     path: "/think-more-clearly",
-    metaTitle: "How to Think More Clearly | NexoMind",
+    metaTitle: "How to Think More Clearly",
     metaDescription:
       "Calm, practical methods for clearer thinking. Reduce noise, name what matters, and use AI reflection to think more clearly — daily.",
     eyebrow: "Think More Clearly",

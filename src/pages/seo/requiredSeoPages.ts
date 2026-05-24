@@ -3,7 +3,7 @@ import type { SeoPageConfig } from "@/components/SeoPage";
 export const requiredSeoPages: SeoPageConfig[] = [
   {
     path: "/stop-overthinking",
-    metaTitle: "How to Stop Overthinking — A Calm AI Approach | NexoMind",
+    metaTitle: "How to Stop Overthinking — A Calm AI Approach",
     metaDescription:
       "Learn how to stop overthinking with a calm AI reflection app that turns racing thoughts into emotional clarity in seconds.",
     eyebrow: "Stop Overthinking",
@@ -63,7 +63,7 @@ export const requiredSeoPages: SeoPageConfig[] = [
   },
   {
     path: "/ai-journaling-app",
-    metaTitle: "AI Journaling App for Mental Clarity | NexoMind",
+    metaTitle: "AI Journaling App for Mental Clarity",
     metaDescription:
       "NexoMind is an AI journaling app that turns messy thoughts into clear emotional insight, patterns, and reflection prompts.",
     eyebrow: "AI Journaling App",
@@ -113,7 +113,7 @@ export const requiredSeoPages: SeoPageConfig[] = [
   },
   {
     path: "/mental-clarity",
-    metaTitle: "Mental Clarity — Understand Your Thoughts | NexoMind",
+    metaTitle: "Mental Clarity — Understand Your Thoughts",
     metaDescription:
       "Find mental clarity by turning scattered thoughts into calm, structured insight with NexoMind's AI reflection app.",
     eyebrow: "Mental Clarity",
@@ -166,7 +166,7 @@ export const requiredSeoPages: SeoPageConfig[] = [
   },
   {
     path: "/overthinking-at-night",
-    metaTitle: "Overthinking at Night — Why It Happens & What Helps | NexoMind",
+    metaTitle: "Overthinking at Night — Why It Happens & What Helps",
     metaDescription:
       "Understand why overthinking at night feels so intense and how AI reflection can help you quiet the loop before sleep.",
     eyebrow: "Overthinking at Night",
@@ -222,7 +222,7 @@ export const requiredSeoPages: SeoPageConfig[] = [
   },
   {
     path: "/why-do-i-overthink",
-    metaTitle: "Why Do I Overthink? A Calm Explanation | NexoMind",
+    metaTitle: "Why Do I Overthink? A Calm Explanation",
     metaDescription:
       "Why do I overthink? Learn what recurring thought loops are trying to tell you and how NexoMind helps turn them into clarity.",
     eyebrow: "Why Do I Overthink",
@@ -278,7 +278,7 @@ export const requiredSeoPages: SeoPageConfig[] = [
   },
   {
     path: "/how-to-stop-overthinking",
-    metaTitle: "How to Stop Overthinking (When Your Brain Won't Shut Off) | NexoMind",
+    metaTitle: "How to Stop Overthinking (When Your Brain Won't Shut Off)",
     metaDescription:
       "Stuck in a thought loop your brain won't release? Learn the calm, AI-guided way to stop overthinking and turn racing thoughts into clarity in minutes.",
     eyebrow: "How to Stop Overthinking",
@@ -350,7 +350,7 @@ export const requiredSeoPages: SeoPageConfig[] = [
   },
   {
     path: "/ai-journaling",
-    metaTitle: "AI Journaling: Turn Thoughts Into Clarity Instantly | NexoMind",
+    metaTitle: "AI Journaling: Turn Thoughts Into Clarity Instantly",
     metaDescription:
       "AI journaling turns messy thoughts into structured insight in minutes. Private, gentle, fast — built for clarity, not streaks.",
     eyebrow: "AI Journaling",
@@ -412,7 +412,7 @@ export const requiredSeoPages: SeoPageConfig[] = [
   {
     path: "/overthinking-analyzer",
     pageType: "tool",
-    metaTitle: "Overthinking Analyzer — Free AI Tool to Name the Loop | NexoMind",
+    metaTitle: "Overthinking Analyzer — Free AI Tool to Name the Loop",
     metaDescription:
       "Paste what's looping in your head. The Overthinking Analyzer names the trigger, the loop, the distortion, and the path to clarity — free, private, no signup.",
     eyebrow: "Overthinking Analyzer",

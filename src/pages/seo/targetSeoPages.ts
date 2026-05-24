@@ -8,7 +8,7 @@ export const targetSeoPages: SeoPageConfig[] = [
   // ───────────────────────────────────────────────────────────────────
   {
     path: "/how-to-stop-overthinking-at-night",
-    metaTitle: "How to Stop Overthinking at Night — A Calm Method | NexoMind",
+    metaTitle: "How to Stop Overthinking at Night — A Calm Method",
     metaDescription:
       "A calm, practical method to stop overthinking at night. Why it happens, what helps in 5 minutes, and how AI journaling quiets the loop.",
     eyebrow: "Stop Overthinking at Night",
@@ -84,7 +84,7 @@ export const targetSeoPages: SeoPageConfig[] = [
   // ───────────────────────────────────────────────────────────────────
   {
     path: "/mental-clarity-for-founders",
-    metaTitle: "Mental Clarity for Founders — A Calm Operating System | NexoMind",
+    metaTitle: "Mental Clarity for Founders — A Calm Operating System",
     metaDescription:
       "A calm, practical guide to mental clarity for founders. How to think more clearly under pressure, decide faster, and stop carrying the company in your head.",
     eyebrow: "Mental Clarity for Founders",
@@ -156,7 +156,7 @@ export const targetSeoPages: SeoPageConfig[] = [
   // ───────────────────────────────────────────────────────────────────
   {
     path: "/ai-journaling-for-anxiety",
-    metaTitle: "AI Journaling for Anxiety — A Calmer Approach | NexoMind",
+    metaTitle: "AI Journaling for Anxiety — A Calmer Approach",
     metaDescription:
       "How AI journaling helps with anxiety: name the feeling, externalize the loop, and find structured clarity in 3 minutes a day with NexoMind.",
     eyebrow: "AI Journaling for Anxiety",
@@ -232,7 +232,7 @@ export const targetSeoPages: SeoPageConfig[] = [
   // ───────────────────────────────────────────────────────────────────
   {
     path: "/private-ai-journaling",
-    metaTitle: "Private AI Journaling — Encrypted, Honest, Yours | NexoMind",
+    metaTitle: "Private AI Journaling — Encrypted, Honest, Yours",
     metaDescription:
       "Private AI journaling that's encrypted, never sold, and never used to train public AI models. NexoMind keeps reflection honest by keeping it yours.",
     eyebrow: "Private AI Journaling",
@@ -308,7 +308,7 @@ export const targetSeoPages: SeoPageConfig[] = [
   // ───────────────────────────────────────────────────────────────────
   {
     path: "/reflect-alternative",
-    metaTitle: "Reflect Alternative — A Calmer AI Journal | NexoMind",
+    metaTitle: "Reflect Alternative — A Calmer AI Journal",
     metaDescription:
       "Looking for a Reflect alternative? NexoMind is a calm, private AI journaling app focused on emotional clarity, not note-taking.",
     eyebrow: "Reflect Alternative",
@@ -380,7 +380,7 @@ export const targetSeoPages: SeoPageConfig[] = [
   // ───────────────────────────────────────────────────────────────────
   {
     path: "/day-one-alternative",
-    metaTitle: "Day One Alternative — AI Journaling, Reimagined | NexoMind",
+    metaTitle: "Day One Alternative — AI Journaling, Reimagined",
     metaDescription:
       "A Day One alternative for people who want reflection, not just record-keeping. NexoMind turns messy thoughts into structured clarity in 3 minutes.",
     eyebrow: "Day One Alternative",
@@ -452,7 +452,7 @@ export const targetSeoPages: SeoPageConfig[] = [
   // ───────────────────────────────────────────────────────────────────
   {
     path: "/clear-your-mind",
-    metaTitle: "Clear Your Mind — Simple, Calm Methods | NexoMind",
+    metaTitle: "Clear Your Mind — Simple, Calm Methods",
     metaDescription:
       "Calm, practical methods to clear your mind when thoughts feel loud. Use journaling, reflection, and AI to find quiet — fast.",
     eyebrow: "Clear Your Mind",
