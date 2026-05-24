@@ -7,6 +7,7 @@ interface SeoProps {
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   ogImage?: string;
   type?: string;
+  noindex?: boolean;
 }
 
 const SITE_URL = "https://www.nexomind.ai";
@@ -22,7 +23,7 @@ const setMeta = (name: string, content: string, attr: "name" | "property" = "nam
   el.setAttribute("content", content);
 };
 
-const Seo = ({ title, description, canonical, jsonLd, ogImage, type = "website" }: SeoProps) => {
+const Seo = ({ title, description, canonical, jsonLd, ogImage, type = "website", noindex = false }: SeoProps) => {
   useEffect(() => {
     document.title = title;
     setMeta("description", description);
@@ -72,7 +73,7 @@ const Seo = ({ title, description, canonical, jsonLd, ogImage, type = "website" 
     setMeta("twitter:image", og);
 
     // Robots / theme
-    setMeta("robots", "index,follow,max-image-preview:large,max-snippet:-1");
+    setMeta("robots", noindex ? "noindex,nofollow" : "index,follow,max-image-preview:large,max-snippet:-1");
 
     // JSON-LD (supports array or single)
     const scripts: HTMLScriptElement[] = [];
@@ -89,7 +90,7 @@ const Seo = ({ title, description, canonical, jsonLd, ogImage, type = "website" 
         if (s.parentNode) s.parentNode.removeChild(s);
       }
     };
-  }, [title, description, canonical, jsonLd, ogImage, type]);
+  }, [title, description, canonical, jsonLd, ogImage, type, noindex]);
 
   return null;
 };

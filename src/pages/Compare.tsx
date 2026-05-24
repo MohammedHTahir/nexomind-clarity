@@ -9,7 +9,7 @@ const Compare = () => {
   return (
     <main className="min-h-screen bg-[#F3F4ED]">
       <Seo
-        title="Compare NexoMind — vs Day One, Reflectly, Stoic & Apple Journal"
+        title="Compare NexoMind — Day One, Reflectly, Stoic, Apple Journal"
         description="Honest, side-by-side comparisons of NexoMind against the most popular journaling apps. See which fits how you actually reflect."
         canonical="https://www.nexomind.ai/compare"
       />

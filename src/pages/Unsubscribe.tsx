@@ -48,7 +48,7 @@ const Unsubscribe = () => {
 
   return (
     <main className="min-h-screen bg-[#F3F4ED] text-[#111] flex items-center justify-center px-6">
-      <Seo title="Unsubscribe — NexoMind" description="Manage your NexoMind email preferences." />
+      <Seo title="Unsubscribe from NexoMind emails" description="Manage your NexoMind email preferences and unsubscribe from reflection reminders or product updates at any time." noindex />
       <div className="max-w-md w-full bg-white rounded-[24px] p-8 md:p-10 border border-black/5 text-center">
         <p className="font-instrument text-[24px] mb-6">
           nexo<span className="italic opacity-55">mind</span>

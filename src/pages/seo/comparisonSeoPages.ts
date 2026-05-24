@@ -11,7 +11,7 @@ export const comparisonSeoPages: SeoPageConfig[] = [
   // ───────────────────────────────────────────────────────────────────
   {
     path: "/nexomind-vs-day-one",
-    metaTitle: "NexoMind vs Day One — Which Journal Is Right for You? | NexoMind",
+    metaTitle: "NexoMind vs Day One — Which Journal Is Right for You?",
     metaDescription:
       "An honest, side-by-side comparison of NexoMind and Day One. Privacy, AI reflection, pricing, and which one fits the way you actually journal.",
     eyebrow: "NexoMind vs Day One",
@@ -87,7 +87,7 @@ export const comparisonSeoPages: SeoPageConfig[] = [
   // ───────────────────────────────────────────────────────────────────
   {
     path: "/nexomind-vs-reflectly",
-    metaTitle: "NexoMind vs Reflectly — Mood Tracking vs Reflection | NexoMind",
+    metaTitle: "NexoMind vs Reflectly — Mood Tracking vs Reflection",
     metaDescription:
       "Reflectly is a mood tracker with prompts. NexoMind is a reflection engine. Here's an honest comparison so you choose the right one.",
     eyebrow: "NexoMind vs Reflectly",
@@ -163,7 +163,7 @@ export const comparisonSeoPages: SeoPageConfig[] = [
   // ───────────────────────────────────────────────────────────────────
   {
     path: "/nexomind-vs-stoic",
-    metaTitle: "NexoMind vs Stoic — Two Reflective Journals Compared | NexoMind",
+    metaTitle: "NexoMind vs Stoic — Two Reflective Journals Compared",
     metaDescription:
       "NexoMind vs Stoic: AI reflection engine vs structured stoic journaling. An honest, side-by-side comparison so you choose the right one.",
     eyebrow: "NexoMind vs Stoic",
@@ -239,7 +239,7 @@ export const comparisonSeoPages: SeoPageConfig[] = [
   // ───────────────────────────────────────────────────────────────────
   {
     path: "/nexomind-vs-apple-journal",
-    metaTitle: "NexoMind vs Apple Journal — Default vs Intentional | NexoMind",
+    metaTitle: "NexoMind vs Apple Journal — Default vs Intentional",
     metaDescription:
       "Apple Journal is free and built into iOS. NexoMind is a focused AI reflection engine. Here's an honest comparison of when each one wins.",
     eyebrow: "NexoMind vs Apple Journal",
