@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check } from "lucide-react";
+import Seo from "@/components/Seo";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -37,6 +38,11 @@ const Onboarding = () => {
 
   return (
     <div className="min-h-screen bg-[#F3F4ED] text-[#111] relative overflow-hidden flex items-center justify-center px-6">
+      <Seo
+        title="Welcome to NexoMind — set up your reflection"
+        description="A short onboarding to personalize your NexoMind journaling experience — mood, intentions, and how you'd like to reflect."
+        noindex
+      />
       {/* Soft ambient color */}
       <div
         aria-hidden

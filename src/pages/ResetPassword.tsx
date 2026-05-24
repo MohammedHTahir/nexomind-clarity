@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import Seo from "@/components/Seo";
 import { toast } from "sonner";
 
 const ease = [0.16, 1, 0.3, 1] as const;
@@ -52,6 +53,11 @@ const ResetPassword = () => {
 
   return (
     <div className="min-h-screen bg-[#F3F4ED] text-[#111] relative overflow-hidden flex items-center justify-center px-6">
+      <Seo
+        title="Reset your NexoMind password"
+        description="Set a new password for your NexoMind account and get back to your private, calm reflection practice in seconds."
+        noindex
+      />
       <div
         aria-hidden
         className="pointer-events-none absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full opacity-40 blur-3xl"

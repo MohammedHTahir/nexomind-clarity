@@ -5,6 +5,8 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/hooks/useAuth";
+import { lovable } from "@/integrations/lovable/index";
+import Seo from "@/components/Seo";
 import { toast } from "sonner";
 
 const ease = [0.16, 1, 0.3, 1] as const;
@@ -99,6 +101,11 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-[#F3F4ED] text-[#111] relative overflow-hidden flex items-center justify-center px-6">
+      <Seo
+        title="Sign in or create your NexoMind account"
+        description="Sign in to NexoMind or create an account to start a calm, private AI journaling practice. Free reflections every week."
+        noindex
+      />
       <div
         aria-hidden
         className="pointer-events-none absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full opacity-40 blur-3xl"
