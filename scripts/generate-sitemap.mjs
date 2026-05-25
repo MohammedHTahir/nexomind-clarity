@@ -21,15 +21,14 @@ const extractArray = (name, source) => {
   return Array.from(match[1].matchAll(/"([^"]+)"/g), (item) => item[1]);
 };
 
-const emotions = extractArray("EMOTIONS", programmaticFile);
-const situations = extractArray("SITUATIONS", programmaticFile);
-const intents = extractArray("INTENTS", programmaticFile);
-
-const programmaticPaths = intents.flatMap((intent) =>
-  emotions.flatMap((emotion) =>
-    situations.map((situation) => `/${slug(intent)}-${slug(emotion)}-${slug(situation)}`),
-  ),
-);
+// Extract the curated allowlist of programmatic combinations.
+// Format in source: ["how to stop", "overthinking", "at night"],
+const curatedMatch = programmaticFile.match(/CURATED[^=]*=\s*\[([\s\S]*?)\];/);
+const programmaticPaths = curatedMatch
+  ? Array.from(curatedMatch[1].matchAll(/\[\s*"([^"]+)"\s*,\s*"([^"]+)"\s*,\s*"([^"]+)"\s*\]/g), (m) =>
+      `/${slug(m[1])}-${slug(m[2])}-${slug(m[3])}`,
+    )
+  : [];
 
 // Note: /terms removed (it's a duplicate of /terms-of-service and now 301-redirects to it)
 const staticPaths = ["/", "/about", "/founder", "/contact", "/privacy-policy", "/terms-of-service", "/pricing", "/blog", "/compare"];
