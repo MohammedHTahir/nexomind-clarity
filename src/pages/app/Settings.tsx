@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import AppShell from "@/components/app/AppShell";
 import GlassCard from "@/components/app/GlassCard";
 import PatternInterruptsCard from "@/components/app/PatternInterruptsCard";
+import NotificationsCard from "@/components/app/NotificationsCard";
 import PaywallModal from "@/components/PaywallModal";
 import { deleteAllJournals } from "@/lib/journal";
 import { useAuth } from "@/hooks/useAuth";
@@ -226,6 +227,7 @@ const Settings = () => {
         </GlassCard>
 
         <PatternInterruptsCard delay={0.08} />
+        <NotificationsCard delay={0.09} />
 
         <div className="space-y-4 mb-10">
 

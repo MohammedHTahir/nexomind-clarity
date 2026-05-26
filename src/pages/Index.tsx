@@ -1,6 +1,10 @@
 import { lazy, Suspense } from "react";
+import { Navigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
+import InstallPWA from "@/components/InstallPWA";
+import { useIsStandalone } from "@/hooks/useIsStandalone";
+import { useAuth } from "@/hooks/useAuth";
 
 // Below-the-fold — lazy load to slim the initial JS bundle
 const About = lazy(() => import("@/components/About"));
@@ -19,10 +23,20 @@ const TopicLinks = lazy(() => import("@/components/TopicLinks"));
 const Fallback = () => <div className="h-32" aria-hidden />;
 
 const Index = () => {
+  const standalone = useIsStandalone();
+  const { user, loading } = useAuth();
+
+  // When launched as an installed PWA, never show the marketing page:
+  // signed-in users go straight to /app, guests to /welcome.
+  if (standalone && !loading) {
+    return <Navigate to={user ? "/app" : "/welcome"} replace />;
+  }
+
   return (
     <main className="min-h-screen bg-[#F3F4ED]">
       <Navbar />
       <Hero />
+      <InstallPWA variant="floating" />
       <Suspense fallback={<Fallback />}>
         <About />
         <DemoVideo />
