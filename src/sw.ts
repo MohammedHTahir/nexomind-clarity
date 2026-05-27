@@ -12,8 +12,9 @@ declare const self: ServiceWorkerGlobalScope & {
 };
 
 // Reference manifest — required by injectManifest, but we don't precache.
-// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-self.__WB_MANIFEST;
+// Assign to a variable so the token survives minification/tree-shaking.
+const _manifest = self.__WB_MANIFEST;
+void _manifest;
 
 self.addEventListener("install", () => {
   self.skipWaiting();
