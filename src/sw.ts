@@ -11,10 +11,9 @@ declare const self: ServiceWorkerGlobalScope & {
   __WB_MANIFEST: Array<{ url: string; revision: string | null }>;
 };
 
-// Reference manifest — required by injectManifest, but we don't precache.
-// Assign to a variable so the token survives minification/tree-shaking.
-const _manifest = self.__WB_MANIFEST;
-void _manifest;
+// Reference manifest — required by injectManifest. Expose it on `self` so
+// rollup/minifiers can't tree-shake the token away before workbox injects.
+(self as any).__WB_MANIFEST_ENTRIES = self.__WB_MANIFEST;
 
 self.addEventListener("install", () => {
   self.skipWaiting();
