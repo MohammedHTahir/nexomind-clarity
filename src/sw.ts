@@ -7,13 +7,12 @@
 // - Uses NetworkFirst for HTML navigations so a new deploy is always reachable.
 // - Handles Web Push (push + notificationclick).
 
-declare const self: ServiceWorkerGlobalScope & {
-  __WB_MANIFEST: Array<{ url: string; revision: string | null }>;
-};
+type ManifestEntry = { url: string; revision: string | null };
+declare const self: ServiceWorkerGlobalScope & Record<string, unknown>;
 
 // Reference manifest — required by injectManifest. Expose it on `self` so
 // rollup/minifiers can't tree-shake the token away before workbox injects.
-(self as any).__WB_MANIFEST_ENTRIES = self.__WB_MANIFEST;
+(self as any).__WB_MANIFEST_ENTRIES = self.__WB_MANIFEST as ManifestEntry[];
 
 self.addEventListener("install", () => {
   self.skipWaiting();
