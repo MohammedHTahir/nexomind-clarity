@@ -50,6 +50,22 @@ export default defineConfig(({ mode }) => ({
             purpose: "maskable",
           },
         ],
+        screenshots: [
+          {
+            src: "/screenshot-wide.jpg",
+            sizes: "1200x630",
+            type: "image/jpeg",
+            form_factor: "wide",
+            label: "NexoMind — Clarity, one thought at a time",
+          },
+          {
+            src: "/screenshot-narrow.jpg",
+            sizes: "720x1280",
+            type: "image/jpeg",
+            form_factor: "narrow",
+            label: "NexoMind — Clarity, one thought at a time",
+          },
+        ],
       },
     }),
   ].filter(Boolean),
