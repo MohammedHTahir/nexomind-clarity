@@ -12,7 +12,7 @@ declare const self: ServiceWorkerGlobalScope & Record<string, unknown>;
 
 // Reference manifest — required by injectManifest. Expose it on `self` so
 // rollup/minifiers can't tree-shake the token away before workbox injects.
-(self as any).__WB_MANIFEST_ENTRIES = self.__WB_MANIFEST as ManifestEntry[];
+(self as any)["__WB_MF_ENTRIES"] = self.__WB_MANIFEST as ManifestEntry[];
 
 self.addEventListener("install", () => {
   self.skipWaiting();
