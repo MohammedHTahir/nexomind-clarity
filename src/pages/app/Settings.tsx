@@ -6,6 +6,7 @@ import ReflectionModeCard from "@/components/app/ReflectionModeCard";
 import PatternInterruptsCard from "@/components/app/PatternInterruptsCard";
 import NotificationsCard from "@/components/app/NotificationsCard";
 import SundayLetterCard from "@/components/app/SundayLetterCard";
+import E2EECard from "@/components/app/E2EECard";
 import PaywallModal from "@/components/PaywallModal";
 import { deleteAllJournals } from "@/lib/journal";
 import { useAuth } from "@/hooks/useAuth";
@@ -232,6 +233,7 @@ const Settings = () => {
         <PatternInterruptsCard delay={0.08} />
         <NotificationsCard delay={0.09} />
         <SundayLetterCard delay={0.10} />
+        <E2EECard delay={0.11} />
 
         <div className="space-y-4 mb-10">
 

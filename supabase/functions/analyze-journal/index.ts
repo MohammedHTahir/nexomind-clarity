@@ -210,6 +210,23 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
+    // E2EE gate: if user has e2ee_enabled, analysis must happen on-device
+    const { data: profileData } = await admin
+      .from("profiles")
+      .select("e2ee_enabled")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (profileData?.e2ee_enabled) {
+      return new Response(
+        JSON.stringify({
+          error: "E2EE entries must be analyzed on-device",
+          code: "E2EE_REQUIRES_CLIENT",
+        }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
     const { data: isPremiumData, error: premErr } = await admin.rpc("is_premium", {
       _user_id: userId,
     });

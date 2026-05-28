@@ -3,20 +3,26 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { analyzeAndStore, clarityBand, FreeLimitReachedError, type AnalysisRow } from "@/lib/journal";
+import { analyzeAndStoreE2EE } from "@/lib/journal";
 import ChallengerNotice from "@/components/app/ChallengerNotice";
 import VoiceEntryButton from "@/components/app/VoiceEntryButton";
+import E2EEStatusBadge from "@/components/app/E2EEStatusBadge";
 import { useFeatureFlag } from "@/lib/feature-flags";
 import { isVoiceSupported } from "@/lib/voice";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useE2EE } from "@/hooks/useE2EE";
+import { getOnDeviceLLM } from "@/lib/on-device-llm";
 import PremiumGate from "@/components/PremiumGate";
 import { toast } from "sonner";
 import { trackEvent } from "@/lib/analytics";
+import { t } from "@/lib/i18n";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
 const Journal = () => {
   const navigate = useNavigate();
   const { isPremium } = useSubscription();
+  const { isE2EE, encryptEntry, isLLMAvailable } = useE2EE();
   const voiceFlagEnabled = useFeatureFlag("voice_entry");
   const [text, setText] = useState("");
   const [phase, setPhase] = useState<"write" | "processing" | "done">("write");
@@ -33,12 +39,22 @@ const Journal = () => {
     if (!text.trim()) return;
     setPhase("processing");
     try {
-      const { analysis } = await analyzeAndStore(text);
+      let analysis: AnalysisRow;
+      if (isE2EE) {
+        const llm = await getOnDeviceLLM();
+        const result = await analyzeAndStoreE2EE(text, encryptEntry, llm);
+        analysis = result.analysis;
+        if (llm) llm.destroy();
+      } else {
+        const result = await analyzeAndStore(text);
+        analysis = result.analysis;
+      }
       setResult(analysis);
       setPhase("done");
       trackEvent("journal_entry_created", {
         source: "journal_mode",
         word_count: text.trim().split(/\s+/).filter(Boolean).length,
+        e2ee: isE2EE,
       });
     } catch (e) {
       if (e instanceof FreeLimitReachedError) {
@@ -92,6 +108,16 @@ const Journal = () => {
                   <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45 mb-4">
                     ( Journaling mode )
                   </p>
+                  {isE2EE && (
+                    <div className="mb-4">
+                      <E2EEStatusBadge />
+                      {!isLLMAvailable && (
+                        <p className="font-barlow text-[12px] text-amber-700 mt-2">
+                          {t("e2ee.llmUnavailableNotice")}
+                        </p>
+                      )}
+                    </div>
+                  )}
                   <textarea
                     autoFocus
                     value={text}

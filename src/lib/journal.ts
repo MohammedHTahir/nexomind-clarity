@@ -87,6 +87,82 @@ export async function analyzeAndStore(
   };
 }
 
+/**
+ * E2EE-aware analyze and store: encrypts content client-side, runs on-device LLM.
+ */
+export async function analyzeAndStoreE2EE(
+  content: string,
+  encryptFn: (text: string) => Promise<string>,
+  onDeviceLLM: { analyzeEntry: (text: string) => Promise<Record<string, unknown>> } | null
+): Promise<{
+  journal: JournalRow;
+  analysis: AnalysisRow;
+}> {
+  const { data: userData } = await supabase.auth.getUser();
+  const userId = userData.user?.id;
+  if (!userId) throw new Error("Not authenticated");
+
+  // Encrypt the content
+  const ciphertext = await encryptFn(content);
+
+  // Insert journal with encrypted content
+  const { data: journal, error: jErr } = await supabase
+    .from("journals")
+    .insert({
+      user_id: userId,
+      content: null,
+      is_encrypted: true,
+      ciphertext,
+    })
+    .select()
+    .single();
+  if (jErr) throw jErr;
+
+  // Run on-device analysis if available
+  let analysisData: Record<string, unknown> = {
+    summary: "Entry encrypted - analysis requires on-device LLM",
+    emotional_state: "unknown",
+    intensity_score: 50,
+    clarity_score: 50,
+    cognitive_patterns: [],
+    key_thoughts: [],
+    distortions_or_biases: [],
+    clarity_insight: "This entry is end-to-end encrypted",
+    suggested_reflection: "On-device analysis will be available when supported by your browser",
+  };
+
+  if (onDeviceLLM) {
+    try {
+      analysisData = await onDeviceLLM.analyzeEntry(content) as Record<string, unknown>;
+    } catch (e) {
+      console.warn("[E2EE] On-device analysis failed, using placeholder:", e);
+    }
+  }
+
+  // Store analysis (encrypted flag set)
+  const { data: analysis, error: aErr } = await supabase
+    .from("journal_analysis")
+    .insert({
+      journal_id: journal.id,
+      user_id: userId,
+      summary: analysisData.summary,
+      emotional_state: analysisData.emotional_state,
+      intensity_score: analysisData.intensity_score,
+      clarity_score: analysisData.clarity_score,
+      cognitive_patterns: analysisData.cognitive_patterns ?? [],
+      key_thoughts: analysisData.key_thoughts ?? [],
+      distortions_or_biases: analysisData.distortions_or_biases ?? [],
+      clarity_insight: analysisData.clarity_insight,
+      suggested_reflection: analysisData.suggested_reflection,
+      is_encrypted: true,
+    })
+    .select()
+    .single();
+  if (aErr) throw aErr;
+
+  return { journal, analysis };
+}
+
 export async function fetchJournals(): Promise<JournalWithAnalysis[]> {
   const { data, error } = await supabase
     .from("journals")

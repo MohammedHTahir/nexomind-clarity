@@ -11,6 +11,7 @@ import { useFeatureFlag } from "@/lib/feature-flags";
 import { isVoiceSupported } from "@/lib/voice";
 import {
   analyzeAndStore,
+  analyzeAndStoreE2EE,
   fetchJournals,
   clarityBand,
   FreeLimitReachedError,
@@ -19,10 +20,14 @@ import {
 } from "@/lib/journal";
 import PaywallModal from "@/components/PaywallModal";
 import PremiumGate from "@/components/PremiumGate";
+import E2EEStatusBadge from "@/components/app/E2EEStatusBadge";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useE2EE } from "@/hooks/useE2EE";
+import { getOnDeviceLLM } from "@/lib/on-device-llm";
 import { toast } from "sonner";
 import { trackEvent } from "@/lib/analytics";
+import { t } from "@/lib/i18n";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -37,6 +42,7 @@ const greeting = () => {
 const Dashboard = () => {
   const { user } = useAuth();
   const { isPremium } = useSubscription();
+  const { isE2EE, encryptEntry, isLLMAvailable } = useE2EE();
   const voiceFlagEnabled = useFeatureFlag("voice_entry");
   const [text, setText] = useState("");
   const [name, setName] = useState("");
@@ -65,15 +71,25 @@ const Dashboard = () => {
     setAnalyzing(true);
     setResult(null);
     try {
-      const { analysis } = await analyzeAndStore(text);
+      let analysis: AnalysisRow;
+      if (isE2EE) {
+        const llm = await getOnDeviceLLM();
+        const result = await analyzeAndStoreE2EE(text, encryptEntry, llm);
+        analysis = result.analysis;
+        if (llm) llm.destroy();
+      } else {
+        const result = await analyzeAndStore(text);
+        analysis = result.analysis;
+        if (!isPremium) {
+          window.setTimeout(() => setPaywallOpen(true), 650);
+        }
+      }
       setResult(analysis);
       trackEvent("journal_entry_created", {
         source: "dashboard",
         word_count: text.trim().split(/\s+/).filter(Boolean).length,
+        e2ee: isE2EE,
       });
-      if (!isPremium) {
-        window.setTimeout(() => setPaywallOpen(true), 650);
-      }
       setText("");
       const fresh = await fetchJournals();
       setEntries(fresh);
@@ -130,6 +146,16 @@ const Dashboard = () => {
         </motion.header>
 
         <GlassCard className="p-6 md:p-8 mb-6">
+          {isE2EE && (
+            <div className="mb-4 flex items-center gap-2">
+              <E2EEStatusBadge />
+              {!isLLMAvailable && (
+                <span className="font-barlow text-[11px] text-amber-700">
+                  {t("e2ee.llmUnavailableNotice")}
+                </span>
+              )}
+            </div>
+          )}
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
