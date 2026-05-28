@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ChevronRight, Search, Sparkles } from "lucide-react";
+import { ChevronRight, Sparkles } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 
 const ease = [0.16, 1, 0.3, 1] as const;
@@ -134,87 +134,6 @@ const Hero = () => {
         </motion.figure>
       </div>
 
-      {/* Dashboard preview mockup */}
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.1, delay: 0.55, ease }}
-        className="relative mt-16 md:mt-20 max-w-5xl mx-auto px-4"
-      >
-        <div className="relative rounded-t-[28px] border border-black/10 border-b-0 bg-white/70 backdrop-blur-md shadow-[0_30px_80px_-30px_rgba(0,0,0,0.25)] overflow-hidden">
-          {/* Window chrome */}
-          <div className="flex items-center justify-between px-5 py-3 border-b border-black/10 bg-white/40">
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-foreground/15" />
-              <span className="w-2.5 h-2.5 rounded-full bg-foreground/15" />
-              <span className="w-2.5 h-2.5 rounded-full bg-foreground/15" />
-            </div>
-            <div className="hidden sm:flex items-center gap-2 text-[11px] font-barlow text-foreground/50 bg-white/60 border border-black/5 rounded-full px-3 py-1">
-              <Search className="w-3 h-3" />
-              nexomind.ai / today
-            </div>
-            <span className="text-[11px] font-barlow text-foreground/40">Tue · 11:42 pm</span>
-          </div>
-
-          {/* App body */}
-          <div className="grid grid-cols-12 gap-0">
-            {/* Sidebar */}
-            <aside className="hidden md:flex col-span-3 flex-col gap-1.5 p-5 border-r border-black/10 bg-white/30">
-              <div className="font-instrument italic text-[18px] text-foreground/80 mb-3">nexomind</div>
-              {["Today", "Journal", "Mind Map", "Insights", "Settings"].map((it, i) => (
-                <div
-                  key={it}
-                  className={`font-barlow text-[12px] px-3 py-2 rounded-lg ${
-                    i === 0
-                      ? "bg-foreground text-background"
-                      : "text-foreground/65 hover:bg-white/60"
-                  }`}
-                >
-                  {it}
-                </div>
-              ))}
-            </aside>
-
-            {/* Main */}
-            <div className="col-span-12 md:col-span-9 p-5 md:p-7">
-              <p className="font-barlow text-[11px] tracking-[0.2em] uppercase text-foreground/45">
-                Tonight's reflection
-              </p>
-              <h3 className="mt-2 font-instrument italic text-[22px] md:text-[28px] text-foreground/90 leading-snug">
-                "I'm replaying the meeting again. I think I came across wrong."
-              </h3>
-
-              <div className="grid grid-cols-3 gap-3 mt-5">
-                {[
-                  { k: "Clarity", v: "72", hint: "+8 from yesterday" },
-                  { k: "Emotion", v: "Tense", hint: "softening" },
-                  { k: "Loop", v: "3rd", hint: "this week" },
-                ].map((m) => (
-                  <div key={m.k} className="rounded-xl border border-black/10 bg-white/70 p-3">
-                    <div className="font-barlow text-[10px] tracking-[0.18em] uppercase text-foreground/45">
-                      {m.k}
-                    </div>
-                    <div className="font-instrument text-[26px] text-foreground/90 leading-none mt-1">
-                      {m.v}
-                    </div>
-                    <div className="font-barlow text-[10px] text-foreground/50 mt-1">{m.hint}</div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-4 rounded-xl border border-black/10 bg-foreground/[0.04] p-4">
-                <div className="font-barlow text-[10px] tracking-[0.18em] uppercase text-foreground/45">
-                  Quiet reflection
-                </div>
-                <p className="mt-2 font-instrument italic text-[16px] md:text-[18px] text-foreground/85 leading-snug">
-                  You're scoring yourself with information you didn't have in the room.
-                  What did you actually do well?
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </motion.div>
     </section>
   );
 };
