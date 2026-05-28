@@ -6,7 +6,9 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const SYSTEM_PROMPT = `You are NexoMind, an AI mental clarity and journaling reflection engine.
+// --- Prompt Pipeline ---
+
+const BASE_PROMPT = `You are NexoMind, an AI mental clarity and journaling reflection engine.
 
 Your role is NOT therapy and NOT emotional support.
 
@@ -22,6 +24,44 @@ You must be: calm, minimal, structured, insight-driven.
 You must NOT: diagnose mental health conditions, give therapy advice, be overly emotional, use motivational clichés.
 
 Always return STRICT structured output via the provided tool.`;
+
+const COMPANION_BLOCK = `
+
+REFLECTION STYLE: Companion
+- Be empathetic and supportive in your observations
+- Acknowledge emotional difficulty before offering clarity
+- Frame distortions gently as "patterns worth noticing"
+- Use language like "you might consider" rather than directives`;
+
+const CHALLENGER_BLOCK = `
+
+REFLECTION STYLE: Challenger
+- Name cognitive distortions directly and specifically
+- Avoid validating language that is unsupported by evidence
+- Include a concrete reframe for each identified distortion
+- Be direct and growth-focused while remaining respectful
+- Use language like "this is catastrophizing" rather than softening`;
+
+type ReflectionMode = "companion" | "challenger";
+
+interface ComposeOptions {
+  mode: ReflectionMode;
+}
+
+function composeSystemPrompt(options: ComposeOptions): string {
+  const { mode } = options;
+  let prompt = BASE_PROMPT;
+
+  if (mode === "challenger") {
+    prompt += CHALLENGER_BLOCK;
+  } else {
+    prompt += COMPANION_BLOCK;
+  }
+
+  return prompt;
+}
+
+// --- End Prompt Pipeline ---
 
 const REFINE_SYSTEM = `You refine psychological insights into clear, plain human-readable reflections.
 Avoid jargon. Keep the user's tone calm and grounded. Return strict JSON via the provided tool.`;
@@ -171,6 +211,23 @@ Deno.serve(async (req) => {
     const apiKey = Deno.env.get("GEMINI_API_KEY");
     if (!apiKey) throw new Error("GEMINI_API_KEY not configured");
 
+    // Resolve reflection mode from user profile
+    let reflectionMode: ReflectionMode = "companion";
+    try {
+      const { data: profile } = await admin
+        .from("profiles")
+        .select("reflection_mode")
+        .eq("id", userId)
+        .maybeSingle();
+      if (profile?.reflection_mode === "challenger") {
+        reflectionMode = "challenger";
+      }
+    } catch (e) {
+      console.warn("Failed to read reflection_mode, defaulting to companion", e);
+    }
+
+    const systemPrompt = composeSystemPrompt({ mode: reflectionMode });
+
     // 1) insert journal
     const { data: journal, error: jErr } = await supabase
       .from("journals")
@@ -184,7 +241,7 @@ Deno.serve(async (req) => {
       {
         model: "gemini-2.5-flash",
         messages: [
-          { role: "system", content: SYSTEM_PROMPT },
+          { role: "system", content: systemPrompt },
           {
             role: "user",
             content: `Analyze this journal entry:\n\nENTRY:\n${content.trim()}`,
@@ -249,7 +306,7 @@ Deno.serve(async (req) => {
       console.warn("Refine pass skipped", e);
     }
 
-    // 4) store analysis
+    // 4) store analysis (with reflection_mode)
     const { data: analysis, error: aErr } = await supabase
       .from("journal_analysis")
       .insert({
@@ -264,6 +321,7 @@ Deno.serve(async (req) => {
         distortions_or_biases: parsed.distortions_or_biases ?? [],
         clarity_insight: parsed.clarity_insight,
         suggested_reflection: parsed.suggested_reflection,
+        reflection_mode: reflectionMode,
       })
       .select()
       .single();
