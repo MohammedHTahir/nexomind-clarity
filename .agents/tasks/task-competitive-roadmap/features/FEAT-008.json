@@ -1,0 +1,37 @@
+{
+  "id": "FEAT-008",
+  "type": "feat",
+  "description": "Phase 6: Mentor Personas + Progressive You-Mentor - mentor_personas table seeded with 5+ curated personas, persona picker UI in Journal + Settings, system prompt composition with persona voice_block, You-Mentor eligibility and refresh edge function, free tier rate limiting (1 switch/7 days), and mode-conflict notice.",
+  "status": "completed",
+  "steps": [
+    "Create migration supabase/migrations/20260601000006_phase6_personas.sql with: CREATE TABLE mentor_personas (key text PK, name text not null, voice_block text not null, compatible_modes text[] not null default '{companion,challenger}', is_curated boolean not null default true, display_order int not null default 0), RLS: select for authenticated, insert/update/delete for service_role. ALTER profiles ADD COLUMN active_mentor_persona text default null, ADD COLUMN default_mentor_persona text default null, ADD COLUMN you_mentor_profile jsonb. CREATE TABLE user_persona_switches (id uuid PK, user_id uuid references auth.users on delete cascade, persona_key text not null, switched_at timestamptz default now()), RLS: select/insert where user_id=auth.uid(). Seed mentor_personas with 5 curated: stoic (Stoic Sage - measured, principle-driven, Marcus Aurelius tone), cbt (CBT Therapist - structured, evidence-based, Socratic), no_bs (No-BS Friend - direct, informal, cuts through noise), coach (Journaling Coach - warm, process-focused, curiosity-driven), future_self (Future Self - compassionate hindsight, temporal perspective). Each with appropriate voice_block text and compatible_modes.",
+    "Create supabase/functions/refresh-you-mentor/index.ts: authenticates user, checks eligibility (>=30 entries with non-empty content), pulls last 30-200 analyses, calls Gemini with tool to extract { themes: string[] (max 5), vocab: string[] (max 10 dominant vocabulary markers), reframe_style: string }. Writes to profiles.you_mentor_profile with refreshed_at timestamp and source_entry_count. If E2EE enabled returns 403 {code: 'E2EE_REQUIRES_CLIENT'}.",
+    "Update supabase/functions/analyze-journal/index.ts: after reading reflection_mode, also read profiles.active_mentor_persona. If set, look up mentor_personas.voice_block via admin client. Pass persona to composeSystemPrompt. Add PERSONA_BLOCK to prompt composition (appended after MODE_BLOCK, voice/vocabulary instructions only). If active persona is 'you_mentor', read profiles.you_mentor_profile and construct a personalized voice_block from themes+vocab+reframe_style. Prompt composition completes within existing function (no separate call).",
+    "Create src/hooks/useMentorPersona.ts: reads profiles.active_mentor_persona and mentor_personas table. Provides { activePersona, personas, setActivePersona, youMentorProfile, isYouMentorEligible, youMentorProgress }. setActivePersona checks free tier rate limit (query user_persona_switches for last 7 days, block if >=1 switch for free tier). Logs switch to user_persona_switches.",
+    "Create src/components/app/MentorPersonaPicker.tsx: horizontal scrollable card list of personas with name, short description, compatible_modes badges. Active persona highlighted. You-Mentor card: locked state with progress bar (X/30 entries) when ineligible, active state when eligible. Free tier: shows '1 switch per week' notice, blocks additional switches. Gate behind useFeatureFlag('mentor_personas').",
+    "Create src/components/app/ModeConflictNotice.tsx: one-line Alert shown in analysis result when active persona's compatible_modes doesn't include the active reflection_mode. Text: 'Your persona doesn't fully support this mode - reflection mode rules still apply.'",
+    "Create src/pages/app/MentorProfile.tsx: view/edit you_mentor_profile fields (themes, vocab, reframe_style). Edit persists to profiles before next prompt composition. Shows last refresh date and source entry count. Refresh button triggers refresh-you-mentor edge function.",
+    "Mount MentorPersonaPicker in Journal.tsx (above the text area) and add a MentorPersonaCard in Settings.tsx (shows current default, link to picker).",
+    "Add MentorProfile route to app router.",
+    "Mount ModeConflictNotice alongside ChallengerNotice in analysis results (Dashboard.tsx, Journal.tsx).",
+    "Add i18n keys for all Phase 6 strings (persona names, descriptions, You-Mentor progress, rate limit messages, mode conflict notice, profile edit labels)."
+  ],
+  "acceptance_criteria": [
+    "5 curated personas seeded in mentor_personas table",
+    "Persona picker shows all personas with active highlight",
+    "Selecting a persona changes the AI voice in next analysis",
+    "You-Mentor locked until >=30 entries, shows progress",
+    "Free tier limited to 1 persona switch per 7 days",
+    "Mode-conflict notice appears when persona incompatible with reflection mode",
+    "refresh-you-mentor extracts themes/vocab/reframe_style from user history",
+    "MentorProfile page allows viewing and editing profile fields",
+    "Prompt composition includes persona voice_block after mode block",
+    "npm run build succeeds"
+  ],
+  "verification": [
+    "Run npm run build and confirm zero errors",
+    "Run npm run test and confirm tests pass"
+  ],
+  "blocked_reason": null,
+  "findings": "All steps implemented successfully. Build and tests pass. The mentor_personas table uses text PK and is seeded with 5 curated personas. The analyze-journal edge function now reads active_mentor_persona from profiles and includes the voice_block in prompt composition after the mode block. The useMentorPersona hook handles rate limiting on the client side for free tier (1 switch/7 days). MentorPersonaPicker is mounted in Journal.tsx above the textarea, MentorPersonaCard in Settings.tsx, and ModeConflictNotice in both Dashboard and Journal analysis results."
+}

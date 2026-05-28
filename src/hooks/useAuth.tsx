@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { trackEvent } from "@/lib/analytics";
+import { clearStoredKey } from "@/lib/e2ee";
 
 type AuthCtx = {
   user: User | null;
@@ -67,6 +68,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const signOut = async () => {
+    // Clear E2EE key from IndexedDB so it does not outlive the session
+    await clearStoredKey();
     await supabase.auth.signOut();
   };
 

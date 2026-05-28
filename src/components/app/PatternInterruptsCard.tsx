@@ -3,10 +3,31 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import GlassCard from "@/components/app/GlassCard";
 import { toast } from "sonner";
+import { t } from "@/lib/i18n";
+
+type Channel = "push" | "banner" | "off";
+
+const channelOptions: { value: Channel; labelKey: string; descKey: string }[] = [
+  {
+    value: "push",
+    labelKey: "settings.patternInterrupts.push",
+    descKey: "settings.patternInterrupts.push.description",
+  },
+  {
+    value: "banner",
+    labelKey: "settings.patternInterrupts.banner",
+    descKey: "settings.patternInterrupts.banner.description",
+  },
+  {
+    value: "off",
+    labelKey: "settings.patternInterrupts.off",
+    descKey: "settings.patternInterrupts.off.description",
+  },
+];
 
 const PatternInterruptsCard = ({ delay = 0.2 }: { delay?: number }) => {
   const { user } = useAuth();
-  const [enabled, setEnabled] = useState(true);
+  const [channel, setChannel] = useState<Channel>("push");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -14,55 +35,82 @@ const PatternInterruptsCard = ({ delay = 0.2 }: { delay?: number }) => {
     if (!user) return;
     supabase
       .from("notification_preferences")
-      .select("pattern_interrupts_enabled")
+      .select("pattern_interrupts_enabled, pattern_interrupt_channel")
       .eq("user_id", user.id)
       .maybeSingle()
       .then(({ data }) => {
-        if (data) setEnabled(!!data.pattern_interrupts_enabled);
+        if (data) {
+          // Support legacy: if pattern_interrupt_channel exists, use it;
+          // otherwise fall back to the boolean flag
+          if (data.pattern_interrupt_channel) {
+            setChannel(data.pattern_interrupt_channel as Channel);
+          } else if (data.pattern_interrupts_enabled === false) {
+            setChannel("off");
+          }
+        }
         setLoading(false);
       });
   }, [user]);
 
-  const toggle = async () => {
+  const handleChange = async (next: Channel) => {
     if (!user || saving) return;
     setSaving(true);
-    const next = !enabled;
     const { error } = await supabase
       .from("notification_preferences")
-      .upsert({ user_id: user.id, pattern_interrupts_enabled: next }, { onConflict: "user_id" });
+      .upsert(
+        {
+          user_id: user.id,
+          pattern_interrupt_channel: next,
+          pattern_interrupts_enabled: next !== "off",
+        },
+        { onConflict: "user_id" }
+      );
     setSaving(false);
     if (error) {
-      toast.error("Couldn't save preference");
+      toast.error(t("settings.patternInterrupts.error"));
       return;
     }
-    setEnabled(next);
-    toast.success(next ? "Pattern interrupts on." : "Pattern interrupts paused.");
+    setChannel(next);
+    toast.success(t("settings.patternInterrupts.saved"));
   };
 
   return (
     <GlassCard className="p-7 mb-4" delay={delay}>
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div className="flex-1 min-w-[240px]">
-          <h2 className="font-instrument text-[24px] mb-2">Pattern interrupts</h2>
-          <p className="font-barlow text-[14px] text-[#111]/60 leading-relaxed">
-            When NexoMind learns the times your loops tend to open, it'll send one calm
-            email — only when it would help. Never spam, never daily.
-          </p>
-        </div>
-        <button
-          onClick={toggle}
-          disabled={loading || saving}
-          className={`relative w-14 h-8 rounded-full border transition-colors flex-shrink-0 ${
-            enabled ? "bg-[#111] border-[#111]" : "bg-white/70 border-black/10"
-          } disabled:opacity-50`}
-          aria-label="Toggle pattern interrupts"
-        >
-          <span
-            className={`absolute top-1 left-1 w-6 h-6 rounded-full bg-white shadow transition-transform ${
-              enabled ? "translate-x-6" : "translate-x-0"
-            }`}
-          />
-        </button>
+      <div className="flex-1 min-w-[240px]">
+        <h2 className="font-instrument text-[24px] mb-2">{t("settings.patternInterrupts")}</h2>
+        <p className="font-barlow text-[14px] text-[#111]/60 leading-relaxed mb-5">
+          {t("settings.patternInterrupts.description")}
+        </p>
+      </div>
+      <div className={`space-y-3 ${loading ? "opacity-50 pointer-events-none" : ""}`}>
+        {channelOptions.map((opt) => {
+          const selected = channel === opt.value;
+          return (
+            <label
+              key={opt.value}
+              className={`flex items-start gap-3 p-4 rounded-2xl border cursor-pointer transition-colors ${
+                selected
+                  ? "bg-[#111]/5 border-[#111]/20"
+                  : "bg-white/50 border-black/5 hover:bg-white/80"
+              } ${saving ? "opacity-50 pointer-events-none" : ""}`}
+            >
+              <input
+                type="radio"
+                name="pattern-interrupt-channel"
+                value={opt.value}
+                checked={selected}
+                onChange={() => handleChange(opt.value)}
+                className="mt-1 accent-[#111]"
+              />
+              <div>
+                <span className="font-barlow font-medium text-[14px]">{t(opt.labelKey)}</span>
+                <p className="font-barlow text-[12px] text-[#111]/55 mt-0.5">
+                  {t(opt.descKey)}
+                </p>
+              </div>
+            </label>
+          );
+        })}
       </div>
     </GlassCard>
   );

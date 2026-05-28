@@ -2,8 +2,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppShell from "@/components/app/AppShell";
 import GlassCard from "@/components/app/GlassCard";
+import ReflectionModeCard from "@/components/app/ReflectionModeCard";
 import PatternInterruptsCard from "@/components/app/PatternInterruptsCard";
 import NotificationsCard from "@/components/app/NotificationsCard";
+import SundayLetterCard from "@/components/app/SundayLetterCard";
+import E2EECard from "@/components/app/E2EECard";
+import IntegrationsCard from "@/components/app/IntegrationsCard";
+import CrisisDetectionCard from "@/components/app/CrisisDetectionCard";
+import MentorPersonaCard from "@/components/app/MentorPersonaCard";
 import PaywallModal from "@/components/PaywallModal";
 import { deleteAllJournals } from "@/lib/journal";
 import { useAuth } from "@/hooks/useAuth";
@@ -226,8 +232,14 @@ const Settings = () => {
           )}
         </GlassCard>
 
+        <ReflectionModeCard delay={0.07} />
         <PatternInterruptsCard delay={0.08} />
         <NotificationsCard delay={0.09} />
+        <SundayLetterCard delay={0.10} />
+        <E2EECard delay={0.11} />
+        <IntegrationsCard delay={0.12} />
+        <CrisisDetectionCard delay={0.13} />
+        <MentorPersonaCard delay={0.14} />
 
         <div className="space-y-4 mb-10">
 

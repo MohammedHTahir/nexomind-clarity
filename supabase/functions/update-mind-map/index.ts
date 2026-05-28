@@ -23,7 +23,7 @@ Rules:
 - type "person": named or role-based people the user mentions (e.g. "mom", "alex", "boss"). lowercase.
 - type "distortion": cognitive distortions (e.g. "catastrophizing", "mind reading", "all-or-nothing").
 - type "trigger": specific triggering events (e.g. "missed deadline", "unread text", "criticism").
-Be conservative. Quality > quantity. Max 8 total entities. All labels lowercase, 1-4 words.`;
+Be thorough. Extract all relevant entities. Max 50 total entities. All labels lowercase, 1-4 words.`;
 
 const extractTool = {
   type: "function",
@@ -134,7 +134,8 @@ Deno.serve(async (req) => {
     if (!aiResp.ok) {
       const t = await aiResp.text();
       console.error("extract err", aiResp.status, t);
-      return new Response(JSON.stringify({ error: "extract failed" }), {
+      console.error("mindmap_extraction_failed", { user_id, journal_id, status: aiResp.status });
+      return new Response(JSON.stringify({ ok: true, error: "mindmap_extraction_failed" }), {
         status: 200, // non-fatal — don't block journal flow
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -150,8 +151,8 @@ Deno.serve(async (req) => {
     const parsed = JSON.parse(args) as { entities: ExtractedEntity[] };
     const entities = (parsed.entities ?? [])
       .map((e) => ({ type: e.type, label: normalize(e.label) }))
-      .filter((e) => e.label.length >= 2)
-      .slice(0, 8);
+      .filter((e) => e.label.length >= 1 && e.label.length <= 80)
+      .slice(0, 50);
 
     if (entities.length === 0) {
       return new Response(JSON.stringify({ ok: true, entities: 0 }), {
@@ -209,7 +210,7 @@ Deno.serve(async (req) => {
           _user_id: user_id,
           _type: ent.type,
           _embedding: emb as unknown as string,
-          _threshold: 0.84,
+          _threshold: 0.85,
         });
         if (Array.isArray(match) && match.length > 0) {
           mergedId = match[0].id;
@@ -294,6 +295,7 @@ Deno.serve(async (req) => {
     });
   } catch (e) {
     console.error("update-mind-map err", e);
+    console.error("mindmap_extraction_failed", { error: String(e) });
     return new Response(JSON.stringify({ error: "internal" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

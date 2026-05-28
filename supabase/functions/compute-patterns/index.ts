@@ -87,6 +87,72 @@ Deno.serve(async (req) => {
       }
     }
 
+    // --- Distortion Recurrence Detection ---
+    // For each user, scan last 7 journal_analysis rows within a rolling 14-day window.
+    // If any distortion label appears in >= 3 of those 7 analyses, upsert a
+    // user_patterns row with pattern_type='distortion_recurrence'.
+    const fourteenDaysAgo = new Date(Date.now() - 14 * 86400000).toISOString();
+
+    // Get distinct user IDs from recent analyses
+    const { data: recentAnalyses, error: analysesError } = await admin
+      .from("journal_analysis")
+      .select("user_id, distortions_or_biases, created_at")
+      .gte("created_at", fourteenDaysAgo)
+      .order("created_at", { ascending: false })
+      .limit(50000);
+    if (analysesError) throw analysesError;
+
+    const analysesByUser = new Map<string, { distortions_or_biases: string[]; created_at: string }[]>();
+    for (const row of recentAnalyses ?? []) {
+      const arr = analysesByUser.get(row.user_id) ?? [];
+      arr.push(row);
+      analysesByUser.set(row.user_id, arr);
+    }
+
+    for (const [userId, analyses] of analysesByUser) {
+      // Take only the last 7 analyses (already sorted desc)
+      const recent = analyses.slice(0, 7);
+      if (recent.length < 3) continue;
+
+      // Count distortion labels across the recent analyses
+      const distortionCounts = new Map<string, number>();
+      for (const a of recent) {
+        const distortions = a.distortions_or_biases ?? [];
+        // Count each distortion once per analysis (not per occurrence within an analysis)
+        const seen = new Set<string>();
+        for (const d of distortions) {
+          if (!seen.has(d)) {
+            seen.add(d);
+            distortionCounts.set(d, (distortionCounts.get(d) ?? 0) + 1);
+          }
+        }
+      }
+
+      // Upsert patterns for distortions appearing in >= 3 analyses
+      for (const [label, count] of distortionCounts) {
+        if (count < 3) continue;
+        const confidence = Math.min(1, count / recent.length);
+
+        await admin.from("user_patterns").upsert(
+          {
+            user_id: userId,
+            pattern_type: "distortion_recurrence",
+            day_of_week: null,
+            hour_of_day: null,
+            theme_node_id: null,
+            theme_label: null,
+            distortion_label: label,
+            last_distortion_seen_at: recent[0].created_at,
+            sample_size: count,
+            confidence,
+            computed_at: new Date().toISOString(),
+          },
+          { onConflict: "user_id,pattern_type,day_of_week,hour_of_day" },
+        );
+        patternsWritten++;
+      }
+    }
+
     return new Response(
       JSON.stringify({ users: byUser.size, patterns_written: patternsWritten }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },

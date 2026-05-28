@@ -5,8 +5,14 @@ import { Mic, ArrowRight, ChevronDown } from "lucide-react";
 import AppShell from "@/components/app/AppShell";
 import GlassCard from "@/components/app/GlassCard";
 import PatternsCard from "@/components/app/PatternsCard";
+import ChallengerNotice from "@/components/app/ChallengerNotice";
+import ModeConflictNotice from "@/components/app/ModeConflictNotice";
+import VoiceEntryButton from "@/components/app/VoiceEntryButton";
+import { useFeatureFlag } from "@/lib/feature-flags";
+import { isVoiceSupported } from "@/lib/voice";
 import {
   analyzeAndStore,
+  analyzeAndStoreE2EE,
   fetchJournals,
   clarityBand,
   FreeLimitReachedError,
@@ -15,10 +21,14 @@ import {
 } from "@/lib/journal";
 import PaywallModal from "@/components/PaywallModal";
 import PremiumGate from "@/components/PremiumGate";
+import E2EEStatusBadge from "@/components/app/E2EEStatusBadge";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useE2EE } from "@/hooks/useE2EE";
+import { getOnDeviceLLM } from "@/lib/on-device-llm";
 import { toast } from "sonner";
 import { trackEvent } from "@/lib/analytics";
+import { t } from "@/lib/i18n";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -33,6 +43,8 @@ const greeting = () => {
 const Dashboard = () => {
   const { user } = useAuth();
   const { isPremium } = useSubscription();
+  const { isE2EE, encryptEntry, isLLMAvailable } = useE2EE();
+  const voiceFlagEnabled = useFeatureFlag("voice_entry");
   const [text, setText] = useState("");
   const [name, setName] = useState("");
   const [analyzing, setAnalyzing] = useState(false);
@@ -60,15 +72,25 @@ const Dashboard = () => {
     setAnalyzing(true);
     setResult(null);
     try {
-      const { analysis } = await analyzeAndStore(text);
+      let analysis: AnalysisRow;
+      if (isE2EE) {
+        const llm = await getOnDeviceLLM();
+        const result = await analyzeAndStoreE2EE(text, encryptEntry, llm);
+        analysis = result.analysis;
+        if (llm) llm.destroy();
+      } else {
+        const result = await analyzeAndStore(text);
+        analysis = result.analysis;
+        if (!isPremium) {
+          window.setTimeout(() => setPaywallOpen(true), 650);
+        }
+      }
       setResult(analysis);
       trackEvent("journal_entry_created", {
         source: "dashboard",
         word_count: text.trim().split(/\s+/).filter(Boolean).length,
+        e2ee: isE2EE,
       });
-      if (!isPremium) {
-        window.setTimeout(() => setPaywallOpen(true), 650);
-      }
       setText("");
       const fresh = await fetchJournals();
       setEntries(fresh);
@@ -125,6 +147,16 @@ const Dashboard = () => {
         </motion.header>
 
         <GlassCard className="p-6 md:p-8 mb-6">
+          {isE2EE && (
+            <div className="mb-4 flex items-center gap-2">
+              <E2EEStatusBadge />
+              {!isLLMAvailable && (
+                <span className="font-barlow text-[11px] text-amber-700">
+                  {t("e2ee.llmUnavailableNotice")}
+                </span>
+              )}
+            </div>
+          )}
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
@@ -138,13 +170,23 @@ const Dashboard = () => {
             }}
           />
           <div className="flex items-center justify-between mt-4 pt-4 border-t border-black/5">
-            <button
-              type="button"
-              className="w-9 h-9 rounded-full bg-white/60 border border-black/5 flex items-center justify-center text-[#111]/60 hover:text-[#111] hover:scale-[1.05] transition-all"
-              aria-label="Voice"
-            >
-              <Mic className="w-4 h-4" strokeWidth={1.75} />
-            </button>
+            {voiceFlagEnabled && isVoiceSupported() ? (
+              <VoiceEntryButton
+                demoMode={!isPremium}
+                onComplete={(analysis) => {
+                  setResult(analysis);
+                  fetchJournals().then(setEntries).catch(console.error);
+                }}
+              />
+            ) : (
+              <button
+                type="button"
+                className="w-9 h-9 rounded-full bg-white/60 border border-black/5 flex items-center justify-center text-[#111]/60 hover:text-[#111] hover:scale-[1.05] transition-all"
+                aria-label="Voice"
+              >
+                <Mic className="w-4 h-4" strokeWidth={1.75} />
+              </button>
+            )}
             <button
               onClick={submit}
               disabled={!text.trim() || analyzing}
@@ -196,6 +238,13 @@ const Dashboard = () => {
                 }}
               >
                 <div className="bg-white/80 backdrop-blur-md rounded-[21px] p-7 md:p-9">
+                  <ChallengerNotice
+                    analysisId={result.id}
+                    reflectionMode={(result as Record<string, unknown>).reflection_mode as string | undefined}
+                  />
+                  <ModeConflictNotice
+                    reflectionMode={(result as Record<string, unknown>).reflection_mode as string | undefined}
+                  />
                   <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45 mb-3">
                     ( {result.emotional_state} )
                   </p>

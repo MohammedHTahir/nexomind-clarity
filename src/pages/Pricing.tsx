@@ -27,6 +27,15 @@ const proFeatures = [
   "Export your journal anytime",
 ];
 
+const premiumPlusFeatures = [
+  "Everything in Premium",
+  "End-to-end encryption (E2EE)",
+  "On-device AI analysis (zero server access)",
+  "Advanced context signals",
+  "Cryptographic privacy guarantee",
+  "Priority support",
+];
+
 const faqs = [
   {
     q: "Can I cancel anytime?",
@@ -67,6 +76,15 @@ const Pricing = () => {
       return;
     }
     setPaywallOpen(true);
+  };
+
+  const handlePremiumPlusClick = () => {
+    trackEvent("cta_click_pricing", { plan: "premium_plus" });
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    navigate("/app/settings");
   };
 
   const jsonLd = [
@@ -134,7 +152,7 @@ const Pricing = () => {
       </section>
 
       <section className="px-6 pb-24 max-w-5xl mx-auto">
-        <div className="grid md:grid-cols-2 gap-5">
+        <div className="grid md:grid-cols-3 gap-5">
           {/* Free */}
           <article className="bg-white rounded-[24px] p-8 md:p-10 border border-black/5 flex flex-col">
             <p className="font-barlow font-medium text-[11px] tracking-[0.22em] uppercase text-[#111]/50">
@@ -210,6 +228,47 @@ const Pricing = () => {
               {isPremium ? "Manage subscription" : user ? "Upgrade to Premium" : "Start free, upgrade anytime"}
             </button>
 
+          </article>
+
+          {/* Premium+ */}
+          <article className="bg-gradient-to-br from-[#1a1a2e] to-[#16213e] text-white rounded-[24px] p-8 md:p-10 flex flex-col relative overflow-hidden">
+            <div className="absolute top-6 right-6 font-barlow text-[10px] tracking-[0.2em] uppercase bg-emerald-400/20 text-emerald-300 rounded-full px-3 py-1.5">
+              Max privacy
+            </div>
+            <p className="font-barlow font-medium text-[11px] tracking-[0.22em] uppercase text-white/55">
+              Premium+
+            </p>
+            <h2 className="font-instrument text-[40px] mt-3">
+              Private <span className="italic">by math.</span>
+            </h2>
+            <p className="font-barlow text-[15px] text-white/60 mt-3 leading-relaxed max-w-xs">
+              End-to-end encryption so not even we can read your thoughts.
+            </p>
+
+            <div className="mt-8">
+              <span className="font-instrument text-[56px] leading-none">$19.99</span>
+              <span className="font-barlow text-[15px] text-white/55 ml-2">/month</span>
+            </div>
+            <p className="font-barlow text-[12px] text-white/45 mt-1">
+              or $190/year (save 20%)
+            </p>
+
+            <ul className="mt-8 space-y-3 flex-1">
+              {premiumPlusFeatures.map((f) => (
+                <li key={f} className="flex items-start gap-3 font-barlow text-[15px] text-white/85">
+                  <Check className="w-4 h-4 mt-1 text-emerald-400/70 shrink-0" />
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+
+            <button
+              type="button"
+              onClick={handlePremiumPlusClick}
+              className="mt-10 block w-full text-center bg-white text-[#111] rounded-full px-6 py-3.5 font-barlow font-medium text-[14px] hover:bg-white/90 transition-colors"
+            >
+              {user ? "Upgrade to Premium+" : "Start free, upgrade anytime"}
+            </button>
           </article>
         </div>
 

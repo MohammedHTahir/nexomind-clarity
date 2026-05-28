@@ -1,0 +1,31 @@
+{
+  "id": "FEAT-001",
+  "type": "chore",
+  "description": "Cross-cutting infrastructure: feature flags table + evaluate-flags edge function, lib/tier.ts tier resolution (free|premium|premium_plus) refactoring useSubscription, lib/i18n.ts minimal shim with t() function, and composeSystemPrompt modular prompt pipeline in analyze-journal. Also adds the feature_flags migration with RLS.",
+  "status": "completed",
+  "steps": [
+    "Create migration file supabase/migrations/20260601000001_cross_cutting_infra.sql with: (1) feature_flags table (key text PK, enabled bool, rollout_percent int 0-100, min_tier text default 'free', config jsonb, updated_at timestamptz), RLS policies (select for authenticated, insert/update/delete for service_role only), (2) ALTER profiles ADD COLUMN reflection_mode text not null default 'companion' check (in companion/challenger), (3) ALTER journal_analysis ADD COLUMN reflection_mode text check (in companion/challenger), (4) ALTER notification_preferences ADD COLUMN pattern_interrupt_channel text not null default 'push' check (in push/banner/off), (5) ALTER user_patterns ADD COLUMN distortion_label text, ADD COLUMN last_distortion_seen_at timestamptz, (6) CREATE TABLE pattern_interrupt_inbox with id uuid PK, user_id uuid references auth.users, distortion_label text, body text, created_at timestamptz, dismissed_at timestamptz nullable, expires_at timestamptz default now()+7days, RLS user_id=auth.uid() for select/update, service_role for insert.",
+    "Create src/lib/tier.ts exporting: Tier type ('free'|'premium'|'premium_plus'), resolveTier(sub) function using PREMIUM_PRICE_IDS and PREMIUM_PLUS_PRICE_IDS sets (with placeholder price IDs like 'premium_plus_monthly'/'premium_plus_yearly'), subIsActive helper. Export constants for price IDs.",
+    "Refactor src/hooks/useSubscription.tsx to import resolveTier from lib/tier.ts. Return { tier, isPremium (tier!=='free'), isPremiumPlus (tier==='premium_plus'), subscription, loading, refresh, isPastDue, isCanceling }. Keep existing isPremium semantics (backward compatible - Premium+ users also get isPremium=true).",
+    "Create src/lib/feature-flags.ts with: useFeatureFlag(key) hook that reads from a react-query cached response of the evaluate-flags edge function, 250ms timeout (abort controller), fail-closed (returns false on timeout/error). Also export <FeatureGate flag='x'>{children}</FeatureGate> component. The query refetches on window focus, caches 5 minutes.",
+    "Create supabase/functions/evaluate-flags/index.ts edge function: authenticates user, reads tier via admin client (using is_premium rpc or subscriptions table), fetches all feature_flags rows, evaluates each flag: enabled AND (deterministic hash of user_id+key % 100 < rollout_percent) AND tier >= min_tier. Returns JSON map { key: boolean } containing only flags the user passes min_tier for.",
+    "Create src/lib/i18n.ts with: flat JSON import from src/locales/en-US.json, t(key, params?) function that returns the string with {{param}} interpolation or the key itself as fallback. Export formatDate/formatNumber/formatRelativeTime helpers using Intl APIs. Log a warning when a key is missing.",
+    "Create src/locales/en-US.json with initial keys for Settings labels, reflection mode, pattern interrupts, and general UI strings that will be needed in Phase 1.",
+    "Refactor supabase/functions/analyze-journal/index.ts: extract prompt construction into a composeSystemPrompt({ mode, persona, voiceFeatures, contextSignals }) helper function at the top of the file. The existing SYSTEM_PROMPT becomes the base. Add COMPANION_BLOCK (current empathetic approach) and CHALLENGER_BLOCK (name distortions, avoid validating unsupported language, include concrete reframe). The function reads profiles.reflection_mode via admin client, passes it to composeSystemPrompt, and persists reflection_mode on the inserted journal_analysis row."
+  ],
+  "acceptance_criteria": [
+    "npm run build succeeds with no TypeScript errors",
+    "useSubscription still returns isPremium=true for existing Premium subscribers (backward compatible)",
+    "useSubscription additionally returns tier and isPremiumPlus fields",
+    "useFeatureFlag hook returns false when edge function is unreachable (fail-closed)",
+    "t() function returns en-US strings for known keys and falls back to key string for unknown keys",
+    "analyze-journal composeSystemPrompt produces different prompt text for companion vs challenger mode",
+    "Migration SQL is syntactically valid and additive (no drops, no renames)"
+  ],
+  "verification": [
+    "Run npm install && npm run build and confirm zero errors",
+    "Run npm run test and confirm tests pass"
+  ],
+  "blocked_reason": null,
+  "findings": "All acceptance criteria verified: build passes, tests pass (14/14), tier resolution backward compatible, i18n fallback works, composeSystemPrompt produces different text for companion vs challenger. resolveJsonModule added to tsconfig.app.json for JSON imports. Edge functions use Deno runtime and are not checked by Vite build - validated manually for syntax correctness."
+}

@@ -2,11 +2,19 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import AppShell from "@/components/app/AppShell";
 import GlassCard from "@/components/app/GlassCard";
 import { supabase } from "@/integrations/supabase/client";
-import { motion, AnimatePresence } from "framer-motion";
-import { X, Sparkles, RefreshCw } from "lucide-react";
+import { Sparkles, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import ForceGraph2D from "react-force-graph-2d";
-
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
+import { useFeatureFlag } from "@/lib/feature-flags";
+import { useSubscription } from "@/hooks/useSubscription";
+import { t } from "@/lib/i18n";
 
 type NodeType = "theme" | "emotion" | "person" | "distortion" | "trigger";
 
@@ -21,9 +29,11 @@ type RawNode = {
 
 type RawEdge = { source: string; target: string; weight: number };
 
+type EntryRef = { id: string; content: string; created_at: string; summary?: string };
+
 type DetailResp = {
   node: RawNode;
-  entries: { id: string; content: string; created_at: string }[];
+  entries: EntryRef[];
   trend: Record<string, number>;
   reframe: string;
 };
@@ -44,17 +54,26 @@ const TYPE_LABEL: Record<NodeType, string> = {
   trigger: "Trigger",
 };
 
+const CLUSTER_THRESHOLD = 1000;
+const CLUSTER_TOP_N = 500;
+
 const MindMap = () => {
   const [nodes, setNodes] = useState<RawNode[]>([]);
   const [edges, setEdges] = useState<RawEdge[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<DetailResp | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [selectedLoading, setSelectedLoading] = useState(false);
   const [backfilling, setBackfilling] = useState(false);
   const [filter, setFilter] = useState<NodeType | "all">("all");
+  const [showAll, setShowAll] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 800, h: 600 });
   const fgRef = useRef<any>(null);
+
+  const livingMindmapFlag = useFeatureFlag("living_mindmap");
+  const { isPremium } = useSubscription();
+  const isEnhanced = livingMindmapFlag && isPremium;
 
   const load = async () => {
     setLoading(true);
@@ -84,7 +103,15 @@ const MindMap = () => {
   }, []);
 
   const graphData = useMemo(() => {
-    const visible = filter === "all" ? nodes : nodes.filter((n) => n.type === filter);
+    let visible = filter === "all" ? nodes : nodes.filter((n) => n.type === filter);
+
+    // Clustered view for 1000+ nodes (enhanced/premium only)
+    if (isEnhanced && visible.length > CLUSTER_THRESHOLD && !showAll) {
+      visible = [...visible]
+        .sort((a, b) => b.frequency - a.frequency)
+        .slice(0, CLUSTER_TOP_N);
+    }
+
     const idSet = new Set(visible.map((n) => n.id));
     return {
       nodes: visible.map((n) => ({
@@ -99,11 +126,13 @@ const MindMap = () => {
         .filter((e) => idSet.has(e.source) && idSet.has(e.target))
         .map((e) => ({ source: e.source, target: e.target, value: e.weight })),
     };
-  }, [nodes, edges, filter]);
+  }, [nodes, edges, filter, showAll, isEnhanced]);
 
   const openDetail = async (id: string) => {
+    if (!isEnhanced) return; // Free tier: no side panel
     setSelectedLoading(true);
     setSelected({ node: nodes.find((n) => n.id === id)!, entries: [], trend: {}, reframe: "" });
+    setSheetOpen(true);
     try {
       const { data, error } = await supabase.functions.invoke("mind-node-detail", {
         body: { node_id: id },
@@ -142,6 +171,9 @@ const MindMap = () => {
     const max = Math.max(1, ...days.map((d) => d.v));
     return days.map((x) => ({ ...x, h: (x.v / max) * 100 }));
   }, [selected]);
+
+  const totalNodeCount = (filter === "all" ? nodes : nodes.filter((n) => n.type === filter)).length;
+  const isClustered = isEnhanced && totalNodeCount > CLUSTER_THRESHOLD && !showAll;
 
   return (
     <AppShell>
@@ -189,6 +221,34 @@ const MindMap = () => {
             </button>
           ))}
         </div>
+
+        {/* Clustered view indicator */}
+        {isClustered && (
+          <div className="flex items-center gap-3 mb-4">
+            <p className="font-barlow text-[12px] text-[#111]/50">
+              {t("mindmap.clusteredView", { shown: String(CLUSTER_TOP_N), total: String(totalNodeCount) })}
+            </p>
+            <button
+              onClick={() => setShowAll(true)}
+              className="font-barlow text-[12px] px-3 py-1 rounded-full border border-black/10 hover:bg-black/[0.04] transition text-[#111]/70"
+            >
+              {t("mindmap.showAll")}
+            </button>
+          </div>
+        )}
+        {isEnhanced && showAll && totalNodeCount > CLUSTER_THRESHOLD && (
+          <div className="flex items-center gap-3 mb-4">
+            <p className="font-barlow text-[12px] text-[#111]/50">
+              {t("mindmap.showingAll", { total: String(totalNodeCount) })}
+            </p>
+            <button
+              onClick={() => setShowAll(false)}
+              className="font-barlow text-[12px] px-3 py-1 rounded-full border border-black/10 hover:bg-black/[0.04] transition text-[#111]/70"
+            >
+              {t("mindmap.showClustered")}
+            </button>
+          </div>
+        )}
 
         <GlassCard className="!p-0 overflow-hidden">
           <div ref={containerRef} className="relative w-full h-[600px] bg-[#FAF9F4]">
@@ -251,110 +311,101 @@ const MindMap = () => {
         </p>
       </div>
 
-      {/* Detail panel */}
-      <AnimatePresence>
-        {selected && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm"
-            onClick={() => setSelected(null)}
-          >
-            <motion.aside
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 28, stiffness: 240 }}
-              onClick={(e) => e.stopPropagation()}
-              className="absolute right-0 top-0 h-full w-full max-w-md bg-[#F3F4ED] overflow-y-auto"
-            >
-              <div className="p-7">
-                <div className="flex items-start justify-between mb-6">
-                  <div>
-                    <span
-                      className="font-barlow text-[10px] tracking-[0.18em] uppercase px-2 py-1 rounded-full text-white"
-                      style={{ backgroundColor: TYPE_COLOR[selected.node.type] }}
-                    >
-                      {TYPE_LABEL[selected.node.type]}
-                    </span>
-                    <h2 className="font-instrument text-[38px] leading-[1.05] mt-3 capitalize">
-                      {selected.node.label}
-                    </h2>
-                    <p className="font-barlow text-[12px] text-[#111]/50 mt-1">
-                      Seen {selected.node.frequency}× · first {new Date(selected.node.first_seen_at).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setSelected(null)}
-                    className="p-1.5 rounded-full hover:bg-black/5"
+      {/* Detail Sheet (premium only) */}
+      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+        <SheetContent side="right" className="w-full max-w-md bg-[#F3F4ED] overflow-y-auto">
+          {selected && (
+            <div className="pt-2">
+              <SheetHeader className="mb-6">
+                <div className="mb-2">
+                  <span
+                    className="font-barlow text-[10px] tracking-[0.18em] uppercase px-2 py-1 rounded-full text-white inline-block"
+                    style={{ backgroundColor: TYPE_COLOR[selected.node.type] }}
                   >
-                    <X className="w-4 h-4" />
-                  </button>
+                    {TYPE_LABEL[selected.node.type]}
+                  </span>
                 </div>
+                <SheetTitle className="font-instrument text-[38px] leading-[1.05] capitalize">
+                  {selected.node.label}
+                </SheetTitle>
+                <SheetDescription className="font-barlow text-[12px] text-[#111]/50">
+                  Seen {selected.node.frequency}x · first {new Date(selected.node.first_seen_at).toLocaleDateString()}
+                </SheetDescription>
+              </SheetHeader>
 
-                {/* Trend */}
-                <div className="mb-7">
-                  <p className="font-barlow text-[11px] tracking-[0.18em] uppercase text-[#111]/40 mb-3">
-                    Last 30 days
-                  </p>
-                  <div className="flex items-end gap-[2px] h-16">
-                    {trendBars.map((b) => (
-                      <div
-                        key={b.d}
-                        className="flex-1 rounded-sm transition-all"
-                        style={{
-                          height: `${Math.max(4, b.h)}%`,
-                          backgroundColor: b.v > 0 ? TYPE_COLOR[selected.node.type] : "rgba(17,17,17,0.08)",
-                          opacity: b.v > 0 ? 0.85 : 1,
-                        }}
-                        title={`${b.d}: ${b.v}`}
-                      />
-                    ))}
-                  </div>
+              {/* Trend */}
+              <div className="mb-7">
+                <p className="font-barlow text-[11px] tracking-[0.18em] uppercase text-[#111]/40 mb-3">
+                  Last 30 days
+                </p>
+                <div className="flex items-end gap-[2px] h-16">
+                  {trendBars.map((b) => (
+                    <div
+                      key={b.d}
+                      className="flex-1 rounded-sm transition-all"
+                      style={{
+                        height: `${Math.max(4, b.h)}%`,
+                        backgroundColor: b.v > 0 ? TYPE_COLOR[selected.node.type] : "rgba(17,17,17,0.08)",
+                        opacity: b.v > 0 ? 0.85 : 1,
+                      }}
+                      title={`${b.d}: ${b.v}`}
+                    />
+                  ))}
                 </div>
-
-                {/* Reframe */}
-                {selectedLoading ? (
-                  <div className="mb-7 rounded-2xl bg-white/60 border border-black/5 p-5">
-                    <p className="font-barlow text-[13px] text-[#111]/40 animate-pulse">Reflecting…</p>
-                  </div>
-                ) : selected.reframe ? (
-                  <div className="mb-7 rounded-2xl bg-white/80 border border-black/5 p-5">
-                    <p className="font-barlow text-[10px] tracking-[0.18em] uppercase text-[#111]/40 mb-2">
-                      Reframe
-                    </p>
-                    <p className="font-instrument text-[20px] leading-[1.3] text-[#111]/85">
-                      "{selected.reframe}"
-                    </p>
-                  </div>
-                ) : null}
-
-                {/* Recent entries */}
-                {selected.entries.length > 0 && (
-                  <div>
-                    <p className="font-barlow text-[11px] tracking-[0.18em] uppercase text-[#111]/40 mb-3">
-                      What built this node
-                    </p>
-                    <div className="space-y-3">
-                      {selected.entries.map((e) => (
-                        <div key={e.id} className="rounded-xl bg-white/60 border border-black/5 p-4">
-                          <p className="font-barlow text-[10px] text-[#111]/40 mb-1.5">
-                            {new Date(e.created_at).toLocaleString()}
-                          </p>
-                          <p className="font-barlow text-[13px] text-[#111]/80 leading-relaxed">
-                            {e.content}{e.content.length >= 240 ? "…" : ""}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
-            </motion.aside>
-          </motion.div>
-        )}
-      </AnimatePresence>
+
+              {/* Reframe */}
+              {selectedLoading ? (
+                <div className="mb-7 rounded-2xl bg-white/60 border border-black/5 p-5">
+                  <p className="font-barlow text-[13px] text-[#111]/40 animate-pulse">Reflecting…</p>
+                </div>
+              ) : selected.reframe ? (
+                <div className="mb-7 rounded-2xl bg-white/80 border border-black/5 p-5">
+                  <p className="font-barlow text-[10px] tracking-[0.18em] uppercase text-[#111]/40 mb-2">
+                    Reframe
+                  </p>
+                  <p className="font-instrument text-[20px] leading-[1.3] text-[#111]/85">
+                    "{selected.reframe}"
+                  </p>
+                </div>
+              ) : null}
+
+              {/* Recent entries - reverse chronological with 200-char excerpts */}
+              {selected.entries.length > 0 && (
+                <div>
+                  <p className="font-barlow text-[11px] tracking-[0.18em] uppercase text-[#111]/40 mb-3">
+                    {t("mindmap.entryReferences")}
+                  </p>
+                  <div className="space-y-3">
+                    {[...selected.entries]
+                      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                      .map((e) => {
+                        const excerpt = e.content.length > 200
+                          ? e.content.slice(0, 200) + "..."
+                          : e.content;
+                        return (
+                          <div key={e.id} className="rounded-xl bg-white/60 border border-black/5 p-4">
+                            <p className="font-barlow text-[10px] text-[#111]/40 mb-1.5">
+                              {new Date(e.created_at).toLocaleString()}
+                            </p>
+                            <p className="font-barlow text-[13px] text-[#111]/80 leading-relaxed">
+                              {excerpt}
+                            </p>
+                            {e.summary && (
+                              <p className="font-barlow text-[12px] text-[#111]/50 mt-2 italic">
+                                {e.summary}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </AppShell>
   );
 };

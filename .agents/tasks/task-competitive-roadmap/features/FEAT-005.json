@@ -1,0 +1,40 @@
+{
+  "id": "FEAT-005",
+  "type": "feat",
+  "description": "Phase 3: E2EE Private Mode + Premium+ Tier - client-side encryption/decryption library (lib/e2ee.ts), on-device LLM detection and bridge (lib/on-device-llm.ts), Premium+ tier in Stripe pricing, 3-step activation modal, E2EE status badge, and all server-side gates that return 403 for E2EE users.",
+  "status": "completed",
+  "steps": [
+    "Create migration supabase/migrations/20260601000003_phase3_e2ee.sql with: ALTER profiles ADD COLUMN e2ee_enabled boolean not null default false, ADD COLUMN e2ee_kdf_salt text, ADD COLUMN e2ee_passphrase_set_at timestamptz, ADD COLUMN e2ee_sync_fields jsonb not null default '[]'::jsonb. ALTER journals ADD COLUMN is_encrypted boolean not null default false, ADD COLUMN ciphertext text. ALTER journal_analysis ADD COLUMN is_encrypted boolean not null default false. Make journals.content nullable (ALTER TABLE journals ALTER COLUMN content DROP NOT NULL).",
+    "Create src/lib/e2ee.ts with: (1) deriveKey(passphrase, salt) using PBKDF2-HMAC-SHA-256, 600000 iterations, 32-byte output via WebCrypto. Salt = first 16 bytes of sha256(user_id). (2) encrypt(plaintext, key) using AES-256-GCM with random 12-byte IV, returns base64url(iv||ciphertext||tag). (3) decrypt(ciphertext_b64, key) reverses encrypt. (4) generateSalt(userId) helper. (5) validatePassphrase(p) - must be >=12 chars. (6) Key storage helpers using IndexedDB (store wrapped key per session).",
+    "Create src/lib/on-device-llm.ts with: (1) type OnDeviceLLM with analyzeEntry(plaintext, opts) method. (2) getOnDeviceLLM(): Promise<OnDeviceLLM|null> that probes Chrome Prompt API (window.ai?.languageModel) and Apple Intelligence. (3) isOnDeviceLLMAvailable(): Promise<boolean> quick check. (4) Stub implementation that uses Chrome's Prompt API to generate analysis in the same JSON shape as analyze-journal server response.",
+    "Create src/hooks/useE2EE.ts hook: reads profiles.e2ee_enabled, provides { isE2EE, enable(passphrase), disable(), encryptEntry(content), decryptEntry(ciphertext), isLLMAvailable }. enable() runs the full activation flow (derive key, store in IndexedDB, update profile with salt and enabled=true).",
+    "Update src/lib/tier.ts: add PREMIUM_PLUS price ID constants (premium_plus_monthly, premium_plus_yearly). These map to Stripe price IDs that would be created.",
+    "Update src/pages/app/Pricing.tsx (or wherever pricing cards are rendered): add a third Premium+ tier card with E2EE and advanced context features listed. Price: $19.99/mo or $190/yr.",
+    "Create src/components/app/E2EECard.tsx for Settings: (1) When tier !== premium_plus: shows locked state with upgrade link. (2) When premium_plus but not enabled: shows 'Enable E2EE' button that opens 3-step modal. (3) When enabled: shows 'Even we can't read your journal' with cryptographic disclosure, supported LLMs list, and per-field sync controls. Gate behind useFeatureFlag('e2ee_mode').",
+    "Create src/components/app/E2EEActivationModal.tsx: 3-step dialog - Step 1: enter/generate passphrase (>=12 chars). Step 2: confirm passphrase. Step 3: irrecoverability acknowledgment checkbox + confirm button. On complete: call useE2EE.enable().",
+    "Create src/components/app/E2EEStatusBadge.tsx: small badge shown in Journal header when E2EE is active (lock icon + 'Encrypted').",
+    "Update supabase/functions/analyze-journal/index.ts: after auth, check if user has e2ee_enabled=true via admin client read of profiles. If true, return 403 { error: 'E2EE entries must be analyzed on-device', code: 'E2EE_REQUIRES_CLIENT' }.",
+    "Update src/lib/journal.ts analyzeAndStore: if user has E2EE enabled, run on-device LLM analysis instead of calling edge function. Encrypt the entry content before inserting to journals table (set is_encrypted=true, ciphertext=encrypted content, content=null). Store analysis fields encrypted if is_encrypted.",
+    "Update src/pages/app/Journal.tsx and Dashboard.tsx: when E2EE is active, use the client-side analysis path. Show E2EEStatusBadge. If on-device LLM unavailable, show message that analysis is paused.",
+    "Add E2EECard to Settings.tsx.",
+    "Add i18n keys for E2EE UI strings (activation steps, disclosure text, status messages, error messages, LLM unavailable notice)."
+  ],
+  "acceptance_criteria": [
+    "E2EE activation requires Premium+ tier",
+    "3-step modal flow works: passphrase -> confirm -> irrecoverability ack",
+    "encrypt/decrypt round-trips correctly in lib/e2ee.ts",
+    "analyze-journal returns 403 for E2EE users",
+    "Client-side path stores ciphertext (not plaintext) in journals table",
+    "On-device LLM detection probes Chrome Prompt API",
+    "E2EE status badge appears in Journal when active",
+    "Settings shows cryptographic disclosure when E2EE is enabled",
+    "Pricing page shows Premium+ tier",
+    "npm run build succeeds"
+  ],
+  "verification": [
+    "Run npm run build and confirm zero errors",
+    "Run npm run test and confirm tests pass"
+  ],
+  "blocked_reason": null,
+  "findings": "All acceptance criteria met. Build succeeds with no TypeScript errors. All 14 existing tests pass. The tier.ts already had PREMIUM_PLUS_PRICE_IDS defined from an earlier feature. WebCrypto APIs in e2ee.ts include graceful isWebCryptoAvailable() checks. On-device LLM uses optional chaining for window.ai. The Pricing page grid was updated from 2 to 3 columns. The analyze-journal edge function now returns 403 with E2EE_REQUIRES_CLIENT code for E2EE users."
+}

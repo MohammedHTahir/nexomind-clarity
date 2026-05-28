@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { getStripeEnvironment } from "@/lib/stripe";
+import { resolveTier, type Tier } from "@/lib/tier";
 
 type SubRow = {
   status: string;
@@ -9,9 +10,6 @@ type SubRow = {
   cancel_at_period_end: boolean;
   price_id: string | null;
 };
-
-// active / trialing / past_due → user keeps access (Stripe auto-retries past_due).
-const ACTIVE_STATUSES = ["active", "trialing", "past_due"];
 
 export const useSubscription = () => {
   const { user } = useAuth();
@@ -71,25 +69,19 @@ export const useSubscription = () => {
     return () => window.removeEventListener("focus", onFocus);
   }, [load]);
 
-  const periodEnd = subscription?.current_period_end
-    ? new Date(subscription.current_period_end)
-    : null;
-  const withinPeriod = !periodEnd || periodEnd > new Date();
-
-  // Cancellation: keep access until current_period_end.
-  const isActive = !!(
-    subscription &&
-    ((ACTIVE_STATUSES.includes(subscription.status) && withinPeriod) ||
-      (subscription.status === "canceled" && periodEnd && periodEnd > new Date()))
-  );
-
+  const tier: Tier = resolveTier(subscription);
+  // Backward compatible: Premium+ users also get isPremium=true
+  const isPremium = tier !== "free";
+  const isPremiumPlus = tier === "premium_plus";
   const isPastDue = subscription?.status === "past_due";
   const isCanceling =
     !!subscription?.cancel_at_period_end || subscription?.status === "canceled";
 
   return {
     subscription,
-    isPremium: isActive,
+    tier,
+    isPremium,
+    isPremiumPlus,
     isPastDue,
     isCanceling,
     loading,
@@ -98,4 +90,3 @@ export const useSubscription = () => {
 };
 
 export default useSubscription;
-

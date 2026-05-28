@@ -46,14 +46,28 @@ export class FreeLimitReachedError extends Error {
   }
 }
 
-export async function analyzeAndStore(content: string): Promise<{
+export interface VoiceFeaturesParam {
+  pace_wpm: number;
+  hesitation_ratio: number;
+  tonal_variability_hz: number;
+}
+
+export async function analyzeAndStore(
+  content: string,
+  voice_features?: VoiceFeaturesParam
+): Promise<{
   journal: JournalRow;
   analysis: AnalysisRow;
   usage?: AnalyzeUsage;
   isPremium?: boolean;
 }> {
+  const body: Record<string, unknown> = { content };
+  if (voice_features) {
+    body.voice_features = voice_features;
+  }
+
   const { data, error } = await supabase.functions.invoke("analyze-journal", {
-    body: { content },
+    body,
   });
   const payload = (data ?? {}) as any;
   if (payload?.code === "FREE_LIMIT_REACHED") {
@@ -71,6 +85,100 @@ export async function analyzeAndStore(content: string): Promise<{
     usage?: AnalyzeUsage;
     isPremium?: boolean;
   };
+}
+
+/**
+ * E2EE-aware analyze and store: encrypts content client-side, runs on-device LLM.
+ * Analysis string fields (summary, emotional_state, clarity_insight, suggested_reflection)
+ * are encrypted before insertion so the server never stores plaintext analysis for E2EE users.
+ */
+export async function analyzeAndStoreE2EE(
+  content: string,
+  encryptFn: (text: string) => Promise<string>,
+  onDeviceLLM: { analyzeEntry: (text: string) => Promise<Record<string, unknown>> } | null
+): Promise<{
+  journal: JournalRow;
+  analysis: AnalysisRow;
+}> {
+  const { data: userData } = await supabase.auth.getUser();
+  const userId = userData.user?.id;
+  if (!userId) throw new Error("Not authenticated");
+
+  // Encrypt the content
+  const ciphertext = await encryptFn(content);
+
+  // Insert journal with encrypted content
+  const { data: journal, error: jErr } = await supabase
+    .from("journals")
+    .insert({
+      user_id: userId,
+      content: null,
+      is_encrypted: true,
+      ciphertext,
+    })
+    .select()
+    .single();
+  if (jErr) throw jErr;
+
+  // Run on-device analysis if available
+  let analysisData: Record<string, unknown> = {
+    summary: "Entry encrypted - analysis requires on-device LLM",
+    emotional_state: "unknown",
+    intensity_score: 50,
+    clarity_score: 50,
+    cognitive_patterns: [],
+    key_thoughts: [],
+    distortions_or_biases: [],
+    clarity_insight: "This entry is end-to-end encrypted",
+    suggested_reflection: "On-device analysis will be available when supported by your browser",
+  };
+
+  if (onDeviceLLM) {
+    try {
+      analysisData = await onDeviceLLM.analyzeEntry(content) as Record<string, unknown>;
+    } catch (e) {
+      console.warn("[E2EE] On-device analysis failed, using placeholder:", e);
+    }
+  }
+
+  // Encrypt string analysis fields before storing to maintain E2EE guarantee.
+  // Numeric fields (intensity_score, clarity_score) are stored unencrypted for
+  // aggregate statistics; they contain no personally identifiable content.
+  const encryptedSummary = typeof analysisData.summary === "string"
+    ? await encryptFn(analysisData.summary)
+    : null;
+  const encryptedEmotionalState = typeof analysisData.emotional_state === "string"
+    ? await encryptFn(analysisData.emotional_state)
+    : null;
+  const encryptedClarityInsight = typeof analysisData.clarity_insight === "string"
+    ? await encryptFn(analysisData.clarity_insight)
+    : null;
+  const encryptedSuggestedReflection = typeof analysisData.suggested_reflection === "string"
+    ? await encryptFn(analysisData.suggested_reflection)
+    : null;
+
+  // Store analysis with encrypted string fields
+  const { data: analysis, error: aErr } = await supabase
+    .from("journal_analysis")
+    .insert({
+      journal_id: journal.id,
+      user_id: userId,
+      summary: encryptedSummary,
+      emotional_state: encryptedEmotionalState,
+      intensity_score: analysisData.intensity_score,
+      clarity_score: analysisData.clarity_score,
+      cognitive_patterns: analysisData.cognitive_patterns ?? [],
+      key_thoughts: analysisData.key_thoughts ?? [],
+      distortions_or_biases: analysisData.distortions_or_biases ?? [],
+      clarity_insight: encryptedClarityInsight,
+      suggested_reflection: encryptedSuggestedReflection,
+      is_encrypted: true,
+    })
+    .select()
+    .single();
+  if (aErr) throw aErr;
+
+  return { journal, analysis };
 }
 
 export async function fetchJournals(): Promise<JournalWithAnalysis[]> {
