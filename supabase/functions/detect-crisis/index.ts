@@ -8,6 +8,14 @@ const corsHeaders = {
 
 // Crisis detection patterns (weighted)
 // These patterns indicate hopelessness, self-harm ideation, or severe distress
+//
+// TODO: These patterns match against LLM-generated key_thoughts and summary, not raw
+// journal text. If the LLM softens or rephrases language (e.g., "I want to end it" becomes
+// "The user expresses desire for finality"), patterns will not trigger. Consider:
+//   1. Running pattern matching on raw journal content before LLM processing
+//   2. Adding a dedicated crisis-screening step in the LLM prompt that returns a
+//      boolean signal before the main analysis rewrites user language
+//   3. Using both raw text and summary for pattern matching
 const CRISIS_PATTERNS: { pattern: RegExp; weight: number }[] = [
   { pattern: /\b(end(ing)?\s+(it|my\s+life|everything))\b/i, weight: 0.35 },
   { pattern: /\b(no\s+(point|reason)\s+(in|to)\s+(living|going\s+on))\b/i, weight: 0.30 },

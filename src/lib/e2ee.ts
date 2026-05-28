@@ -228,6 +228,7 @@ export async function getKeyFromIDB(): Promise<CryptoKey | null> {
 
 /**
  * Remove the stored key from IndexedDB.
+ * Should be called on auth sign-out to prevent key persistence beyond the user session.
  */
 export async function clearKeyFromIDB(): Promise<void> {
   try {
@@ -244,3 +245,9 @@ export async function clearKeyFromIDB(): Promise<void> {
     // Silently fail - best effort cleanup
   }
 }
+
+/**
+ * Clear the E2EE key from IndexedDB. Exported for use in auth sign-out flows
+ * to ensure the encryption key does not outlive the user session.
+ */
+export const clearStoredKey = clearKeyFromIDB;

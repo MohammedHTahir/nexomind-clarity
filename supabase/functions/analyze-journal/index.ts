@@ -367,6 +367,7 @@ Deno.serve(async (req) => {
       if (integrationCount && (integrationCount as any) > 0) {
         const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
         const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+        const INTERNAL_SECRET = Deno.env.get("INTERNAL_FUNCTION_SECRET") ?? "";
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 5000);
         try {
@@ -376,6 +377,7 @@ Deno.serve(async (req) => {
               Authorization: `Bearer ${SERVICE_KEY}`,
               apikey: SERVICE_KEY,
               "Content-Type": "application/json",
+              "x-internal-secret": INTERNAL_SECRET,
             },
             body: JSON.stringify({ user_id: userId }),
             signal: controller.signal,

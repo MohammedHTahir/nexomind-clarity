@@ -104,6 +104,13 @@ export function useMentorPersona(): UseMentorPersonaReturn {
 
       try {
         // Free tier rate limit check: 1 switch per 7 days
+        // TODO: This is client-side enforcement only. A user can bypass by calling
+        // supabase.from("profiles").update({ active_mentor_persona: "..." }) directly.
+        // Server-side enforcement options:
+        //   1. Add a PostgreSQL trigger on profiles.active_mentor_persona that checks
+        //      user_persona_switches within 7 days for free-tier users and raises an exception.
+        //   2. Add an RLS policy with a subquery on user_persona_switches.
+        //   3. Move persona switching to a dedicated edge function that validates timing.
         if (!isPremium && key !== null) {
           const since = new Date(Date.now() - SEVEN_DAYS_MS).toISOString();
           const { data: switches, error: switchErr } = await supabase

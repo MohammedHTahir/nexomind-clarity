@@ -3,6 +3,16 @@
  * Called inline from analyze-journal. Accepts user_id via JSON body (service-role only).
  * Returns { sleep_minutes, hrv_avg, meeting_count_24h, meeting_minutes_24h, source_versions }
  * or null on failure. Never surfaces errors to the end user.
+ *
+ * Security: Validates the X-Internal-Secret header (INTERNAL_FUNCTION_SECRET env var)
+ * to ensure only authorized internal edge functions can invoke this endpoint.
+ *
+ * TODO: Tokens in access_token_enc are currently stored/read as plaintext.
+ * Add pgsodium decryption or application-layer decryption before using as bearer tokens.
+ *
+ * TODO: token_expires_at is stored but never checked before making API calls.
+ * Add refresh token flow: check expiry, call provider refresh endpoint if expired,
+ * update stored tokens. Currently expired tokens produce silent 401 failures.
  */
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
@@ -32,6 +42,15 @@ interface Integration {
 const TIMEOUT_MS = 5000;
 const MAX_RETRIES = 3;
 const BASE_DELAY_MS = 500;
+
+// TODO: Each edge function implements its own ad-hoc timeout/retry logic with varying
+// semantics (AbortController, setTimeout, different backoff strategies). Extract a shared
+// utility module (e.g., supabase/functions/_shared/fetch-retry.ts) that provides:
+//   - Configurable timeout via AbortController
+//   - Exponential backoff with jitter
+//   - Consistent error classification (retryable vs non-retryable)
+//   - Shared logging format
+// Then import it in fetch-context-signals, detect-crisis, generate-sunday-letter, etc.
 
 async function fetchWithRetry(
   url: string,
@@ -201,6 +220,17 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
+    // Caller authentication: verify this request comes from an internal edge function
+    // (e.g., analyze-journal) by checking a shared internal secret header.
+    const internalSecret = Deno.env.get("INTERNAL_FUNCTION_SECRET");
+    const callerSecret = req.headers.get("x-internal-secret");
+    if (!internalSecret || callerSecret !== internalSecret) {
+      return new Response(JSON.stringify({ error: "Forbidden: internal use only" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { user_id } = await req.json();
     if (!user_id) {
       return new Response(JSON.stringify(null), {
@@ -236,6 +266,11 @@ Deno.serve(async (req) => {
     for (const integration of integrations as Integration[]) {
       const token = integration.access_token_enc;
       if (!token) continue;
+
+      // TODO: Check token_expires_at before using the token. If expired, use
+      // refresh_token_enc to obtain a new access token from the provider's OAuth
+      // refresh endpoint, then update the stored tokens. Currently expired tokens
+      // produce silent 401 failures from provider APIs.
 
       try {
         if (integration.provider === "oura") {

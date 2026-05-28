@@ -118,6 +118,13 @@ Deno.serve(async (req) => {
 
   try {
     // Select profiles with sunday_letter_enabled = true
+    // TODO: This query fetches ALL enabled profiles in one shot with no pagination.
+    // At scale (thousands of subscribers), sequential processing with per-user Gemini
+    // calls will exceed edge function timeout limits. To fix:
+    //   1. Add LIMIT/OFFSET pagination with a cursor stored in a progress table
+    //   2. Use a fan-out pattern: this function selects user IDs and dispatches individual
+    //      per-user generation functions via fire-and-forget
+    //   3. Add a resumption mechanism so partial progress is not lost on timeout
     const { data: profiles, error: profileErr } = await admin
       .from("profiles")
       .select("id, sunday_letter_time, sunday_letter_email_enabled, sunday_letter_push_enabled, timezone, email")

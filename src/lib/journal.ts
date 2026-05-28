@@ -89,6 +89,8 @@ export async function analyzeAndStore(
 
 /**
  * E2EE-aware analyze and store: encrypts content client-side, runs on-device LLM.
+ * Analysis string fields (summary, emotional_state, clarity_insight, suggested_reflection)
+ * are encrypted before insertion so the server never stores plaintext analysis for E2EE users.
  */
 export async function analyzeAndStoreE2EE(
   content: string,
@@ -139,21 +141,37 @@ export async function analyzeAndStoreE2EE(
     }
   }
 
-  // Store analysis (encrypted flag set)
+  // Encrypt string analysis fields before storing to maintain E2EE guarantee.
+  // Numeric fields (intensity_score, clarity_score) are stored unencrypted for
+  // aggregate statistics; they contain no personally identifiable content.
+  const encryptedSummary = typeof analysisData.summary === "string"
+    ? await encryptFn(analysisData.summary)
+    : null;
+  const encryptedEmotionalState = typeof analysisData.emotional_state === "string"
+    ? await encryptFn(analysisData.emotional_state)
+    : null;
+  const encryptedClarityInsight = typeof analysisData.clarity_insight === "string"
+    ? await encryptFn(analysisData.clarity_insight)
+    : null;
+  const encryptedSuggestedReflection = typeof analysisData.suggested_reflection === "string"
+    ? await encryptFn(analysisData.suggested_reflection)
+    : null;
+
+  // Store analysis with encrypted string fields
   const { data: analysis, error: aErr } = await supabase
     .from("journal_analysis")
     .insert({
       journal_id: journal.id,
       user_id: userId,
-      summary: analysisData.summary,
-      emotional_state: analysisData.emotional_state,
+      summary: encryptedSummary,
+      emotional_state: encryptedEmotionalState,
       intensity_score: analysisData.intensity_score,
       clarity_score: analysisData.clarity_score,
       cognitive_patterns: analysisData.cognitive_patterns ?? [],
       key_thoughts: analysisData.key_thoughts ?? [],
       distortions_or_biases: analysisData.distortions_or_biases ?? [],
-      clarity_insight: analysisData.clarity_insight,
-      suggested_reflection: analysisData.suggested_reflection,
+      clarity_insight: encryptedClarityInsight,
+      suggested_reflection: encryptedSuggestedReflection,
       is_encrypted: true,
     })
     .select()

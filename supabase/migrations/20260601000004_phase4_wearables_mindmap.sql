@@ -1,6 +1,11 @@
 -- Phase 4: Wearable + Calendar Integration and Living MindMap Upgrade
 
 -- user_integrations table for OAuth token storage
+-- TODO: The _enc suffix on access_token_enc/refresh_token_enc implies encryption-at-rest
+-- but no application-layer encryption is currently applied. Tokens are stored as plaintext
+-- and protected only by RLS + service-role access control. When deployed to production,
+-- add pgsodium column encryption (ALTER COLUMN ... USING pgsodium.encrypt_column(...))
+-- or implement application-layer encryption/decryption in fetch-context-signals.
 CREATE TABLE IF NOT EXISTS public.user_integrations (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL REFERENCES auth.users ON DELETE CASCADE,
