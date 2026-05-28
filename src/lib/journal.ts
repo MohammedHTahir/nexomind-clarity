@@ -46,14 +46,28 @@ export class FreeLimitReachedError extends Error {
   }
 }
 
-export async function analyzeAndStore(content: string): Promise<{
+export interface VoiceFeaturesParam {
+  pace_wpm: number;
+  hesitation_ratio: number;
+  tonal_variability_hz: number;
+}
+
+export async function analyzeAndStore(
+  content: string,
+  voice_features?: VoiceFeaturesParam
+): Promise<{
   journal: JournalRow;
   analysis: AnalysisRow;
   usage?: AnalyzeUsage;
   isPremium?: boolean;
 }> {
+  const body: Record<string, unknown> = { content };
+  if (voice_features) {
+    body.voice_features = voice_features;
+  }
+
   const { data, error } = await supabase.functions.invoke("analyze-journal", {
-    body: { content },
+    body,
   });
   const payload = (data ?? {}) as any;
   if (payload?.code === "FREE_LIMIT_REACHED") {

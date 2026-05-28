@@ -35,5 +35,16 @@
   "general.premiumFeature": "Premium Feature",
   "tier.free": "Free",
   "tier.premium": "Premium",
-  "tier.premiumPlus": "Premium+"
+  "tier.premiumPlus": "Premium+",
+  "voice.startRecording": "Start voice recording",
+  "voice.stopRecording": "Stop recording",
+  "voice.submit": "Submit recording",
+  "voice.reRecord": "Re-record",
+  "voice.discard": "Discard recording",
+  "voice.processing": "Transcribing...",
+  "voice.done": "Entry saved",
+  "voice.permissionDenied": "Microphone access denied. Please allow microphone permission in your browser settings.",
+  "voice.tooShort": "Recording too short. Please record at least 3 seconds.",
+  "voice.unsupported": "Voice recording is not supported on this device.",
+  "voice.freeTierUpsell": "Upgrade to Premium for full voice journaling"
 }

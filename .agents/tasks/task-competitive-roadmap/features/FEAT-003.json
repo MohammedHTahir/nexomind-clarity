@@ -1,0 +1,33 @@
+{
+  "id": "FEAT-003",
+  "type": "feat",
+  "description": "Phase 2: Voice-First Thought Dump - MediaRecorder capture, Whisper/Gemini transcription edge function, acoustic feature extraction (pace_wpm, hesitation_ratio, tonal_variability_hz), voice-aware prompt composition, and full UI with recording indicator, preview, and submit flow.",
+  "status": "in_progress",
+  "steps": [
+    "Create migration supabase/migrations/20260601000002_phase2_voice_sunday.sql with: ALTER journal_analysis ADD COLUMN voice_pace_wpm numeric, ADD COLUMN voice_hesitation_ratio numeric, ADD COLUMN voice_tonal_variability_hz numeric, ADD COLUMN is_voice_entry boolean not null default false. Also create sunday_letters table (id uuid PK, user_id uuid references auth.users on delete cascade, week_starts_on date not null, body text not null, generated_at timestamptz default now(), read_at timestamptz, UNIQUE(user_id, week_starts_on)), RLS: select/update where user_id=auth.uid(), insert for service_role. ALTER profiles ADD COLUMN sunday_letter_enabled boolean not null default false, ADD COLUMN sunday_letter_time time not null default '09:00', ADD COLUMN sunday_letter_email_enabled boolean not null default false, ADD COLUMN sunday_letter_push_enabled boolean not null default false, ADD COLUMN timezone text not null default 'UTC'.",
+    "Create src/lib/voice.ts with: (1) startVoiceCapture({ maxSeconds: 60, minSeconds: 3 }) function using MediaRecorder API with audio/webm;codecs=opus, returns VoiceClip object with blob, duration, elapsed tick callback. Auto-stops at 60s. (2) AcousticFeatures type { pace_wpm, hesitation_ratio, tonal_variability_hz }. (3) extractAcousticFeatures(clip: VoiceClip, transcript: string): Promise<AcousticFeatures> - pace = word count / duration in minutes, hesitation_ratio via energy-threshold silence detection + filler regex on transcript, tonal_variability via AudioContext AnalyserNode + autocorrelation pitch estimator. (4) isVoiceSupported() capability check.",
+    "Create supabase/functions/transcribe-voice-entry/index.ts edge function: authenticates user, receives audio blob (multipart or base64), sends to Gemini API audio input for transcription, returns { transcript: string }. Handles errors gracefully, returns 500 on transcription failure.",
+    "Update supabase/functions/analyze-journal/index.ts: accept optional voice_features parameter in request body ({ pace_wpm, hesitation_ratio, tonal_variability_hz }). Pass to composeSystemPrompt as voiceFeatures. Add VOICE_BLOCK to prompt composition that instructs AI to reference pace/hesitation/tone when present. Persist voice fields on journal_analysis row. Set is_voice_entry=true when voice_features provided.",
+    "Create src/components/app/VoiceEntryButton.tsx: state machine (idle -> recording -> preview -> submitting -> done). Shows microphone icon button. On click: request mic permission, start recording with elapsed counter display. Stop button (keyboard accessible via Enter/Space). At 60s auto-stop. Preview state shows Submit/Re-record/Discard. Under 3s discards with toast. On submit: upload to transcribe-voice-entry, extract acoustic features client-side, call analyzeAndStore with content=transcript + voice_features. Shows recording indicator with elapsed seconds.",
+    "Update src/lib/journal.ts: extend analyzeAndStore to accept optional voice_features parameter that gets passed to the analyze-journal edge function body.",
+    "Mount VoiceEntryButton in src/pages/app/Journal.tsx (in the write phase, next to submit button) and src/pages/app/Dashboard.tsx (next to the text input area). Gate behind useFeatureFlag('voice_entry'). Hide entirely if !isVoiceSupported(). Free tier: show 15-second demo mode (no persistence, Submit hidden).",
+    "Add i18n keys for voice entry UI strings (recording indicator, permission denied message, minimum duration message, unsupported device message, free tier upsell)."
+  ],
+  "acceptance_criteria": [
+    "Voice entry button appears on Journal and Dashboard pages when feature flag is enabled and browser supports MediaRecorder",
+    "Recording shows elapsed time counter and stops at 60 seconds",
+    "Recordings under 3 seconds are discarded with a message",
+    "Preview state offers Submit, Re-record, and Discard options",
+    "Successful submission creates a journal entry with transcript as content and acoustic features stored",
+    "analyze-journal includes voice context in AI prompt when voice_features are provided",
+    "Free tier users see 15-second demo without persistence",
+    "Permission denied shows non-blocking message",
+    "npm run build succeeds"
+  ],
+  "verification": [
+    "Run npm run build and confirm zero errors",
+    "Run npm run test and confirm tests pass"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

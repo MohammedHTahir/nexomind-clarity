@@ -4,6 +4,10 @@ import { ArrowRight, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { analyzeAndStore, clarityBand, FreeLimitReachedError, type AnalysisRow } from "@/lib/journal";
 import ChallengerNotice from "@/components/app/ChallengerNotice";
+import VoiceEntryButton from "@/components/app/VoiceEntryButton";
+import { useFeatureFlag } from "@/lib/feature-flags";
+import { isVoiceSupported } from "@/lib/voice";
+import { useSubscription } from "@/hooks/useSubscription";
 import PremiumGate from "@/components/PremiumGate";
 import { toast } from "sonner";
 import { trackEvent } from "@/lib/analytics";
@@ -12,6 +16,8 @@ const ease = [0.16, 1, 0.3, 1] as const;
 
 const Journal = () => {
   const navigate = useNavigate();
+  const { isPremium } = useSubscription();
+  const voiceFlagEnabled = useFeatureFlag("voice_entry");
   const [text, setText] = useState("");
   const [phase, setPhase] = useState<"write" | "processing" | "done">("write");
   const [result, setResult] = useState<AnalysisRow | null>(null);
@@ -98,16 +104,27 @@ const Journal = () => {
                     <span className="font-barlow text-[12px] text-[#111]/40">
                       {text.trim().split(/\s+/).filter(Boolean).length} words
                     </span>
-                    <button
-                      onClick={submit}
-                      disabled={!text.trim()}
-                      className="group flex items-center gap-2 bg-[#111] text-white rounded-full pl-5 pr-1.5 py-1.5 font-barlow font-medium text-[13px] hover:bg-black transition-colors disabled:opacity-30"
-                    >
-                      <span>Reflect</span>
-                      <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white text-[#111] group-hover:rotate-45 transition-transform duration-300">
-                        <ArrowRight className="w-3.5 h-3.5" strokeWidth={2.25} />
-                      </span>
-                    </button>
+                    <div className="flex items-center gap-3">
+                      {voiceFlagEnabled && isVoiceSupported() && (
+                        <VoiceEntryButton
+                          demoMode={!isPremium}
+                          onComplete={(analysis) => {
+                            setResult(analysis);
+                            setPhase("done");
+                          }}
+                        />
+                      )}
+                      <button
+                        onClick={submit}
+                        disabled={!text.trim()}
+                        className="group flex items-center gap-2 bg-[#111] text-white rounded-full pl-5 pr-1.5 py-1.5 font-barlow font-medium text-[13px] hover:bg-black transition-colors disabled:opacity-30"
+                      >
+                        <span>Reflect</span>
+                        <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white text-[#111] group-hover:rotate-45 transition-transform duration-300">
+                          <ArrowRight className="w-3.5 h-3.5" strokeWidth={2.25} />
+                        </span>
+                      </button>
+                    </div>
                   </div>
                 </motion.div>
               )}

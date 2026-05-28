@@ -6,6 +6,9 @@ import AppShell from "@/components/app/AppShell";
 import GlassCard from "@/components/app/GlassCard";
 import PatternsCard from "@/components/app/PatternsCard";
 import ChallengerNotice from "@/components/app/ChallengerNotice";
+import VoiceEntryButton from "@/components/app/VoiceEntryButton";
+import { useFeatureFlag } from "@/lib/feature-flags";
+import { isVoiceSupported } from "@/lib/voice";
 import {
   analyzeAndStore,
   fetchJournals,
@@ -34,6 +37,7 @@ const greeting = () => {
 const Dashboard = () => {
   const { user } = useAuth();
   const { isPremium } = useSubscription();
+  const voiceFlagEnabled = useFeatureFlag("voice_entry");
   const [text, setText] = useState("");
   const [name, setName] = useState("");
   const [analyzing, setAnalyzing] = useState(false);
@@ -139,13 +143,23 @@ const Dashboard = () => {
             }}
           />
           <div className="flex items-center justify-between mt-4 pt-4 border-t border-black/5">
-            <button
-              type="button"
-              className="w-9 h-9 rounded-full bg-white/60 border border-black/5 flex items-center justify-center text-[#111]/60 hover:text-[#111] hover:scale-[1.05] transition-all"
-              aria-label="Voice"
-            >
-              <Mic className="w-4 h-4" strokeWidth={1.75} />
-            </button>
+            {voiceFlagEnabled && isVoiceSupported() ? (
+              <VoiceEntryButton
+                demoMode={!isPremium}
+                onComplete={(analysis) => {
+                  setResult(analysis);
+                  fetchJournals().then(setEntries).catch(console.error);
+                }}
+              />
+            ) : (
+              <button
+                type="button"
+                className="w-9 h-9 rounded-full bg-white/60 border border-black/5 flex items-center justify-center text-[#111]/60 hover:text-[#111] hover:scale-[1.05] transition-all"
+                aria-label="Voice"
+              >
+                <Mic className="w-4 h-4" strokeWidth={1.75} />
+              </button>
+            )}
             <button
               onClick={submit}
               disabled={!text.trim() || analyzing}

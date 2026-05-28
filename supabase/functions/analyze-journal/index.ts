@@ -42,20 +42,48 @@ REFLECTION STYLE: Challenger
 - Be direct and growth-focused while remaining respectful
 - Use language like "this is catastrophizing" rather than softening`;
 
+const VOICE_BLOCK = `
+
+VOICE CONTEXT:
+The user recorded this entry via voice. Acoustic analysis detected the following:
+- Speaking pace: {{pace_wpm}} words per minute
+- Hesitation ratio: {{hesitation_ratio}} (proportion of filler words/pauses)
+- Tonal variability: {{tonal_variability_hz}} Hz standard deviation
+
+Consider these signals in your analysis:
+- A slow pace with high hesitation may indicate uncertainty or processing difficulty
+- Rapid pace with low variability may suggest rehearsed avoidance
+- High tonal variability can indicate emotional activation
+Reference these observations naturally in your insight when relevant.`;
+
 type ReflectionMode = "companion" | "challenger";
+
+interface VoiceFeatures {
+  pace_wpm: number;
+  hesitation_ratio: number;
+  tonal_variability_hz: number;
+}
 
 interface ComposeOptions {
   mode: ReflectionMode;
+  voiceFeatures?: VoiceFeatures;
 }
 
 function composeSystemPrompt(options: ComposeOptions): string {
-  const { mode } = options;
+  const { mode, voiceFeatures } = options;
   let prompt = BASE_PROMPT;
 
   if (mode === "challenger") {
     prompt += CHALLENGER_BLOCK;
   } else {
     prompt += COMPANION_BLOCK;
+  }
+
+  if (voiceFeatures) {
+    prompt += VOICE_BLOCK
+      .replace("{{pace_wpm}}", String(voiceFeatures.pace_wpm))
+      .replace("{{hesitation_ratio}}", String(voiceFeatures.hesitation_ratio))
+      .replace("{{tonal_variability_hz}}", String(voiceFeatures.tonal_variability_hz));
   }
 
   return prompt;
@@ -162,7 +190,11 @@ Deno.serve(async (req) => {
     }
     const userId = userData.user.id;
 
-    const { content } = await req.json();
+    const body = await req.json();
+    const { content, voice_features } = body as {
+      content: string;
+      voice_features?: VoiceFeatures;
+    };
     if (typeof content !== "string" || content.trim().length < 2 || content.length > 10000) {
       return new Response(JSON.stringify({ error: "Invalid content" }), {
         status: 400,
@@ -226,7 +258,7 @@ Deno.serve(async (req) => {
       console.warn("Failed to read reflection_mode, defaulting to companion", e);
     }
 
-    const systemPrompt = composeSystemPrompt({ mode: reflectionMode });
+    const systemPrompt = composeSystemPrompt({ mode: reflectionMode, voiceFeatures: voice_features });
 
     // 1) insert journal
     const { data: journal, error: jErr } = await supabase
@@ -306,7 +338,7 @@ Deno.serve(async (req) => {
       console.warn("Refine pass skipped", e);
     }
 
-    // 4) store analysis (with reflection_mode)
+    // 4) store analysis (with reflection_mode and voice features)
     const { data: analysis, error: aErr } = await supabase
       .from("journal_analysis")
       .insert({
@@ -322,6 +354,14 @@ Deno.serve(async (req) => {
         clarity_insight: parsed.clarity_insight,
         suggested_reflection: parsed.suggested_reflection,
         reflection_mode: reflectionMode,
+        ...(voice_features
+          ? {
+              is_voice_entry: true,
+              voice_pace_wpm: voice_features.pace_wpm,
+              voice_hesitation_ratio: voice_features.hesitation_ratio,
+              voice_tonal_variability_hz: voice_features.tonal_variability_hz,
+            }
+          : {}),
       })
       .select()
       .single();
