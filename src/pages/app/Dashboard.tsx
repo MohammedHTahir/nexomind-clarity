@@ -6,6 +6,7 @@ import AppShell from "@/components/app/AppShell";
 import GlassCard from "@/components/app/GlassCard";
 import PatternsCard from "@/components/app/PatternsCard";
 import ChallengerNotice from "@/components/app/ChallengerNotice";
+import ModeConflictNotice from "@/components/app/ModeConflictNotice";
 import VoiceEntryButton from "@/components/app/VoiceEntryButton";
 import { useFeatureFlag } from "@/lib/feature-flags";
 import { isVoiceSupported } from "@/lib/voice";
@@ -239,6 +240,9 @@ const Dashboard = () => {
                 <div className="bg-white/80 backdrop-blur-md rounded-[21px] p-7 md:p-9">
                   <ChallengerNotice
                     analysisId={result.id}
+                    reflectionMode={(result as Record<string, unknown>).reflection_mode as string | undefined}
+                  />
+                  <ModeConflictNotice
                     reflectionMode={(result as Record<string, unknown>).reflection_mode as string | undefined}
                   />
                   <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45 mb-3">

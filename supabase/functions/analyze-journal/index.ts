@@ -85,18 +85,24 @@ interface ContextSignals {
 
 interface ComposeOptions {
   mode: ReflectionMode;
+  persona?: string | null;
   voiceFeatures?: VoiceFeatures;
   contextSignals?: ContextSignals | null;
 }
 
 function composeSystemPrompt(options: ComposeOptions): string {
-  const { mode, voiceFeatures, contextSignals } = options;
+  const { mode, persona, voiceFeatures, contextSignals } = options;
   let prompt = BASE_PROMPT;
 
   if (mode === "challenger") {
     prompt += CHALLENGER_BLOCK;
   } else {
     prompt += COMPANION_BLOCK;
+  }
+
+  // PERSONA_BLOCK: appended after mode block
+  if (persona) {
+    prompt += `\n\nMENTOR PERSONA VOICE:\n${persona}`;
   }
 
   if (voiceFeatures) {
@@ -298,19 +304,56 @@ Deno.serve(async (req) => {
     const apiKey = Deno.env.get("GEMINI_API_KEY");
     if (!apiKey) throw new Error("GEMINI_API_KEY not configured");
 
-    // Resolve reflection mode from user profile
+    // Resolve reflection mode and active persona from user profile
     let reflectionMode: ReflectionMode = "companion";
+    let personaVoiceBlock: string | null = null;
     try {
       const { data: profile } = await admin
         .from("profiles")
-        .select("reflection_mode")
+        .select("reflection_mode, active_mentor_persona, you_mentor_profile")
         .eq("id", userId)
         .maybeSingle();
       if (profile?.reflection_mode === "challenger") {
         reflectionMode = "challenger";
       }
+      // Resolve persona voice block
+      if (profile?.active_mentor_persona) {
+        if (profile.active_mentor_persona === "you_mentor") {
+          // Construct personalized voice_block from you_mentor_profile
+          const ymp = profile.you_mentor_profile as {
+            themes?: string[];
+            vocab?: string[];
+            reframe_style?: string;
+          } | null;
+          if (ymp) {
+            const parts: string[] = [];
+            if (ymp.themes?.length) {
+              parts.push(`Focus on these themes the user cares about: ${ymp.themes.join(", ")}.`);
+            }
+            if (ymp.vocab?.length) {
+              parts.push(`Use vocabulary the user resonates with: ${ymp.vocab.join(", ")}.`);
+            }
+            if (ymp.reframe_style) {
+              parts.push(`Reframing style: ${ymp.reframe_style}`);
+            }
+            if (parts.length > 0) {
+              personaVoiceBlock = parts.join(" ");
+            }
+          }
+        } else {
+          // Look up curated persona voice_block
+          const { data: persona } = await admin
+            .from("mentor_personas")
+            .select("voice_block")
+            .eq("key", profile.active_mentor_persona)
+            .maybeSingle();
+          if (persona?.voice_block) {
+            personaVoiceBlock = persona.voice_block;
+          }
+        }
+      }
     } catch (e) {
-      console.warn("Failed to read reflection_mode, defaulting to companion", e);
+      console.warn("Failed to read reflection_mode/persona, defaulting to companion", e);
     }
 
     // Fetch context signals from connected integrations (5s timeout, non-blocking)
@@ -350,7 +393,7 @@ Deno.serve(async (req) => {
       console.warn("context signals check failed (non-fatal)", e);
     }
 
-    const systemPrompt = composeSystemPrompt({ mode: reflectionMode, voiceFeatures: voice_features, contextSignals });
+    const systemPrompt = composeSystemPrompt({ mode: reflectionMode, persona: personaVoiceBlock, voiceFeatures: voice_features, contextSignals });
 
     // 1) insert journal
     const { data: journal, error: jErr } = await supabase

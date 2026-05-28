@@ -5,6 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { analyzeAndStore, clarityBand, FreeLimitReachedError, type AnalysisRow } from "@/lib/journal";
 import { analyzeAndStoreE2EE } from "@/lib/journal";
 import ChallengerNotice from "@/components/app/ChallengerNotice";
+import MentorPersonaPicker from "@/components/app/MentorPersonaPicker";
+import ModeConflictNotice from "@/components/app/ModeConflictNotice";
 import VoiceEntryButton from "@/components/app/VoiceEntryButton";
 import E2EEStatusBadge from "@/components/app/E2EEStatusBadge";
 import { useFeatureFlag } from "@/lib/feature-flags";
@@ -118,6 +120,7 @@ const Journal = () => {
                       )}
                     </div>
                   )}
+                  <MentorPersonaPicker />
                   <textarea
                     autoFocus
                     value={text}
@@ -182,6 +185,9 @@ const Journal = () => {
                 >
                   <ChallengerNotice
                     analysisId={result.id}
+                    reflectionMode={(result as Record<string, unknown>).reflection_mode as string | undefined}
+                  />
+                  <ModeConflictNotice
                     reflectionMode={(result as Record<string, unknown>).reflection_mode as string | undefined}
                   />
                   <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45 mb-4">

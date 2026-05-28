@@ -19,6 +19,7 @@ const Settings = lazy(() => import("./pages/app/Settings.tsx"));
 const MindMap = lazy(() => import("./pages/app/MindMap.tsx"));
 const Inbox = lazy(() => import("./pages/app/Inbox.tsx"));
 const TherapistBridge = lazy(() => import("./pages/app/TherapistBridge.tsx"));
+const MentorProfile = lazy(() => import("./pages/app/MentorProfile.tsx"));
 
 const DynamicSeoPage = lazy(() => import("./pages/seo/DynamicSeoPage.tsx"));
 const About = lazy(() => import("./pages/About.tsx"));
@@ -136,6 +137,14 @@ const App = () => (
                 element={
                   <RequireAuth>
                     <TherapistBridge />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/app/mentor-profile"
+                element={
+                  <RequireAuth>
+                    <MentorProfile />
                   </RequireAuth>
                 }
               />
