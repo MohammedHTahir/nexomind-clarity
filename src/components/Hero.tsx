@@ -1,138 +1,220 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { ChevronRight, Search, Sparkles } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
 const Hero = () => {
-  const [showVideo, setShowVideo] = useState(false);
-
-  useEffect(() => {
-    // Defer video mount until after first paint so it doesn't compete with LCP
-    const w = window as any;
-    const idle = w.requestIdleCallback || ((cb: () => void) => setTimeout(cb, 200));
-    const handle = idle(() => setShowVideo(true));
-    return () => {
-      const cancel = w.cancelIdleCallback || clearTimeout;
-      cancel(handle);
-    };
-  }, []);
-
   return (
-    <section className="relative min-h-[90vh] w-full overflow-hidden flex items-center justify-center">
-      {/* Placeholder backdrop — paints instantly, replaced by video once idle */}
+    <section className="relative w-full overflow-hidden bg-[#F3F4ED] pt-28 md:pt-36 pb-12">
+      {/* Subtle warm radial wash + grid */}
       <div
         aria-hidden
-        className="absolute inset-0 z-0 bg-gradient-to-br from-[#1a1a2a] via-[#2a2a3a] to-[#1a1a2a]"
+        className="absolute inset-0 -z-10 opacity-[0.55]"
+        style={{
+          background:
+            "radial-gradient(900px 520px at 50% -10%, rgba(0,0,0,0.06), transparent 60%), radial-gradient(700px 420px at 50% 110%, rgba(0,0,0,0.05), transparent 60%)",
+        }}
       />
-      {/* Video bg (lazy-mounted) */}
-      {showVideo && (
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="none"
-          className="absolute inset-0 w-full h-full object-cover z-0"
-        >
-          <source
-            src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260228_065522_522e2295-ba22-457e-8fdb-fbcd68109c73.mp4"
-            type="video/mp4"
-          />
-        </video>
-      )}
-
-      {/* Readability overlay — dark scrim for light video */}
-      <div className="absolute inset-0 z-[1] bg-black/45" aria-hidden />
       <div
-        className="absolute inset-0 z-[1] bg-gradient-to-b from-black/40 via-black/20 to-black/60"
         aria-hidden
+        className="absolute inset-0 -z-10 opacity-[0.07]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(0,0,0,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.6) 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+          maskImage:
+            "radial-gradient(ellipse at center, black 30%, transparent 75%)",
+        }}
       />
 
-      {/* Hero content */}
-      <div className="relative z-10 text-center px-6 pt-32 pb-16 max-w-5xl mx-auto">
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 0.7, y: 0 }}
-          transition={{ duration: 1, ease }}
-          className="font-barlow font-medium text-[13px] md:text-[14px] text-white/70 mb-6 tracking-wide"
-        >
-          For when your mind won't slow down.
-        </motion.p>
-
-        <motion.h1
-          initial={{ opacity: 1, y: 0 }}
+      <div className="relative max-w-6xl mx-auto px-6 text-center">
+        {/* Kicker pill */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, ease }}
-          className="text-white"
+          transition={{ duration: 0.8, ease }}
+          className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white/70 backdrop-blur px-4 py-1.5 text-[12px] md:text-[13px] text-foreground/75 font-barlow"
         >
-          <span className="block font-barlow font-medium text-[40px] md:text-[68px] lg:text-[80px] leading-[1.05] md:leading-[0.95] tracking-[-1.5px] md:tracking-[-4px]">
-            Understand your thoughts
+          <Sparkles className="w-3.5 h-3.5 opacity-70" />
+          <span>For when your mind won't slow down</span>
+          <ChevronRight className="w-3.5 h-3.5 opacity-60" />
+        </motion.div>
+
+        {/* Headline */}
+        <motion.h1
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.1, ease }}
+          className="mt-6 text-foreground"
+        >
+          <span className="block font-barlow font-medium text-[40px] md:text-[72px] lg:text-[88px] leading-[1.02] tracking-[-1.5px] md:tracking-[-3.5px]">
+            A quieter way to think,
           </span>
-          <span className="block font-instrument italic text-[48px] md:text-[76px] lg:text-[96px] leading-[1.05] md:leading-[1] mt-2">
-            in seconds.
+          <span className="relative inline-block mt-3">
+            <span className="absolute inset-0 -mx-3 md:-mx-5 rounded-[14px] bg-foreground/[0.06] border border-foreground/15" aria-hidden />
+            <span className="relative font-instrument italic text-[44px] md:text-[76px] lg:text-[92px] leading-[1.05] px-3 md:px-5 text-foreground/85">
+              one thought at a time.
+            </span>
           </span>
         </motion.h1>
 
+        {/* Sub */}
         <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.25, ease }}
-          className="font-barlow font-medium text-[16px] md:text-[19px] text-white/85 mt-8 max-w-xl mx-auto leading-relaxed"
-        >
-          A private AI journaling app that turns overthinking into clarity — in under 30 seconds.
-        </motion.p>
-
-        <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.45, ease }}
-          className="mt-10 flex flex-col items-center gap-3"
+          transition={{ duration: 0.9, delay: 0.25, ease }}
+          className="mt-8 font-barlow text-[15px] md:text-[18px] text-foreground/65 max-w-xl mx-auto leading-relaxed"
+        >
+          A private AI journal that turns overthinking into clarity — an emotional read, a clarity score, and one quiet reflection. In under 30 seconds.
+        </motion.p>
+
+        {/* CTAs */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.4, ease }}
+          className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-3"
         >
           <Link
             to="/auth"
             onClick={() => trackEvent("cta_click_hero", { location: "hero_primary" })}
-            className="bg-white text-[#111] rounded-full px-8 py-4 font-barlow font-medium text-[15px] hover:bg-white/90 hover:scale-[1.02] transition-all duration-300"
+            className="group inline-flex items-center gap-2 rounded-full bg-foreground text-background px-7 py-3.5 font-barlow font-medium text-[14px] hover:opacity-90 transition-all"
           >
-            Start your first reflection — free
+            Start your first reflection
+            <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
-          <p className="font-barlow text-sm text-white/65">
-            Free to start · <span className="text-white/85">$9.99/mo</span> for unlimited · cancel anytime
-          </p>
-          <p className="font-barlow text-xs text-white/45">
-            Takes under 30 seconds.
-          </p>
+          <Link
+            to="/about"
+            className="inline-flex items-center gap-2 rounded-full border border-foreground/25 bg-white/60 backdrop-blur px-7 py-3.5 font-barlow font-medium text-[14px] text-foreground/85 hover:bg-white/80 transition-all"
+          >
+            See how it works
+          </Link>
         </motion.div>
 
-        {/* Social proof */}
-        <motion.figure
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.6, ease }}
-          className="mt-12 max-w-lg mx-auto"
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.9, delay: 0.55, ease }}
+          className="mt-4 font-barlow text-[12px] text-foreground/50"
         >
-          <blockquote className="font-instrument italic text-[20px] md:text-[22px] text-white/90 leading-snug">
-            “I stopped spiraling at 1am. It just… listened, and made sense of it.”
+          Free to start · $9.99/mo for unlimited · cancel anytime
+        </motion.p>
+
+        {/* Floating testimonial cards (desktop only) */}
+        <motion.figure
+          initial={{ opacity: 0, x: -20, y: 20 }}
+          animate={{ opacity: 1, x: 0, y: 0 }}
+          transition={{ duration: 1.1, delay: 0.7, ease }}
+          className="hidden lg:block absolute left-[-10px] top-[58%] w-[230px] rotate-[-6deg] bg-white/80 backdrop-blur-sm border border-black/10 rounded-2xl p-4 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.18)]"
+        >
+          <blockquote className="font-instrument italic text-[15px] text-foreground/85 leading-snug">
+            "I stopped spiraling at 1am. It just… listened, and made sense of it."
           </blockquote>
-          <figcaption className="font-barlow text-[12px] tracking-[0.14em] uppercase text-white/55 mt-3">
+          <figcaption className="mt-3 flex items-center gap-2 font-barlow text-[10px] tracking-[0.14em] uppercase text-foreground/55">
+            <span className="w-1.5 h-1.5 rounded-full bg-foreground/40" />
             Maya · early user
           </figcaption>
         </motion.figure>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.8, ease }}
-          className="mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 font-barlow text-[12px] tracking-[0.12em] uppercase text-white/55"
+        <motion.figure
+          initial={{ opacity: 0, x: 20, y: 20 }}
+          animate={{ opacity: 1, x: 0, y: 0 }}
+          transition={{ duration: 1.1, delay: 0.85, ease }}
+          className="hidden lg:block absolute right-[-10px] top-[62%] w-[240px] rotate-[5deg] bg-white/80 backdrop-blur-sm border border-black/10 rounded-2xl p-4 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.18)]"
         >
-          <span>Private by design</span>
-          <span className="opacity-40">•</span>
-          <span>Encrypted reflections</span>
-          <span className="opacity-40">•</span>
-          <span>No data sold</span>
-        </motion.div>
+          <blockquote className="font-instrument italic text-[15px] text-foreground/85 leading-snug">
+            "Three minutes a night. My head is quieter than it's been in years."
+          </blockquote>
+          <figcaption className="mt-3 flex items-center gap-2 font-barlow text-[10px] tracking-[0.14em] uppercase text-foreground/55">
+            <span className="w-1.5 h-1.5 rounded-full bg-foreground/40" />
+            Jordan · daily user
+          </figcaption>
+        </motion.figure>
       </div>
+
+      {/* Dashboard preview mockup */}
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1.1, delay: 0.55, ease }}
+        className="relative mt-16 md:mt-20 max-w-5xl mx-auto px-4"
+      >
+        <div className="relative rounded-t-[28px] border border-black/10 border-b-0 bg-white/70 backdrop-blur-md shadow-[0_30px_80px_-30px_rgba(0,0,0,0.25)] overflow-hidden">
+          {/* Window chrome */}
+          <div className="flex items-center justify-between px-5 py-3 border-b border-black/10 bg-white/40">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-foreground/15" />
+              <span className="w-2.5 h-2.5 rounded-full bg-foreground/15" />
+              <span className="w-2.5 h-2.5 rounded-full bg-foreground/15" />
+            </div>
+            <div className="hidden sm:flex items-center gap-2 text-[11px] font-barlow text-foreground/50 bg-white/60 border border-black/5 rounded-full px-3 py-1">
+              <Search className="w-3 h-3" />
+              nexomind.ai / today
+            </div>
+            <span className="text-[11px] font-barlow text-foreground/40">Tue · 11:42 pm</span>
+          </div>
+
+          {/* App body */}
+          <div className="grid grid-cols-12 gap-0">
+            {/* Sidebar */}
+            <aside className="hidden md:flex col-span-3 flex-col gap-1.5 p-5 border-r border-black/10 bg-white/30">
+              <div className="font-instrument italic text-[18px] text-foreground/80 mb-3">nexomind</div>
+              {["Today", "Journal", "Mind Map", "Insights", "Settings"].map((it, i) => (
+                <div
+                  key={it}
+                  className={`font-barlow text-[12px] px-3 py-2 rounded-lg ${
+                    i === 0
+                      ? "bg-foreground text-background"
+                      : "text-foreground/65 hover:bg-white/60"
+                  }`}
+                >
+                  {it}
+                </div>
+              ))}
+            </aside>
+
+            {/* Main */}
+            <div className="col-span-12 md:col-span-9 p-5 md:p-7">
+              <p className="font-barlow text-[11px] tracking-[0.2em] uppercase text-foreground/45">
+                Tonight's reflection
+              </p>
+              <h3 className="mt-2 font-instrument italic text-[22px] md:text-[28px] text-foreground/90 leading-snug">
+                "I'm replaying the meeting again. I think I came across wrong."
+              </h3>
+
+              <div className="grid grid-cols-3 gap-3 mt-5">
+                {[
+                  { k: "Clarity", v: "72", hint: "+8 from yesterday" },
+                  { k: "Emotion", v: "Tense", hint: "softening" },
+                  { k: "Loop", v: "3rd", hint: "this week" },
+                ].map((m) => (
+                  <div key={m.k} className="rounded-xl border border-black/10 bg-white/70 p-3">
+                    <div className="font-barlow text-[10px] tracking-[0.18em] uppercase text-foreground/45">
+                      {m.k}
+                    </div>
+                    <div className="font-instrument text-[26px] text-foreground/90 leading-none mt-1">
+                      {m.v}
+                    </div>
+                    <div className="font-barlow text-[10px] text-foreground/50 mt-1">{m.hint}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-4 rounded-xl border border-black/10 bg-foreground/[0.04] p-4">
+                <div className="font-barlow text-[10px] tracking-[0.18em] uppercase text-foreground/45">
+                  Quiet reflection
+                </div>
+                <p className="mt-2 font-instrument italic text-[16px] md:text-[18px] text-foreground/85 leading-snug">
+                  You're scoring yourself with information you didn't have in the room.
+                  What did you actually do well?
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.div>
     </section>
   );
 };
