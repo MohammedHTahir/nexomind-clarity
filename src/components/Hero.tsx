@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ChevronRight, Search, Sparkles } from "lucide-react";
+import { ChevronRight, Sparkles } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 
 const ease = [0.16, 1, 0.3, 1] as const;
