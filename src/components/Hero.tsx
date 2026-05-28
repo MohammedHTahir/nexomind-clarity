@@ -7,7 +7,7 @@ const ease = [0.16, 1, 0.3, 1] as const;
 
 const Hero = () => {
   return (
-    <section className="relative w-full overflow-hidden bg-[#F3F4ED] pt-28 md:pt-36 pb-12">
+    <section className="relative w-full overflow-hidden bg-[#F3F4ED] pt-20 md:pt-24 pb-8">
       {/* Subtle warm radial wash + grid */}
       <div
         aria-hidden
