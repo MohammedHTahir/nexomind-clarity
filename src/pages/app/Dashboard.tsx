@@ -5,6 +5,7 @@ import { Mic, ArrowRight, ChevronDown } from "lucide-react";
 import AppShell from "@/components/app/AppShell";
 import GlassCard from "@/components/app/GlassCard";
 import PatternsCard from "@/components/app/PatternsCard";
+import ChallengerNotice from "@/components/app/ChallengerNotice";
 import {
   analyzeAndStore,
   fetchJournals,
@@ -196,6 +197,10 @@ const Dashboard = () => {
                 }}
               >
                 <div className="bg-white/80 backdrop-blur-md rounded-[21px] p-7 md:p-9">
+                  <ChallengerNotice
+                    analysisId={result.id}
+                    reflectionMode={(result as Record<string, unknown>).reflection_mode as string | undefined}
+                  />
                   <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45 mb-3">
                     ( {result.emotional_state} )
                   </p>

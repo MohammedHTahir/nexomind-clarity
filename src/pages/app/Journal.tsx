@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { analyzeAndStore, clarityBand, FreeLimitReachedError, type AnalysisRow } from "@/lib/journal";
+import ChallengerNotice from "@/components/app/ChallengerNotice";
 import PremiumGate from "@/components/PremiumGate";
 import { toast } from "sonner";
 import { trackEvent } from "@/lib/analytics";
@@ -136,6 +137,10 @@ const Journal = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.9, ease }}
                 >
+                  <ChallengerNotice
+                    analysisId={result.id}
+                    reflectionMode={(result as Record<string, unknown>).reflection_mode as string | undefined}
+                  />
                   <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45 mb-4">
                     ( Reflection · {clarityBand(result.clarity_score)} )
                   </p>

@@ -20,8 +20,10 @@ Deno.serve(async (req) => {
     const dow = now.getUTCDay();
     const hour = now.getUTCHours();
     const fiveDaysAgo = new Date(Date.now() - 5 * 86400000).toISOString();
+    const oneDayAgo = new Date(Date.now() - 1 * 86400000).toISOString();
+    const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString();
 
-    // Pull matching patterns (current hour ± 0; runs hourly so window is exact)
+    // Pull matching patterns (current hour +/- 0; runs hourly so window is exact)
     const { data: patterns, error } = await admin
       .from("user_patterns")
       .select("id, user_id, day_of_week, hour_of_day, theme_label, sample_size, confidence, last_fired_at")
@@ -96,6 +98,109 @@ Deno.serve(async (req) => {
         .from("user_patterns")
         .update({ last_fired_at: now.toISOString() })
         .eq("id", p.id);
+      sent++;
+    }
+
+    // --- Distortion Recurrence Pattern Interrupts ---
+    // Find distortion_recurrence patterns not fired within rate-limit windows:
+    // 1 per 24h, max 3 per 7d per user.
+    const { data: distortionPatterns, error: dpError } = await admin
+      .from("user_patterns")
+      .select("id, user_id, distortion_label, sample_size, confidence, last_fired_at")
+      .eq("pattern_type", "distortion_recurrence")
+      .gte("confidence", 0.4);
+    if (dpError) throw dpError;
+
+    // Group by user for rate limiting
+    const distortionByUser = new Map<string, typeof distortionPatterns>();
+    for (const dp of distortionPatterns ?? []) {
+      const arr = distortionByUser.get(dp.user_id) ?? [];
+      arr.push(dp);
+      distortionByUser.set(dp.user_id, arr);
+    }
+
+    for (const [userId, userPatterns] of distortionByUser) {
+      // Check per-user 24h rate limit (any distortion_recurrence fired in last 24h)
+      const firedRecently = userPatterns.some(
+        (p) => p.last_fired_at && p.last_fired_at > oneDayAgo
+      );
+      if (firedRecently) continue;
+
+      // Check 7-day rate limit: max 3 fires in 7 days
+      const firedInWeek = userPatterns.filter(
+        (p) => p.last_fired_at && p.last_fired_at > sevenDaysAgo
+      ).length;
+      if (firedInWeek >= 3) continue;
+
+      // Check notification preferences
+      const { data: prefs } = await admin
+        .from("notification_preferences")
+        .select("pattern_interrupts_enabled, pattern_interrupt_channel")
+        .eq("user_id", userId)
+        .maybeSingle();
+      if (prefs && prefs.pattern_interrupts_enabled === false) continue;
+
+      const channel: string = prefs?.pattern_interrupt_channel ?? "push";
+      if (channel === "off") continue;
+
+      // Pick the highest-confidence unfired pattern for this user
+      const candidates = userPatterns
+        .filter((p) => !p.last_fired_at || p.last_fired_at <= oneDayAgo)
+        .sort((a, b) => (b.confidence ?? 0) - (a.confidence ?? 0));
+      const target = candidates[0];
+      if (!target || !target.distortion_label) continue;
+
+      // Build a body (max 180 chars, no plaintext from entries)
+      const body = `You've shown a recurring "${target.distortion_label}" pattern. A moment of awareness can interrupt the loop.`.slice(0, 180);
+
+      if (channel === "push") {
+        // Check for validated push subscriptions
+        const { data: pushSubs } = await admin
+          .from("push_subscriptions")
+          .select("id")
+          .eq("user_id", userId)
+          .limit(1);
+
+        if (pushSubs && pushSubs.length > 0) {
+          // Send push notification
+          const { error: pushErr } = await admin.functions.invoke("send-push-notification", {
+            body: {
+              userId,
+              title: "Pattern Interrupt",
+              body,
+            },
+          });
+          if (pushErr) {
+            console.error("push send failed for distortion_recurrence", pushErr);
+            // Fall back to banner
+            await admin.from("pattern_interrupt_inbox").insert({
+              user_id: userId,
+              distortion_label: target.distortion_label,
+              body,
+            });
+          }
+        } else {
+          // No push subscription - fall back to banner
+          await admin.from("pattern_interrupt_inbox").insert({
+            user_id: userId,
+            distortion_label: target.distortion_label,
+            body,
+          });
+        }
+      } else {
+        // banner-only or free-tier: write to pattern_interrupt_inbox
+        await admin.from("pattern_interrupt_inbox").insert({
+          user_id: userId,
+          distortion_label: target.distortion_label,
+          body,
+        });
+      }
+
+      // Mark as fired
+      await admin
+        .from("user_patterns")
+        .update({ last_fired_at: now.toISOString() })
+        .eq("id", target.id);
       sent++;
     }
 

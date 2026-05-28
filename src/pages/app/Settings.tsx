@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppShell from "@/components/app/AppShell";
 import GlassCard from "@/components/app/GlassCard";
+import ReflectionModeCard from "@/components/app/ReflectionModeCard";
 import PatternInterruptsCard from "@/components/app/PatternInterruptsCard";
 import NotificationsCard from "@/components/app/NotificationsCard";
 import PaywallModal from "@/components/PaywallModal";
@@ -226,6 +227,7 @@ const Settings = () => {
           )}
         </GlassCard>
 
+        <ReflectionModeCard delay={0.07} />
         <PatternInterruptsCard delay={0.08} />
         <NotificationsCard delay={0.09} />
 

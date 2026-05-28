@@ -1,0 +1,35 @@
+{
+  "id": "FEAT-002",
+  "type": "feat",
+  "description": "Phase 1 UI: Reflection Mode toggle in Settings + Pattern Interrupt push notifications with in-app banner fallback. Implements the full Phase 1 user-facing features including the challenger mode notice on analysis results and the pattern interrupt inbox banner.",
+  "status": "in_progress",
+  "steps": [
+    "Create src/hooks/useReflectionMode.ts - react-query hook that reads profiles.reflection_mode from supabase (select from profiles where id=user.id), exposes { mode, setMode, isLoading }. setMode does optimistic update, persists to profiles table, invalidates query on success, rolls back + shows toast on failure.",
+    "Create src/components/app/ReflectionModeCard.tsx - shadcn RadioGroup with companion/challenger options inside a GlassCard. Uses useReflectionMode hook. Shows description text for each mode. Gated behind useFeatureFlag('reflection_mode').",
+    "Add ReflectionModeCard to src/pages/app/Settings.tsx after the billing card section.",
+    "Create src/components/app/ChallengerNotice.tsx - a small dismissible Alert component that shows 'Challenger mode active - distortions named directly' when analysis.reflection_mode === 'challenger'. Dismissal stored in sessionStorage keyed by analysis ID.",
+    "Add ChallengerNotice to the analysis result display in Dashboard.tsx (after the result renders) and in Journal.tsx (in the done phase).",
+    "Extend supabase/functions/compute-patterns/index.ts to add a second pattern computation block for distortion_recurrence: for each user, scan last 7 journal_analysis rows within rolling 14-day window, count distortion labels, upsert user_patterns rows with pattern_type='distortion_recurrence' when any distortion appears in >=3 of the 7 analyses.",
+    "Extend supabase/functions/fire-pattern-interrupts/index.ts to handle pattern_type='distortion_recurrence': on hourly tick, find matching patterns not fired in rate-limit windows (1 per 24h, 3 per 7d), check notification_preferences.pattern_interrupt_channel, for push users with validated push_subscriptions call send-push-notification with <=180 char body referencing distortion by name (no plaintext from entries). For banner-only or free-tier users, write to pattern_interrupt_inbox table instead.",
+    "Update src/components/app/PatternInterruptsCard.tsx to use the new pattern_interrupt_channel column instead of just pattern_interrupts_enabled. Show radio options: Push notifications / In-app banners only / Off. Use the i18n t() function for labels.",
+    "Create src/components/app/PatternInterruptBanner.tsx - reads pattern_interrupt_inbox for current user (where dismissed_at is null and expires_at > now()), renders a top-of-page dismissible banner with the distortion label and reframe body. On dismiss, updates dismissed_at.",
+    "Mount PatternInterruptBanner in src/components/app/AppShell.tsx so it appears on all authenticated pages.",
+    "Add relevant i18n keys to src/locales/en-US.json for all new UI strings (reflection mode labels, pattern interrupt messages, challenger notice text)."
+  ],
+  "acceptance_criteria": [
+    "Settings page shows Reflection Mode card with companion/challenger radio toggle",
+    "Changing reflection mode persists to profiles table and applies to next analysis",
+    "Challenger mode analysis results show a dismissible notice",
+    "Pattern interrupt banner appears when there are unread items in pattern_interrupt_inbox",
+    "Banner can be dismissed and stays dismissed",
+    "PatternInterruptsCard shows push/banner/off options",
+    "All new UI strings come from i18n layer (no hardcoded strings in components)",
+    "npm run build succeeds"
+  ],
+  "verification": [
+    "Run npm run build and confirm zero errors",
+    "Run npm run test and confirm tests pass"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}
