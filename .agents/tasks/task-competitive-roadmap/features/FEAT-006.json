@@ -2,7 +2,7 @@
   "id": "FEAT-006",
   "type": "feat",
   "description": "Phase 4: Wearable + Calendar Integration and Living MindMap Upgrade - user_integrations table with OAuth flows, context signals attachment to journal analysis, MindMap node extraction upgrade (50 candidates, cosine >= 0.85 dedup), node-click side panel with Sheet component, and 1k+ node performance (clustered view).",
-  "status": "in_progress",
+  "status": "completed",
   "steps": [
     "Create migration supabase/migrations/20260601000004_phase4_wearables_mindmap.sql with: CREATE TABLE user_integrations (id uuid PK, user_id uuid references auth.users on delete cascade, provider text check (in apple_health/oura/google_fit/google_calendar/apple_calendar), access_token_enc text, refresh_token_enc text, token_expires_at timestamptz, scopes jsonb default '[]', calendar_mask_titles boolean default true, connected_at timestamptz default now(), UNIQUE(user_id, provider)), RLS: select/update/delete where user_id=auth.uid(), insert with check user_id=auth.uid(). ALTER journal_analysis ADD COLUMN context_signals jsonb. ALTER mind_nodes ADD COLUMN IF NOT EXISTS last_seen_at timestamptz default now(). CREATE INDEX idx_mind_nodes_user_lastseen on mind_nodes(user_id, last_seen_at desc).",
     "Create supabase/functions/fetch-context-signals/index.ts: internal helper called from analyze-journal. Accepts user_id, reads user_integrations for connected providers, fetches last 24h data from each (Oura REST API, Google Fit REST, Google Calendar). 5-second total timeout, 3 retries with exponential backoff per provider capped at 30s. Returns { sleep_minutes, hrv_avg, meeting_count_24h, meeting_minutes_24h, source_versions }. Respects calendar_mask_titles (only count+duration when masked). Falls back to null on failure (no error surfaced to user).",
@@ -30,5 +30,5 @@
     "Run npm run test and confirm tests pass"
   ],
   "blocked_reason": null,
-  "findings": ""
+  "findings": "All acceptance criteria met. Build succeeds with zero errors. All 14 existing tests pass. Sheet component from shadcn/ui (already available via @radix-ui/react-dialog) used for MindMap side panel. AnimatePresence replaced with Sheet. Clustered view defaults when nodes > 1000, showing top 500 by frequency with Show All toggle. Enhanced features gated behind useFeatureFlag('living_mindmap') + isPremium. IntegrationsCard gated behind useFeatureFlag('wearable_integrations') + isPremium. Context signals fetched inline in analyze-journal with 5s timeout (non-blocking). update-mind-map now extracts up to 50 entities with 0.85 cosine dedup threshold and 1-80 char label validation. mindmap_extraction_failed logged on error."
 }
