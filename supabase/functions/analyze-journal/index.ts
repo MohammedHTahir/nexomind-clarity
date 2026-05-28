@@ -56,6 +56,17 @@ Consider these signals in your analysis:
 - High tonal variability can indicate emotional activation
 Reference these observations naturally in your insight when relevant.`;
 
+const CONTEXT_BLOCK = `
+
+BIOMETRIC & CALENDAR CONTEXT (last 24 hours):
+{{context_lines}}
+
+Factor these signals into your analysis:
+- Poor sleep or low HRV may correlate with heightened emotional reactivity
+- Heavy meeting load can indicate cognitive fatigue or reduced self-reflection time
+- Use this context to inform, not override, your clinical observations
+Mention relevant biometric context when it naturally supports your insight.`;
+
 type ReflectionMode = "companion" | "challenger";
 
 interface VoiceFeatures {
@@ -64,13 +75,22 @@ interface VoiceFeatures {
   tonal_variability_hz: number;
 }
 
+interface ContextSignals {
+  sleep_minutes: number | null;
+  hrv_avg: number | null;
+  meeting_count_24h: number | null;
+  meeting_minutes_24h: number | null;
+  source_versions?: Record<string, string>;
+}
+
 interface ComposeOptions {
   mode: ReflectionMode;
   voiceFeatures?: VoiceFeatures;
+  contextSignals?: ContextSignals | null;
 }
 
 function composeSystemPrompt(options: ComposeOptions): string {
-  const { mode, voiceFeatures } = options;
+  const { mode, voiceFeatures, contextSignals } = options;
   let prompt = BASE_PROMPT;
 
   if (mode === "challenger") {
@@ -84,6 +104,24 @@ function composeSystemPrompt(options: ComposeOptions): string {
       .replace("{{pace_wpm}}", String(voiceFeatures.pace_wpm))
       .replace("{{hesitation_ratio}}", String(voiceFeatures.hesitation_ratio))
       .replace("{{tonal_variability_hz}}", String(voiceFeatures.tonal_variability_hz));
+  }
+
+  if (contextSignals) {
+    const lines: string[] = [];
+    if (contextSignals.sleep_minutes !== null) {
+      const hrs = Math.floor(contextSignals.sleep_minutes / 60);
+      const mins = contextSignals.sleep_minutes % 60;
+      lines.push(`- Sleep: ${hrs}h ${mins}m`);
+    }
+    if (contextSignals.hrv_avg !== null) {
+      lines.push(`- HRV average: ${contextSignals.hrv_avg} ms`);
+    }
+    if (contextSignals.meeting_count_24h !== null) {
+      lines.push(`- Meetings (24h): ${contextSignals.meeting_count_24h} meetings, ${contextSignals.meeting_minutes_24h ?? 0} minutes total`);
+    }
+    if (lines.length > 0) {
+      prompt += CONTEXT_BLOCK.replace("{{context_lines}}", lines.join("\n"));
+    }
   }
 
   return prompt;
@@ -275,7 +313,44 @@ Deno.serve(async (req) => {
       console.warn("Failed to read reflection_mode, defaulting to companion", e);
     }
 
-    const systemPrompt = composeSystemPrompt({ mode: reflectionMode, voiceFeatures: voice_features });
+    // Fetch context signals from connected integrations (5s timeout, non-blocking)
+    let contextSignals: ContextSignals | null = null;
+    try {
+      const { data: integrationCount } = await admin
+        .from("user_integrations")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId);
+
+      if (integrationCount && (integrationCount as any) > 0) {
+        const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+        const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000);
+        try {
+          const csResp = await fetch(`${SUPABASE_URL}/functions/v1/fetch-context-signals`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${SERVICE_KEY}`,
+              apikey: SERVICE_KEY,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ user_id: userId }),
+            signal: controller.signal,
+          });
+          clearTimeout(timeout);
+          if (csResp.ok) {
+            contextSignals = await csResp.json();
+          }
+        } catch (e) {
+          clearTimeout(timeout);
+          console.warn("context signals fetch failed (non-fatal)", e);
+        }
+      }
+    } catch (e) {
+      console.warn("context signals check failed (non-fatal)", e);
+    }
+
+    const systemPrompt = composeSystemPrompt({ mode: reflectionMode, voiceFeatures: voice_features, contextSignals });
 
     // 1) insert journal
     const { data: journal, error: jErr } = await supabase
@@ -355,7 +430,7 @@ Deno.serve(async (req) => {
       console.warn("Refine pass skipped", e);
     }
 
-    // 4) store analysis (with reflection_mode and voice features)
+    // 4) store analysis (with reflection_mode, voice features, and context signals)
     const { data: analysis, error: aErr } = await supabase
       .from("journal_analysis")
       .insert({
@@ -371,6 +446,7 @@ Deno.serve(async (req) => {
         clarity_insight: parsed.clarity_insight,
         suggested_reflection: parsed.suggested_reflection,
         reflection_mode: reflectionMode,
+        ...(contextSignals ? { context_signals: contextSignals } : {}),
         ...(voice_features
           ? {
               is_voice_entry: true,
