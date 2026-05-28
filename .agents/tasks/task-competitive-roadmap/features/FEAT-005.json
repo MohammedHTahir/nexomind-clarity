@@ -2,7 +2,7 @@
   "id": "FEAT-005",
   "type": "feat",
   "description": "Phase 3: E2EE Private Mode + Premium+ Tier - client-side encryption/decryption library (lib/e2ee.ts), on-device LLM detection and bridge (lib/on-device-llm.ts), Premium+ tier in Stripe pricing, 3-step activation modal, E2EE status badge, and all server-side gates that return 403 for E2EE users.",
-  "status": "in_progress",
+  "status": "completed",
   "steps": [
     "Create migration supabase/migrations/20260601000003_phase3_e2ee.sql with: ALTER profiles ADD COLUMN e2ee_enabled boolean not null default false, ADD COLUMN e2ee_kdf_salt text, ADD COLUMN e2ee_passphrase_set_at timestamptz, ADD COLUMN e2ee_sync_fields jsonb not null default '[]'::jsonb. ALTER journals ADD COLUMN is_encrypted boolean not null default false, ADD COLUMN ciphertext text. ALTER journal_analysis ADD COLUMN is_encrypted boolean not null default false. Make journals.content nullable (ALTER TABLE journals ALTER COLUMN content DROP NOT NULL).",
     "Create src/lib/e2ee.ts with: (1) deriveKey(passphrase, salt) using PBKDF2-HMAC-SHA-256, 600000 iterations, 32-byte output via WebCrypto. Salt = first 16 bytes of sha256(user_id). (2) encrypt(plaintext, key) using AES-256-GCM with random 12-byte IV, returns base64url(iv||ciphertext||tag). (3) decrypt(ciphertext_b64, key) reverses encrypt. (4) generateSalt(userId) helper. (5) validatePassphrase(p) - must be >=12 chars. (6) Key storage helpers using IndexedDB (store wrapped key per session).",
@@ -36,5 +36,5 @@
     "Run npm run test and confirm tests pass"
   ],
   "blocked_reason": null,
-  "findings": ""
+  "findings": "All acceptance criteria met. Build succeeds with no TypeScript errors. All 14 existing tests pass. The tier.ts already had PREMIUM_PLUS_PRICE_IDS defined from an earlier feature. WebCrypto APIs in e2ee.ts include graceful isWebCryptoAvailable() checks. On-device LLM uses optional chaining for window.ai. The Pricing page grid was updated from 2 to 3 columns. The analyze-journal edge function now returns 403 with E2EE_REQUIRES_CLIENT code for E2EE users."
 }
