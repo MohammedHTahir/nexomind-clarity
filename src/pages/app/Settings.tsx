@@ -5,6 +5,7 @@ import GlassCard from "@/components/app/GlassCard";
 import ReflectionModeCard from "@/components/app/ReflectionModeCard";
 import PatternInterruptsCard from "@/components/app/PatternInterruptsCard";
 import NotificationsCard from "@/components/app/NotificationsCard";
+import SundayLetterCard from "@/components/app/SundayLetterCard";
 import PaywallModal from "@/components/PaywallModal";
 import { deleteAllJournals } from "@/lib/journal";
 import { useAuth } from "@/hooks/useAuth";
@@ -230,6 +231,7 @@ const Settings = () => {
         <ReflectionModeCard delay={0.07} />
         <PatternInterruptsCard delay={0.08} />
         <NotificationsCard delay={0.09} />
+        <SundayLetterCard delay={0.10} />
 
         <div className="space-y-4 mb-10">
 

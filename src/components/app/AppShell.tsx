@@ -13,6 +13,7 @@ const nav = [
   { to: "/app", label: "Reflect" },
   { to: "/app/journal", label: "Write" },
   { to: "/app/mind-map", label: "Mind Map" },
+  { to: "/app/inbox", label: "Inbox" },
   { to: "/app/insights", label: "Insights" },
   { to: "/app/settings", label: "Settings" },
 ];
