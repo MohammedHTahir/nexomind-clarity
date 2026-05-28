@@ -2,7 +2,7 @@
   "id": "FEAT-001",
   "type": "chore",
   "description": "Cross-cutting infrastructure: feature flags table + evaluate-flags edge function, lib/tier.ts tier resolution (free|premium|premium_plus) refactoring useSubscription, lib/i18n.ts minimal shim with t() function, and composeSystemPrompt modular prompt pipeline in analyze-journal. Also adds the feature_flags migration with RLS.",
-  "status": "in_progress",
+  "status": "completed",
   "steps": [
     "Create migration file supabase/migrations/20260601000001_cross_cutting_infra.sql with: (1) feature_flags table (key text PK, enabled bool, rollout_percent int 0-100, min_tier text default 'free', config jsonb, updated_at timestamptz), RLS policies (select for authenticated, insert/update/delete for service_role only), (2) ALTER profiles ADD COLUMN reflection_mode text not null default 'companion' check (in companion/challenger), (3) ALTER journal_analysis ADD COLUMN reflection_mode text check (in companion/challenger), (4) ALTER notification_preferences ADD COLUMN pattern_interrupt_channel text not null default 'push' check (in push/banner/off), (5) ALTER user_patterns ADD COLUMN distortion_label text, ADD COLUMN last_distortion_seen_at timestamptz, (6) CREATE TABLE pattern_interrupt_inbox with id uuid PK, user_id uuid references auth.users, distortion_label text, body text, created_at timestamptz, dismissed_at timestamptz nullable, expires_at timestamptz default now()+7days, RLS user_id=auth.uid() for select/update, service_role for insert.",
     "Create src/lib/tier.ts exporting: Tier type ('free'|'premium'|'premium_plus'), resolveTier(sub) function using PREMIUM_PRICE_IDS and PREMIUM_PLUS_PRICE_IDS sets (with placeholder price IDs like 'premium_plus_monthly'/'premium_plus_yearly'), subIsActive helper. Export constants for price IDs.",
@@ -27,5 +27,5 @@
     "Run npm run test and confirm tests pass"
   ],
   "blocked_reason": null,
-  "findings": ""
+  "findings": "All acceptance criteria verified: build passes, tests pass (14/14), tier resolution backward compatible, i18n fallback works, composeSystemPrompt produces different text for companion vs challenger. resolveJsonModule added to tsconfig.app.json for JSON imports. Edge functions use Deno runtime and are not checked by Vite build - validated manually for syntax correctness."
 }
