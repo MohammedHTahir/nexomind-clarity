@@ -2,7 +2,7 @@
   "id": "FEAT-003",
   "type": "feat",
   "description": "Phase 2: Voice-First Thought Dump - MediaRecorder capture, Whisper/Gemini transcription edge function, acoustic feature extraction (pace_wpm, hesitation_ratio, tonal_variability_hz), voice-aware prompt composition, and full UI with recording indicator, preview, and submit flow.",
-  "status": "in_progress",
+  "status": "completed",
   "steps": [
     "Create migration supabase/migrations/20260601000002_phase2_voice_sunday.sql with: ALTER journal_analysis ADD COLUMN voice_pace_wpm numeric, ADD COLUMN voice_hesitation_ratio numeric, ADD COLUMN voice_tonal_variability_hz numeric, ADD COLUMN is_voice_entry boolean not null default false. Also create sunday_letters table (id uuid PK, user_id uuid references auth.users on delete cascade, week_starts_on date not null, body text not null, generated_at timestamptz default now(), read_at timestamptz, UNIQUE(user_id, week_starts_on)), RLS: select/update where user_id=auth.uid(), insert for service_role. ALTER profiles ADD COLUMN sunday_letter_enabled boolean not null default false, ADD COLUMN sunday_letter_time time not null default '09:00', ADD COLUMN sunday_letter_email_enabled boolean not null default false, ADD COLUMN sunday_letter_push_enabled boolean not null default false, ADD COLUMN timezone text not null default 'UTC'.",
     "Create src/lib/voice.ts with: (1) startVoiceCapture({ maxSeconds: 60, minSeconds: 3 }) function using MediaRecorder API with audio/webm;codecs=opus, returns VoiceClip object with blob, duration, elapsed tick callback. Auto-stops at 60s. (2) AcousticFeatures type { pace_wpm, hesitation_ratio, tonal_variability_hz }. (3) extractAcousticFeatures(clip: VoiceClip, transcript: string): Promise<AcousticFeatures> - pace = word count / duration in minutes, hesitation_ratio via energy-threshold silence detection + filler regex on transcript, tonal_variability via AudioContext AnalyserNode + autocorrelation pitch estimator. (4) isVoiceSupported() capability check.",
@@ -29,5 +29,5 @@
     "Run npm run test and confirm tests pass"
   ],
   "blocked_reason": null,
-  "findings": ""
+  "findings": "All acceptance criteria verified: build passes (zero errors), tests pass (14/14). VoiceEntryButton mounted in both Journal.tsx and Dashboard.tsx gated behind useFeatureFlag('voice_entry') and isVoiceSupported(). Free tier gets demoMode=true (15s max, no persistence - Submit button hidden). analyze-journal accepts voice_features in body, adds VOICE_BLOCK to prompt composition, and persists voice_pace_wpm, voice_hesitation_ratio, voice_tonal_variability_hz, and is_voice_entry on journal_analysis. transcribe-voice-entry edge function uses Gemini generateContent API with inlineData audio. The existing Mic icon button in Dashboard is preserved as fallback when feature flag is disabled. Migration also includes sunday_letters table and profile columns for FEAT-004."
 }
