@@ -8,6 +8,7 @@ import NotificationsCard from "@/components/app/NotificationsCard";
 import SundayLetterCard from "@/components/app/SundayLetterCard";
 import E2EECard from "@/components/app/E2EECard";
 import IntegrationsCard from "@/components/app/IntegrationsCard";
+import CrisisDetectionCard from "@/components/app/CrisisDetectionCard";
 import PaywallModal from "@/components/PaywallModal";
 import { deleteAllJournals } from "@/lib/journal";
 import { useAuth } from "@/hooks/useAuth";
@@ -236,6 +237,7 @@ const Settings = () => {
         <SundayLetterCard delay={0.10} />
         <E2EECard delay={0.11} />
         <IntegrationsCard delay={0.12} />
+        <CrisisDetectionCard delay={0.13} />
 
         <div className="space-y-4 mb-10">
 

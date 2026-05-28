@@ -486,6 +486,49 @@ Deno.serve(async (req) => {
       }).catch((err) => console.warn("mind map fire-and-forget failed", err));
     } catch (e) { console.warn("mind map dispatch err", e); }
 
+    // Fire-and-forget: crisis detection (if enabled for user)
+    try {
+      const { data: crisisProfile } = await admin
+        .from("profiles")
+        .select("crisis_detection_enabled")
+        .eq("id", userId)
+        .maybeSingle();
+
+      if (crisisProfile?.crisis_detection_enabled) {
+        const { data: crisisDisclaimer } = await admin
+          .from("disclaimer_acceptances")
+          .select("id")
+          .eq("user_id", userId)
+          .eq("feature_key", "crisis_detection")
+          .maybeSingle();
+
+        if (crisisDisclaimer) {
+          const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+          const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+          fetch(`${SUPABASE_URL}/functions/v1/detect-crisis`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${SERVICE_KEY}`,
+              apikey: SERVICE_KEY,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              user_id: userId,
+              journal_id: journal.id,
+              analysis_id: analysis.id,
+              key_thoughts: parsed.key_thoughts ?? [],
+              summary: parsed.summary ?? "",
+              ...(voice_features ? {
+                voice_pace_wpm: voice_features.pace_wpm,
+                voice_hesitation_ratio: voice_features.hesitation_ratio,
+                voice_tonal_variability_hz: voice_features.tonal_variability_hz,
+              } : {}),
+            }),
+          }).catch((err) => console.warn("crisis detection fire-and-forget failed", err));
+        }
+      }
+    } catch (e) { console.warn("crisis detection dispatch err", e); }
+
 
     // Recompute usage post-insert so the client can show "X of 3 left"
     let usage: { limit: number | null; used: number; remaining: number | null } = {
