@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { Navigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
+import ScrollHeroVideo from "@/components/ScrollHeroVideo";
 import InstallPWA from "@/components/InstallPWA";
 import { useIsStandalone } from "@/hooks/useIsStandalone";
 import { useAuth } from "@/hooks/useAuth";
