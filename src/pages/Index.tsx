@@ -37,6 +37,7 @@ const Index = () => {
     <main className="min-h-screen bg-[#F3F4ED]">
       <Navbar />
       <Hero />
+      <ScrollHeroVideo />
       <InstallPWA variant="floating" />
       <Suspense fallback={<Fallback />}>
         <About />
