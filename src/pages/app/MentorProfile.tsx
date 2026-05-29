@@ -65,7 +65,8 @@ const MentorProfile = () => {
       };
       const { error } = await supabase
         .from("profiles")
-        .update({ you_mentor_profile: updatedProfile } as Record<string, unknown>)
+        .update({ you_mentor_profile: updatedProfile } as never)
+
         .eq("id", user.id);
       if (error) throw error;
       toast.success(t("persona.profileSaved"));

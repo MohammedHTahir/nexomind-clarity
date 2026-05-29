@@ -55,7 +55,7 @@ const CrisisCard = () => {
       .eq("id", user.id)
       .maybeSingle();
     if (profile?.trusted_contact) {
-      setTrustedContact(profile.trusted_contact as TrustedContact);
+      setTrustedContact(profile.trusted_contact as unknown as TrustedContact);
     }
   }, [user]);
 

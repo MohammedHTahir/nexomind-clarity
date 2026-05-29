@@ -38,6 +38,74 @@ export type Database = {
         }
         Relationships: []
       }
+      crisis_events: {
+        Row: {
+          id: string
+          journal_id: string | null
+          signal_score: number
+          surfaced_at: string
+          threshold: number
+          trusted_notified: boolean
+          user_action: string | null
+          user_action_at: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          journal_id?: string | null
+          signal_score: number
+          surfaced_at?: string
+          threshold: number
+          trusted_notified?: boolean
+          user_action?: string | null
+          user_action_at?: string | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          journal_id?: string | null
+          signal_score?: number
+          surfaced_at?: string
+          threshold?: number
+          trusted_notified?: boolean
+          user_action?: string | null
+          user_action_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crisis_events_journal_id_fkey"
+            columns: ["journal_id"]
+            isOneToOne: false
+            referencedRelation: "journals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      disclaimer_acceptances: {
+        Row: {
+          accepted_at: string
+          disclaimer_version: string
+          feature_key: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string
+          disclaimer_version: string
+          feature_key: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string
+          disclaimer_version?: string
+          feature_key?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       email_leads: {
         Row: {
           created_at: string
@@ -149,51 +217,105 @@ export type Database = {
         }
         Relationships: []
       }
+      feature_flags: {
+        Row: {
+          config: Json | null
+          enabled: boolean
+          key: string
+          min_tier: string
+          rollout_percent: number
+          updated_at: string
+        }
+        Insert: {
+          config?: Json | null
+          enabled?: boolean
+          key: string
+          min_tier?: string
+          rollout_percent?: number
+          updated_at?: string
+        }
+        Update: {
+          config?: Json | null
+          enabled?: boolean
+          key?: string
+          min_tier?: string
+          rollout_percent?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       journal_analysis: {
         Row: {
           clarity_insight: string | null
           clarity_score: number | null
           cognitive_patterns: Json | null
+          context_signals: Json | null
           created_at: string
+          crisis_signal: number | null
+          crisis_signal_threshold_breached: boolean | null
           distortions_or_biases: Json | null
           emotional_state: string | null
           id: string
           intensity_score: number | null
+          is_encrypted: boolean
+          is_voice_entry: boolean
           journal_id: string
           key_thoughts: Json | null
+          reflection_mode: string | null
           suggested_reflection: string | null
           summary: string | null
           user_id: string
+          voice_hesitation_ratio: number | null
+          voice_pace_wpm: number | null
+          voice_tonal_variability_hz: number | null
         }
         Insert: {
           clarity_insight?: string | null
           clarity_score?: number | null
           cognitive_patterns?: Json | null
+          context_signals?: Json | null
           created_at?: string
+          crisis_signal?: number | null
+          crisis_signal_threshold_breached?: boolean | null
           distortions_or_biases?: Json | null
           emotional_state?: string | null
           id?: string
           intensity_score?: number | null
+          is_encrypted?: boolean
+          is_voice_entry?: boolean
           journal_id: string
           key_thoughts?: Json | null
+          reflection_mode?: string | null
           suggested_reflection?: string | null
           summary?: string | null
           user_id: string
+          voice_hesitation_ratio?: number | null
+          voice_pace_wpm?: number | null
+          voice_tonal_variability_hz?: number | null
         }
         Update: {
           clarity_insight?: string | null
           clarity_score?: number | null
           cognitive_patterns?: Json | null
+          context_signals?: Json | null
           created_at?: string
+          crisis_signal?: number | null
+          crisis_signal_threshold_breached?: boolean | null
           distortions_or_biases?: Json | null
           emotional_state?: string | null
           id?: string
           intensity_score?: number | null
+          is_encrypted?: boolean
+          is_voice_entry?: boolean
           journal_id?: string
           key_thoughts?: Json | null
+          reflection_mode?: string | null
           suggested_reflection?: string | null
           summary?: string | null
           user_id?: string
+          voice_hesitation_ratio?: number | null
+          voice_pace_wpm?: number | null
+          voice_tonal_variability_hz?: number | null
         }
         Relationships: [
           {
@@ -207,22 +329,55 @@ export type Database = {
       }
       journals: {
         Row: {
-          content: string
+          ciphertext: string | null
+          content: string | null
           created_at: string
           id: string
+          is_encrypted: boolean
           user_id: string
         }
         Insert: {
-          content: string
+          ciphertext?: string | null
+          content?: string | null
           created_at?: string
           id?: string
+          is_encrypted?: boolean
           user_id: string
         }
         Update: {
-          content?: string
+          ciphertext?: string | null
+          content?: string | null
           created_at?: string
           id?: string
+          is_encrypted?: boolean
           user_id?: string
+        }
+        Relationships: []
+      }
+      mentor_personas: {
+        Row: {
+          compatible_modes: string[]
+          display_order: number
+          is_curated: boolean
+          key: string
+          name: string
+          voice_block: string
+        }
+        Insert: {
+          compatible_modes?: string[]
+          display_order?: number
+          is_curated?: boolean
+          key: string
+          name: string
+          voice_block: string
+        }
+        Update: {
+          compatible_modes?: string[]
+          display_order?: number
+          is_curated?: boolean
+          key?: string
+          name?: string
+          voice_block?: string
         }
         Relationships: []
       }
@@ -352,6 +507,7 @@ export type Database = {
         Row: {
           created_at: string
           email_for_interrupts: string | null
+          pattern_interrupt_channel: string
           pattern_interrupts_enabled: boolean
           timezone: string
           updated_at: string
@@ -360,6 +516,7 @@ export type Database = {
         Insert: {
           created_at?: string
           email_for_interrupts?: string | null
+          pattern_interrupt_channel?: string
           pattern_interrupts_enabled?: boolean
           timezone?: string
           updated_at?: string
@@ -368,6 +525,7 @@ export type Database = {
         Update: {
           created_at?: string
           email_for_interrupts?: string | null
+          pattern_interrupt_channel?: string
           pattern_interrupts_enabled?: boolean
           timezone?: string
           updated_at?: string
@@ -375,27 +533,105 @@ export type Database = {
         }
         Relationships: []
       }
-      profiles: {
+      pattern_interrupt_inbox: {
         Row: {
+          body: string
           created_at: string
-          display_name: string | null
-          email: string | null
+          dismissed_at: string | null
+          distortion_label: string
+          expires_at: string
           id: string
-          updated_at: string
+          user_id: string
         }
         Insert: {
+          body: string
           created_at?: string
-          display_name?: string | null
-          email?: string | null
-          id: string
-          updated_at?: string
+          dismissed_at?: string | null
+          distortion_label: string
+          expires_at?: string
+          id?: string
+          user_id: string
         }
         Update: {
+          body?: string
           created_at?: string
+          dismissed_at?: string | null
+          distortion_label?: string
+          expires_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          active_mentor_persona: string | null
+          created_at: string
+          crisis_detection_enabled: boolean
+          crisis_detection_locale_approved: boolean
+          default_mentor_persona: string | null
+          display_name: string | null
+          e2ee_enabled: boolean
+          e2ee_kdf_salt: string | null
+          e2ee_passphrase_set_at: string | null
+          e2ee_sync_fields: Json
+          email: string | null
+          id: string
+          reflection_mode: string
+          sunday_letter_email_enabled: boolean
+          sunday_letter_enabled: boolean
+          sunday_letter_push_enabled: boolean
+          sunday_letter_time: string
+          timezone: string
+          trusted_contact: Json | null
+          updated_at: string
+          you_mentor_profile: Json | null
+        }
+        Insert: {
+          active_mentor_persona?: string | null
+          created_at?: string
+          crisis_detection_enabled?: boolean
+          crisis_detection_locale_approved?: boolean
+          default_mentor_persona?: string | null
           display_name?: string | null
+          e2ee_enabled?: boolean
+          e2ee_kdf_salt?: string | null
+          e2ee_passphrase_set_at?: string | null
+          e2ee_sync_fields?: Json
+          email?: string | null
+          id: string
+          reflection_mode?: string
+          sunday_letter_email_enabled?: boolean
+          sunday_letter_enabled?: boolean
+          sunday_letter_push_enabled?: boolean
+          sunday_letter_time?: string
+          timezone?: string
+          trusted_contact?: Json | null
+          updated_at?: string
+          you_mentor_profile?: Json | null
+        }
+        Update: {
+          active_mentor_persona?: string | null
+          created_at?: string
+          crisis_detection_enabled?: boolean
+          crisis_detection_locale_approved?: boolean
+          default_mentor_persona?: string | null
+          display_name?: string | null
+          e2ee_enabled?: boolean
+          e2ee_kdf_salt?: string | null
+          e2ee_passphrase_set_at?: string | null
+          e2ee_sync_fields?: Json
           email?: string | null
           id?: string
+          reflection_mode?: string
+          sunday_letter_email_enabled?: boolean
+          sunday_letter_enabled?: boolean
+          sunday_letter_push_enabled?: boolean
+          sunday_letter_time?: string
+          timezone?: string
+          trusted_contact?: Json | null
           updated_at?: string
+          you_mentor_profile?: Json | null
         }
         Relationships: []
       }
@@ -480,6 +716,33 @@ export type Database = {
         }
         Relationships: []
       }
+      sunday_letters: {
+        Row: {
+          body: string
+          generated_at: string | null
+          id: string
+          read_at: string | null
+          user_id: string
+          week_starts_on: string
+        }
+        Insert: {
+          body: string
+          generated_at?: string | null
+          id?: string
+          read_at?: string | null
+          user_id: string
+          week_starts_on: string
+        }
+        Update: {
+          body?: string
+          generated_at?: string | null
+          id?: string
+          read_at?: string | null
+          user_id?: string
+          week_starts_on?: string
+        }
+        Relationships: []
+      }
       suppressed_emails: {
         Row: {
           created_at: string
@@ -504,14 +767,52 @@ export type Database = {
         }
         Relationships: []
       }
+      user_integrations: {
+        Row: {
+          access_token_enc: string | null
+          calendar_mask_titles: boolean | null
+          connected_at: string | null
+          id: string
+          provider: string
+          refresh_token_enc: string | null
+          scopes: Json | null
+          token_expires_at: string | null
+          user_id: string
+        }
+        Insert: {
+          access_token_enc?: string | null
+          calendar_mask_titles?: boolean | null
+          connected_at?: string | null
+          id?: string
+          provider: string
+          refresh_token_enc?: string | null
+          scopes?: Json | null
+          token_expires_at?: string | null
+          user_id: string
+        }
+        Update: {
+          access_token_enc?: string | null
+          calendar_mask_titles?: boolean | null
+          connected_at?: string | null
+          id?: string
+          provider?: string
+          refresh_token_enc?: string | null
+          scopes?: Json | null
+          token_expires_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_patterns: {
         Row: {
           computed_at: string
           confidence: number
           created_at: string
           day_of_week: number
+          distortion_label: string | null
           hour_of_day: number
           id: string
+          last_distortion_seen_at: string | null
           last_fired_at: string | null
           pattern_type: string
           sample_size: number
@@ -524,8 +825,10 @@ export type Database = {
           confidence?: number
           created_at?: string
           day_of_week: number
+          distortion_label?: string | null
           hour_of_day: number
           id?: string
+          last_distortion_seen_at?: string | null
           last_fired_at?: string | null
           pattern_type?: string
           sample_size?: number
@@ -538,13 +841,36 @@ export type Database = {
           confidence?: number
           created_at?: string
           day_of_week?: number
+          distortion_label?: string | null
           hour_of_day?: number
           id?: string
+          last_distortion_seen_at?: string | null
           last_fired_at?: string | null
           pattern_type?: string
           sample_size?: number
           theme_label?: string | null
           theme_node_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_persona_switches: {
+        Row: {
+          id: string
+          persona_key: string
+          switched_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          persona_key: string
+          switched_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          persona_key?: string
+          switched_at?: string
           user_id?: string
         }
         Relationships: []

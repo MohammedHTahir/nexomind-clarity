@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 
 export type AnalysisRow = {
   id: string;
@@ -165,11 +166,11 @@ export async function analyzeAndStoreE2EE(
       user_id: userId,
       summary: encryptedSummary,
       emotional_state: encryptedEmotionalState,
-      intensity_score: analysisData.intensity_score,
-      clarity_score: analysisData.clarity_score,
-      cognitive_patterns: analysisData.cognitive_patterns ?? [],
-      key_thoughts: analysisData.key_thoughts ?? [],
-      distortions_or_biases: analysisData.distortions_or_biases ?? [],
+      intensity_score: analysisData.intensity_score as number | null,
+      clarity_score: analysisData.clarity_score as number | null,
+      cognitive_patterns: (analysisData.cognitive_patterns ?? []) as Json,
+      key_thoughts: (analysisData.key_thoughts ?? []) as Json,
+      distortions_or_biases: (analysisData.distortions_or_biases ?? []) as Json,
       clarity_insight: encryptedClarityInsight,
       suggested_reflection: encryptedSuggestedReflection,
       is_encrypted: true,
@@ -178,7 +179,7 @@ export async function analyzeAndStoreE2EE(
     .single();
   if (aErr) throw aErr;
 
-  return { journal, analysis };
+  return { journal, analysis: analysis as unknown as AnalysisRow };
 }
 
 export async function fetchJournals(): Promise<JournalWithAnalysis[]> {

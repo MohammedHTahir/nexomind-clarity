@@ -51,7 +51,7 @@ const SundayLetterCard = ({ delay = 0.2 }: { delay?: number }) => {
     setSaving(true);
     const { error } = await supabase
       .from("profiles")
-      .update(updates)
+      .update(updates as never)
       .eq("id", user.id);
     setSaving(false);
     if (error) {

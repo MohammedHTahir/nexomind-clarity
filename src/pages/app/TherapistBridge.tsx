@@ -109,7 +109,7 @@ const TherapistBridge = () => {
     setDownloading(true);
     try {
       const pdfBytes = await generateTherapistBriefPDF(briefData, redactedIds);
-      const blob = new Blob([pdfBytes], { type: "application/pdf" });
+      const blob = new Blob([new Uint8Array(pdfBytes)], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       const date = new Date().toISOString().slice(0, 10);

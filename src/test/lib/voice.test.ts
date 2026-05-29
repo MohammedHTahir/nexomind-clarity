@@ -93,8 +93,8 @@ describe("voice", () => {
 
     it("returns false when MediaRecorder is undefined", () => {
       const originalMediaRecorder = globalThis.MediaRecorder;
-      // @ts-expect-error - deliberately removing for test
-      globalThis.MediaRecorder = undefined;
+      // deliberately removing for test
+      (globalThis as { MediaRecorder?: unknown }).MediaRecorder = undefined;
 
       expect(isVoiceSupported()).toBe(false);
 
