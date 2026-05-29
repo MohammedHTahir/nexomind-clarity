@@ -51,7 +51,7 @@ const CrisisDetectionCard = ({ delay = 0 }: CrisisDetectionCardProps) => {
       setEnabled(data.crisis_detection_enabled ?? false);
       setLocaleApproved(data.crisis_detection_locale_approved ?? false);
       if (data.trusted_contact) {
-        setTrustedContact(data.trusted_contact as TrustedContact);
+        setTrustedContact(data.trusted_contact as unknown as TrustedContact);
       }
       if (data.crisis_detection_enabled) {
         setStep("enabled");
@@ -117,7 +117,8 @@ const CrisisDetectionCard = ({ delay = 0 }: CrisisDetectionCardProps) => {
     try {
       const { error } = await supabase
         .from("profiles")
-        .update({ trusted_contact: trustedContact })
+        .update({ trusted_contact: trustedContact as unknown as never })
+
         .eq("id", user.id);
       if (error) throw error;
       toast.success(t("crisisDetection.contactSaved"));

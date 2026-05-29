@@ -44,7 +44,7 @@ const Journal = () => {
       let analysis: AnalysisRow;
       if (isE2EE) {
         const llm = await getOnDeviceLLM();
-        const result = await analyzeAndStoreE2EE(text, encryptEntry, llm);
+        const result = await analyzeAndStoreE2EE(text, encryptEntry, llm as never);
         analysis = result.analysis;
         if (llm) llm.destroy();
       } else {
