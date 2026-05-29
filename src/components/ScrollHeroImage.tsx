@@ -36,15 +36,15 @@ const ScrollHeroImage = () => {
   // Ease-out cubic for a more natural settle
   const eased = 1 - Math.pow(1 - progress, 3);
 
-  // Tilted at start, flat at end
-  const rotateX = (1 - eased) * 22;   // deg
-  const translateY = (1 - eased) * 60; // px
-  const scale = 0.92 + eased * 0.08;
+  // Gentle initial tilt — tablet is already visible on load and just settles flat as you scroll
+  const rotateX = (1 - eased) * 10;   // deg (was 22)
+  const translateY = (1 - eased) * 24; // px (was 60)
+  const scale = 0.96 + eased * 0.04;   // starts closer to full size
 
   return (
     <section
       ref={sectionRef}
-      className="relative hidden md:block bg-[#F3F4ED] pt-4 md:pt-6 pb-16 md:pb-24"
+      className="relative hidden md:block bg-[#F3F4ED] -mt-8 md:-mt-16 lg:-mt-24 pb-16 md:pb-24"
       aria-label="Product preview"
       style={{ perspective: "1600px" }}
     >
@@ -55,7 +55,7 @@ const ScrollHeroImage = () => {
             boxShadow:
               "0 60px 120px -30px rgba(20,20,20,0.35), 0 30px 60px -20px rgba(20,20,20,0.20), inset 0 0 0 1.5px rgba(255,255,255,0.06)",
             transform: `translateY(${translateY}px) rotateX(${rotateX}deg) scale(${scale})`,
-            transformOrigin: "50% 100%",
+            transformOrigin: "50% 0%",
             transition: "transform 0.05s linear",
             willChange: "transform",
           }}
