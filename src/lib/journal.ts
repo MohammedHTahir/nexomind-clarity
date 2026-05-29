@@ -180,7 +180,6 @@ export async function analyzeAndStoreE2EE(
 
   return { journal, analysis: analysis as unknown as AnalysisRow };
 }
-}
 
 export async function fetchJournals(): Promise<JournalWithAnalysis[]> {
   const { data, error } = await supabase
