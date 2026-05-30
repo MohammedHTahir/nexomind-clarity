@@ -118,7 +118,7 @@ const PaywallModal = ({ open, onUnlock, onContinue, tier = "premium" }: PaywallM
               <>
                 <div className="flex items-center justify-between mb-5">
                   <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45">
-                    ( Premium · {plan === "monthly" ? "Monthly" : "Yearly"} )
+                    ( {LABEL[tier]} · {plan === "monthly" ? "Monthly" : "Yearly"} )
                   </p>
                   <button
                     onClick={close}
