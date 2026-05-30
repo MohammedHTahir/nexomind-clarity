@@ -1,5 +1,11 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
+import {
+  enqueueJournal,
+  isOnline,
+  readCachedJournals,
+  writeCachedJournals,
+} from "@/lib/offline";
 
 export type AnalysisRow = {
   id: string;
@@ -62,30 +68,68 @@ export async function analyzeAndStore(
   usage?: AnalyzeUsage;
   isPremium?: boolean;
 }> {
+  // Offline path: queue locally and return an optimistic entry.
+  if (!isOnline()) {
+    const { data: userData } = await supabase.auth.getUser();
+    const userId = userData.user?.id;
+    if (!userId) throw new Error("Not authenticated");
+    const optimistic = await enqueueJournal(content, userId, voice_features);
+    return {
+      journal: {
+        id: optimistic.id,
+        user_id: optimistic.user_id,
+        content: optimistic.content,
+        created_at: optimistic.created_at,
+      },
+      analysis: optimistic.analysis as AnalysisRow,
+    };
+  }
+
   const body: Record<string, unknown> = { content };
   if (voice_features) {
     body.voice_features = voice_features;
   }
 
-  const { data, error } = await supabase.functions.invoke("analyze-journal", {
-    body,
-  });
-  const payload = (data ?? {}) as any;
-  if (payload?.code === "FREE_LIMIT_REACHED") {
-    throw new FreeLimitReachedError(
-      payload.error ?? "Free limit reached",
-      payload.limit ?? 3,
-      payload.used ?? 0,
-    );
+  try {
+    const { data, error } = await supabase.functions.invoke("analyze-journal", {
+      body,
+    });
+    const payload = (data ?? {}) as any;
+    if (payload?.code === "FREE_LIMIT_REACHED") {
+      throw new FreeLimitReachedError(
+        payload.error ?? "Free limit reached",
+        payload.limit ?? 3,
+        payload.used ?? 0,
+      );
+    }
+    if (error) throw error;
+    if (payload?.error) throw new Error(payload.error);
+    return payload as {
+      journal: JournalRow;
+      analysis: AnalysisRow;
+      usage?: AnalyzeUsage;
+      isPremium?: boolean;
+    };
+  } catch (e) {
+    // Network failure during request — fall back to offline queue rather than losing the entry.
+    if (e instanceof FreeLimitReachedError) throw e;
+    if (!isOnline() || (e instanceof TypeError /* fetch failed */)) {
+      const { data: userData } = await supabase.auth.getUser();
+      const userId = userData.user?.id;
+      if (!userId) throw e;
+      const optimistic = await enqueueJournal(content, userId, voice_features);
+      return {
+        journal: {
+          id: optimistic.id,
+          user_id: optimistic.user_id,
+          content: optimistic.content,
+          created_at: optimistic.created_at,
+        },
+        analysis: optimistic.analysis as AnalysisRow,
+      };
+    }
+    throw e;
   }
-  if (error) throw error;
-  if (payload?.error) throw new Error(payload.error);
-  return payload as {
-    journal: JournalRow;
-    analysis: AnalysisRow;
-    usage?: AnalyzeUsage;
-    isPremium?: boolean;
-  };
 }
 
 /**
@@ -183,16 +227,33 @@ export async function analyzeAndStoreE2EE(
 }
 
 export async function fetchJournals(): Promise<JournalWithAnalysis[]> {
-  const { data, error } = await supabase
-    .from("journals")
-    .select("*, analysis:journal_analysis(*)")
-    .order("created_at", { ascending: false })
-    .limit(200);
-  if (error) throw error;
-  return (data ?? []).map((row: any) => ({
-    ...row,
-    analysis: Array.isArray(row.analysis) ? row.analysis[0] ?? null : row.analysis,
-  }));
+  // Offline: serve cached snapshot.
+  if (!isOnline()) {
+    return readCachedJournals();
+  }
+  try {
+    const { data, error } = await supabase
+      .from("journals")
+      .select("*, analysis:journal_analysis(*)")
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (error) throw error;
+    const normalized = (data ?? []).map((row: any) => ({
+      ...row,
+      analysis: Array.isArray(row.analysis) ? row.analysis[0] ?? null : row.analysis,
+    })) as JournalWithAnalysis[];
+
+    // Merge: keep any still-pending local entries on top of fresh server data.
+    const cached = await readCachedJournals();
+    const pendingLocals = cached.filter((r) => r.id.startsWith("local-"));
+    const merged = [...pendingLocals, ...normalized];
+    await writeCachedJournals(merged);
+    return merged;
+  } catch (e) {
+    const cached = await readCachedJournals();
+    if (cached.length > 0) return cached;
+    throw e;
+  }
 }
 
 export async function deleteAllJournals(): Promise<void> {

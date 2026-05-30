@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mic, ArrowRight, ChevronDown } from "lucide-react";
 import AppShell from "@/components/app/AppShell";
+import OfflineIndicator from "@/components/app/OfflineIndicator";
 import GlassCard from "@/components/app/GlassCard";
 import PatternsCard from "@/components/app/PatternsCard";
 import ChallengerNotice from "@/components/app/ChallengerNotice";
@@ -129,6 +130,7 @@ const Dashboard = () => {
   return (
     <AppShell>
       <div className="max-w-4xl mx-auto">
+        <OfflineIndicator />
         <motion.header
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
