@@ -94,11 +94,14 @@ Deno.serve(async (req) => {
   }, 9000);
 
   try {
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
+    // Internal-only: caller must present the service-role key as Bearer token.
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const authHeader = req.headers.get("Authorization") ?? "";
+    const presented = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+    if (!presented || presented !== serviceKey) {
       clearTimeout(timeoutId);
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
+      return new Response(JSON.stringify({ error: "Forbidden: internal use only" }), {
+        status: 403,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
