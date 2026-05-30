@@ -108,7 +108,7 @@ const Hero = () => {
           initial={{ opacity: 0, x: -20, y: 20 }}
           animate={{ opacity: 1, x: 0, y: 0 }}
           transition={{ duration: 1.1, delay: 0.7, ease }}
-          className="hidden lg:block absolute left-[-10px] top-[38%] w-[230px] rotate-[-6deg] bg-white/80 backdrop-blur-sm border border-black/10 rounded-2xl p-4 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.18)]"
+          className="hidden lg:block absolute left-[-10px] top-[60%] w-[230px] rotate-[-6deg] bg-white/80 backdrop-blur-sm border border-black/10 rounded-2xl p-4 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.18)]"
         >
           <blockquote className="font-instrument italic text-[15px] text-foreground/85 leading-snug">
             "I stopped spiraling at 1am. It just… listened, and made sense of it."
@@ -123,7 +123,7 @@ const Hero = () => {
           initial={{ opacity: 0, x: 20, y: 20 }}
           animate={{ opacity: 1, x: 0, y: 0 }}
           transition={{ duration: 1.1, delay: 0.85, ease }}
-          className="hidden lg:block absolute right-[-10px] top-[42%] w-[240px] rotate-[5deg] bg-white/80 backdrop-blur-sm border border-black/10 rounded-2xl p-4 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.18)]"
+          className="hidden lg:block absolute right-[-10px] top-[64%] w-[240px] rotate-[5deg] bg-white/80 backdrop-blur-sm border border-black/10 rounded-2xl p-4 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.18)]"
         >
           <blockquote className="font-instrument italic text-[15px] text-foreground/85 leading-snug">
             "Three minutes a night. My head is quieter than it's been in years."
