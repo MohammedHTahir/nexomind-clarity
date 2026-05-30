@@ -302,6 +302,7 @@ const Pricing = () => {
       <SiteFooter />
       <PaywallModal
         open={paywallOpen}
+        tier={paywallTier}
         onContinue={() => setPaywallOpen(false)}
       />
     </main>
