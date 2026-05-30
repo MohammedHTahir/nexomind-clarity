@@ -46,6 +46,45 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    // Validate returnUrl against an allowlist to prevent open-redirect abuse.
+    let safeReturnUrl: string | undefined;
+    if (returnUrl !== undefined && returnUrl !== null && returnUrl !== "") {
+      if (typeof returnUrl !== "string") {
+        return new Response(JSON.stringify({ error: "Invalid returnUrl" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const ALLOWED_ORIGINS = [
+        "https://nexomind.ai",
+        "https://www.nexomind.ai",
+        "https://clarity-echo-calm.lovable.app",
+        "https://id-preview--ee448f32-3498-4b9f-81d4-2a971af9887d.lovable.app",
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://localhost:8080",
+      ];
+      try {
+        const parsed = new URL(returnUrl);
+        const isAllowed =
+          ALLOWED_ORIGINS.includes(parsed.origin) ||
+          /\.lovable\.app$/.test(parsed.hostname) ||
+          /\.lovableproject\.com$/.test(parsed.hostname);
+        if (!isAllowed) {
+          return new Response(JSON.stringify({ error: "Invalid returnUrl origin" }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        safeReturnUrl = returnUrl;
+      } catch {
+        return new Response(JSON.stringify({ error: "Invalid returnUrl" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
     const env: StripeEnv = environment;
 
     const { data: sub } = await supabaseAdmin
