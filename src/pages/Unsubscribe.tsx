@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Seo from "@/components/Seo";
@@ -46,7 +46,7 @@ const Unsubscribe = () => {
     else setState("error");
   };
 
-  const headings: Record<State, { title: React.ReactNode; body?: React.ReactNode } | null> = {
+  const headings: Record<State, { title: ReactNode; body?: ReactNode } | null> = {
     loading: null,
     confirming: null,
     error: null,
