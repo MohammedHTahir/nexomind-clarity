@@ -62,8 +62,9 @@ const faqs = [
 const Pricing = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { isPremium } = useSubscription();
+  const { isPremium, isPremiumPlus } = useSubscription();
   const [paywallOpen, setPaywallOpen] = useState(false);
+  const [paywallTier, setPaywallTier] = useState<"premium" | "premium_plus">("premium");
 
   const handlePremiumClick = () => {
     trackEvent("cta_click_pricing", { plan: "premium" });
@@ -75,6 +76,7 @@ const Pricing = () => {
       navigate("/app/settings");
       return;
     }
+    setPaywallTier("premium");
     setPaywallOpen(true);
   };
 
@@ -84,7 +86,12 @@ const Pricing = () => {
       navigate("/auth");
       return;
     }
-    navigate("/app/settings");
+    if (isPremiumPlus) {
+      navigate("/app/settings");
+      return;
+    }
+    setPaywallTier("premium_plus");
+    setPaywallOpen(true);
   };
 
   const jsonLd = [
