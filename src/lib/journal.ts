@@ -68,30 +68,68 @@ export async function analyzeAndStore(
   usage?: AnalyzeUsage;
   isPremium?: boolean;
 }> {
+  // Offline path: queue locally and return an optimistic entry.
+  if (!isOnline()) {
+    const { data: userData } = await supabase.auth.getUser();
+    const userId = userData.user?.id;
+    if (!userId) throw new Error("Not authenticated");
+    const optimistic = await enqueueJournal(content, userId, voice_features);
+    return {
+      journal: {
+        id: optimistic.id,
+        user_id: optimistic.user_id,
+        content: optimistic.content,
+        created_at: optimistic.created_at,
+      },
+      analysis: optimistic.analysis as AnalysisRow,
+    };
+  }
+
   const body: Record<string, unknown> = { content };
   if (voice_features) {
     body.voice_features = voice_features;
   }
 
-  const { data, error } = await supabase.functions.invoke("analyze-journal", {
-    body,
-  });
-  const payload = (data ?? {}) as any;
-  if (payload?.code === "FREE_LIMIT_REACHED") {
-    throw new FreeLimitReachedError(
-      payload.error ?? "Free limit reached",
-      payload.limit ?? 3,
-      payload.used ?? 0,
-    );
+  try {
+    const { data, error } = await supabase.functions.invoke("analyze-journal", {
+      body,
+    });
+    const payload = (data ?? {}) as any;
+    if (payload?.code === "FREE_LIMIT_REACHED") {
+      throw new FreeLimitReachedError(
+        payload.error ?? "Free limit reached",
+        payload.limit ?? 3,
+        payload.used ?? 0,
+      );
+    }
+    if (error) throw error;
+    if (payload?.error) throw new Error(payload.error);
+    return payload as {
+      journal: JournalRow;
+      analysis: AnalysisRow;
+      usage?: AnalyzeUsage;
+      isPremium?: boolean;
+    };
+  } catch (e) {
+    // Network failure during request — fall back to offline queue rather than losing the entry.
+    if (e instanceof FreeLimitReachedError) throw e;
+    if (!isOnline() || (e instanceof TypeError /* fetch failed */)) {
+      const { data: userData } = await supabase.auth.getUser();
+      const userId = userData.user?.id;
+      if (!userId) throw e;
+      const optimistic = await enqueueJournal(content, userId, voice_features);
+      return {
+        journal: {
+          id: optimistic.id,
+          user_id: optimistic.user_id,
+          content: optimistic.content,
+          created_at: optimistic.created_at,
+        },
+        analysis: optimistic.analysis as AnalysisRow,
+      };
+    }
+    throw e;
   }
-  if (error) throw error;
-  if (payload?.error) throw new Error(payload.error);
-  return payload as {
-    journal: JournalRow;
-    analysis: AnalysisRow;
-    usage?: AnalyzeUsage;
-    isPremium?: boolean;
-  };
 }
 
 /**
