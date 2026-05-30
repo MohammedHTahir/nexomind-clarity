@@ -274,7 +274,7 @@ const Pricing = () => {
               onClick={handlePremiumPlusClick}
               className="mt-10 block w-full text-center bg-white text-[#111] rounded-full px-6 py-3.5 font-barlow font-medium text-[14px] hover:bg-white/90 transition-colors"
             >
-              {user ? "Upgrade to Premium+" : "Start free, upgrade anytime"}
+              {isPremiumPlus ? "Manage subscription" : user ? "Upgrade to Premium+" : "Start free, upgrade anytime"}
             </button>
           </article>
         </div>
