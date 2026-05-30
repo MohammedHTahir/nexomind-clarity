@@ -44,7 +44,7 @@ const ScrollHeroImage = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative hidden md:block bg-[#F3F4ED] -mt-8 md:-mt-16 lg:-mt-24 pb-16 md:pb-24"
+      className="relative hidden md:block bg-[#F3F4ED] pt-8 md:pt-12 lg:pt-16 pb-16 md:pb-24"
       aria-label="Product preview"
       style={{ perspective: "1600px" }}
     >
