@@ -62,8 +62,9 @@ const faqs = [
 const Pricing = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { isPremium } = useSubscription();
+  const { isPremium, isPremiumPlus } = useSubscription();
   const [paywallOpen, setPaywallOpen] = useState(false);
+  const [paywallTier, setPaywallTier] = useState<"premium" | "premium_plus">("premium");
 
   const handlePremiumClick = () => {
     trackEvent("cta_click_pricing", { plan: "premium" });
@@ -75,6 +76,7 @@ const Pricing = () => {
       navigate("/app/settings");
       return;
     }
+    setPaywallTier("premium");
     setPaywallOpen(true);
   };
 
@@ -84,7 +86,12 @@ const Pricing = () => {
       navigate("/auth");
       return;
     }
-    navigate("/app/settings");
+    if (isPremiumPlus) {
+      navigate("/app/settings");
+      return;
+    }
+    setPaywallTier("premium_plus");
+    setPaywallOpen(true);
   };
 
   const jsonLd = [
@@ -267,7 +274,7 @@ const Pricing = () => {
               onClick={handlePremiumPlusClick}
               className="mt-10 block w-full text-center bg-white text-[#111] rounded-full px-6 py-3.5 font-barlow font-medium text-[14px] hover:bg-white/90 transition-colors"
             >
-              {user ? "Upgrade to Premium+" : "Start free, upgrade anytime"}
+              {isPremiumPlus ? "Manage subscription" : user ? "Upgrade to Premium+" : "Start free, upgrade anytime"}
             </button>
           </article>
         </div>
@@ -295,6 +302,7 @@ const Pricing = () => {
       <SiteFooter />
       <PaywallModal
         open={paywallOpen}
+        tier={paywallTier}
         onContinue={() => setPaywallOpen(false)}
       />
     </main>

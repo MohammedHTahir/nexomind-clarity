@@ -5,30 +5,31 @@ import { StripeEmbeddedCheckoutForm } from "@/components/StripeEmbeddedCheckout"
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
+type Tier = "premium" | "premium_plus";
+
 interface PaywallModalProps {
   open: boolean;
   onUnlock?: () => void;
   onContinue: () => void;
+  tier?: Tier;
 }
 
 type Plan = "monthly" | "yearly";
 
-const PLANS: Record<Plan, { priceId: string; price: string; cadence: string; note: string }> = {
-  monthly: {
-    priceId: "premium_monthly",
-    price: "$9.99",
-    cadence: "/month",
-    note: "Cancel anytime",
+const PLANS: Record<Tier, Record<Plan, { priceId: string; price: string; cadence: string; note: string }>> = {
+  premium: {
+    monthly: { priceId: "premium_monthly", price: "$9.99", cadence: "/month", note: "Cancel anytime" },
+    yearly: { priceId: "premium_yearly", price: "$95", cadence: "/year", note: "Save ~20% vs monthly" },
   },
-  yearly: {
-    priceId: "premium_yearly",
-    price: "$95",
-    cadence: "/year",
-    note: "Save ~20% vs monthly",
+  premium_plus: {
+    monthly: { priceId: "premium_plus_monthly", price: "$19.99", cadence: "/month", note: "Cancel anytime" },
+    yearly: { priceId: "premium_plus_yearly", price: "$190", cadence: "/year", note: "Save ~20% vs monthly" },
   },
 };
 
-const PaywallModal = ({ open, onUnlock, onContinue }: PaywallModalProps) => {
+const LABEL: Record<Tier, string> = { premium: "Premium", premium_plus: "Premium+" };
+
+const PaywallModal = ({ open, onUnlock, onContinue, tier = "premium" }: PaywallModalProps) => {
   const { user } = useAuth();
   const [plan, setPlan] = useState<Plan>("monthly");
   const [showCheckout, setShowCheckout] = useState(false);
@@ -43,7 +44,7 @@ const PaywallModal = ({ open, onUnlock, onContinue }: PaywallModalProps) => {
     onContinue();
   };
 
-  const selected = PLANS[plan];
+  const selected = PLANS[tier][plan];
 
   return (
     <AnimatePresence>
@@ -65,7 +66,7 @@ const PaywallModal = ({ open, onUnlock, onContinue }: PaywallModalProps) => {
             {!showCheckout ? (
               <>
                 <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45 mb-3">
-                  ( NexoMind Premium )
+                  ( NexoMind {LABEL[tier]} )
                 </p>
                 <h2 className="font-instrument text-[36px] md:text-[44px] leading-[1.04] tracking-tight text-[#111]">
                   See what's really <span className="italic">going on</span>
@@ -117,7 +118,7 @@ const PaywallModal = ({ open, onUnlock, onContinue }: PaywallModalProps) => {
               <>
                 <div className="flex items-center justify-between mb-5">
                   <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45">
-                    ( Premium · {plan === "monthly" ? "Monthly" : "Yearly"} )
+                    ( {LABEL[tier]} · {plan === "monthly" ? "Monthly" : "Yearly"} )
                   </p>
                   <button
                     onClick={close}
