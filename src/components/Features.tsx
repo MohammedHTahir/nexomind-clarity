@@ -1,4 +1,4 @@
-import { Lock, Sparkles, Moon, Waves, Network, BellRing } from "lucide-react";
+import { Lock, Sparkles, Mic, Waves, Network, BellRing, Mail, ShieldCheck, Stethoscope } from "lucide-react";
 
 const features = [
   {
@@ -12,6 +12,16 @@ const features = [
     d: "NexoMind learns when your loops open — Sunday 8pm, Tuesday 11pm — and quietly nudges you before they grip.",
   },
   {
+    icon: Mail,
+    t: "Sunday Letter",
+    d: "A private weekly letter from your AI mentor — what shifted, what looped, what to gently watch this week.",
+  },
+  {
+    icon: Mic,
+    t: "Voice reflections",
+    d: "Speak your thoughts when typing feels like too much. We transcribe and reflect — privately.",
+  },
+  {
     icon: Waves,
     t: "Pattern recognition over time",
     d: "See the loops, triggers, and themes that quietly shape your days.",
@@ -19,17 +29,22 @@ const features = [
   {
     icon: Sparkles,
     t: "Unlimited AI reflections",
-    d: "Reflect as often as your mind needs. No caps, no limits.",
+    d: "Reflect as often as your mind needs. No caps, no limits. Priority models for deeper insight.",
   },
   {
-    icon: Moon,
-    t: "It gets clearer over time",
-    d: "The longer you write, the sharper the picture of your own mind becomes.",
+    icon: Stethoscope,
+    t: "Therapist Brief",
+    d: "Export a concise, professional summary of your week to share with your therapist — your words, your control.",
+  },
+  {
+    icon: ShieldCheck,
+    t: "End-to-end encryption",
+    d: "Premium+ adds on-device AI and E2EE — your entries are sealed before they ever leave your phone.",
   },
   {
     icon: Lock,
-    t: "Private. Secure. No data shared.",
-    d: "Your reflections stay yours. We never sell, train on, or read them.",
+    t: "Private. Never sold.",
+    d: "Your reflections stay yours. We never sell them, never train external models on them, never read them.",
   },
 ];
 
@@ -39,14 +54,14 @@ const Features = () => {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-20 max-w-2xl mx-auto">
           <p className="font-barlow font-medium text-[12px] tracking-[0.2em] uppercase text-white/40 mb-4">
-            ( NexoMind Premium · $9.99 / month )
+            ( Free · Premium $9.99/mo · Premium+ $19.99/mo )
           </p>
           <h2 className="font-instrument text-[44px] md:text-[64px] leading-[1]">
             See what your mind <br />
             is <span className="italic">actually</span> doing.
           </h2>
           <p className="font-barlow text-[15px] text-white/55 mt-6">
-            Unlimited reflections. Cancel anytime.
+            Start free. Upgrade for unlimited reflections, patterns, and your weekly Sunday Letter. Cancel anytime.
           </p>
         </div>
 
