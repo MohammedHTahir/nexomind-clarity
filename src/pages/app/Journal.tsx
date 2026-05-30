@@ -95,6 +95,7 @@ const Journal = () => {
         </button>
       </div>
 
+      <h1 className="sr-only">Journal — write a private reflection</h1>
       <div className="relative z-10 h-full flex">
         <div className="flex-1 flex items-center justify-center px-6 md:px-10">
           <div className="w-full max-w-2xl">

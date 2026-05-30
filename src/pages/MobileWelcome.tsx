@@ -47,14 +47,14 @@ const MobileWelcome = () => {
           nexo<span className="italic text-white/70">mind</span>
         </motion.div>
 
-        <motion.p
+        <motion.h1
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.15, ease }}
           className="mt-8 font-instrument italic text-[34px] leading-[1.1] max-w-[20rem]"
         >
           Clarity, one thought at a time.
-        </motion.p>
+        </motion.h1>
 
         <motion.p
           initial={{ opacity: 0, y: 12 }}
