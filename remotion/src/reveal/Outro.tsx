@@ -9,39 +9,40 @@ export const RevealOutro: React.FC = () => {
   const subP = interpolate(f, [50, 90], [0, 1], { extrapolateRight: "clamp" });
   const urlP = interpolate(f, [80, 115], [0, 1], { extrapolateRight: "clamp" });
 
-  const glow = interpolate(Math.sin(f / 14), [-1, 1], [0.7, 1]);
+  const glow = interpolate(Math.sin(f / 14), [-1, 1], [0.6, 1]);
 
   return (
     <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", textAlign: "center" }}>
-      {/* central halo */}
+      {/* warm halo */}
       <AbsoluteFill
         style={{
-          background: `radial-gradient(40% 40% at 50% 50%, ${REVEAL.blue}55 0%, transparent 70%)`,
+          background: `radial-gradient(45% 45% at 50% 50%, ${REVEAL.accent}cc 0%, transparent 70%)`,
           opacity: glow,
         }}
       />
+      {/* wordmark — matches site: lowercase serif, italic 'mind' */}
       <div
         style={{
           position: "relative",
           opacity: titleP,
           transform: `translateY(${interpolate(titleP, [0, 1], [24, 0])}px)`,
           fontFamily: serif,
-          fontSize: 220,
+          fontSize: 240,
           color: REVEAL.ink,
           lineHeight: 1,
-          letterSpacing: -4,
-          textShadow: `0 0 80px ${REVEAL.blue}80`,
+          letterSpacing: -6,
         }}
       >
-        Nexo<span style={{ fontFamily: serifItalic, color: REVEAL.blue }}>Mind</span>
+        nexo<span style={{ fontFamily: serifItalic }}>mind</span>
       </div>
       <div
         style={{
           position: "relative",
-          width: lineP * 260,
-          height: 1.5,
-          background: `linear-gradient(90deg, transparent, ${REVEAL.blue}, transparent)`,
-          margin: "40px 0 32px",
+          width: lineP * 220,
+          height: 1,
+          background: REVEAL.ink,
+          opacity: 0.4,
+          margin: "44px 0 32px",
         }}
       />
       <div
@@ -49,22 +50,23 @@ export const RevealOutro: React.FC = () => {
           position: "relative",
           opacity: subP,
           fontFamily: serifItalic,
-          fontSize: 44,
-          color: REVEAL.muted,
+          fontSize: 46,
+          color: REVEAL.inkSoft,
         }}
       >
-        A quieter way to think.
+        a quieter way to think.
       </div>
       <div
         style={{
           position: "relative",
           opacity: urlP,
-          marginTop: 70,
+          marginTop: 80,
           fontFamily: sans,
-          fontSize: 22,
+          fontSize: 20,
           letterSpacing: 10,
           textTransform: "uppercase",
-          color: REVEAL.blue,
+          color: REVEAL.muted,
+          fontWeight: 500,
         }}
       >
         nexomind.ai
