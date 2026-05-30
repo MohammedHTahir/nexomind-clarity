@@ -54,11 +54,12 @@ export const ScreenFloat: React.FC<Props> = ({ src, kicker, title, italicTail, b
         <div
           style={{
             fontFamily: sans,
-            fontSize: 16,
+            fontSize: 15,
             letterSpacing: 6,
             textTransform: "uppercase",
-            color: REVEAL.blue,
-            marginBottom: 20,
+            color: REVEAL.muted,
+            marginBottom: 22,
+            fontWeight: 500,
           }}
         >
           {kicker}
@@ -66,14 +67,15 @@ export const ScreenFloat: React.FC<Props> = ({ src, kicker, title, italicTail, b
         <div
           style={{
             fontFamily: serif,
-            fontSize: 76,
+            fontSize: 82,
             lineHeight: 1.02,
             color: REVEAL.ink,
-            letterSpacing: -1.5,
+            letterSpacing: -2,
+            fontWeight: 400,
           }}
         >
           {title}{" "}
-          <span style={{ fontFamily: serifItalic, color: REVEAL.blue }}>{italicTail}</span>
+          <span style={{ fontFamily: serifItalic, color: REVEAL.ink }}>{italicTail}</span>
         </div>
         <div
           style={{
