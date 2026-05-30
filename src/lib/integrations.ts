@@ -23,6 +23,54 @@ const REDIRECT_URI = `${window.location.origin}/app/settings/integrations/callba
 
 // --- OAuth URL Builders ---
 
+// --- CSRF state helpers ---
+
+const STATE_STORAGE_KEY = "oauth_state";
+
+function createState(provider: IntegrationProvider): string {
+  const nonce =
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : Math.random().toString(36).slice(2) + Date.now().toString(36);
+  const state = `${provider}:${nonce}`;
+  try {
+    sessionStorage.setItem(STATE_STORAGE_KEY, state);
+  } catch {
+    // sessionStorage unavailable — caller can still proceed but verifyState will fail
+  }
+  return state;
+}
+
+/**
+ * Verify the OAuth state returned from the provider matches the per-request
+ * nonce we stored before redirecting. Returns the provider on success, or null
+ * if state is missing/mismatched (callback must be rejected).
+ */
+export function verifyOAuthState(returnedState: string | null): IntegrationProvider | null {
+  if (!returnedState) return null;
+  let stored: string | null = null;
+  try {
+    stored = sessionStorage.getItem(STATE_STORAGE_KEY);
+    sessionStorage.removeItem(STATE_STORAGE_KEY);
+  } catch {
+    return null;
+  }
+  if (!stored || stored !== returnedState) return null;
+  const [provider] = returnedState.split(":");
+  const valid: IntegrationProvider[] = [
+    "oura",
+    "google_fit",
+    "google_calendar",
+    "apple_health",
+    "apple_calendar",
+  ];
+  return valid.includes(provider as IntegrationProvider)
+    ? (provider as IntegrationProvider)
+    : null;
+}
+
+// --- OAuth URL Builders ---
+
 export function getOuraAuthUrl(): string {
   const clientId = import.meta.env.VITE_OURA_CLIENT_ID ?? "";
   const params = new URLSearchParams({
@@ -30,7 +78,7 @@ export function getOuraAuthUrl(): string {
     client_id: clientId,
     redirect_uri: REDIRECT_URI,
     scope: "daily readiness sleep personal",
-    state: "oura",
+    state: createState("oura"),
   });
   return `https://cloud.ouraring.com/oauth/authorize?${params.toString()}`;
 }
@@ -44,7 +92,7 @@ export function getGoogleFitAuthUrl(): string {
     scope: "https://www.googleapis.com/auth/fitness.sleep.read https://www.googleapis.com/auth/fitness.heart_rate.read",
     access_type: "offline",
     prompt: "consent",
-    state: "google_fit",
+    state: createState("google_fit"),
   });
   return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
 }
@@ -58,7 +106,7 @@ export function getGoogleCalendarAuthUrl(): string {
     scope: "https://www.googleapis.com/auth/calendar.readonly",
     access_type: "offline",
     prompt: "consent",
-    state: "google_calendar",
+    state: createState("google_calendar"),
   });
   return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
 }

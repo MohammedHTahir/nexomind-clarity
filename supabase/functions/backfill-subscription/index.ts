@@ -14,7 +14,18 @@ Deno.serve(async (req) => {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
 
   try {
-    // No auth — function is one-off and only acts on a hardcoded allowlist.
+    // Require service-role key for this admin-only backfill endpoint.
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const authHeader = req.headers.get("Authorization") || "";
+    const token = authHeader.replace(/^Bearer\s+/i, "");
+    if (!token || token !== serviceKey) {
+      return new Response(
+        JSON.stringify({ error: "Forbidden" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    // Hardcoded allowlist still applies as defense-in-depth.
     const ALLOWED = new Set(["lloydjack276@gmail.com"]);
 
     const { email } = await req.json();
