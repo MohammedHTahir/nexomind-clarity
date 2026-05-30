@@ -40,42 +40,54 @@ Deno.serve(async (req) => {
       });
     }
 
-    const apiKey = Deno.env.get("GEMINI_API_KEY");
-    if (!apiKey) throw new Error("GEMINI_API_KEY not configured");
+    const apiKey = Deno.env.get("LOVABLE_API_KEY");
+    if (!apiKey) throw new Error("LOVABLE_API_KEY not configured");
 
-    // Use Gemini API for audio transcription via the generateContent endpoint
+    // Lovable AI Gateway (OpenAI-compatible) with multimodal audio input.
     const geminiResp = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      "https://ai.gateway.lovable.dev/v1/chat/completions",
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
-          contents: [
+          model: "google/gemini-2.5-flash",
+          messages: [
             {
-              parts: [
+              role: "user",
+              content: [
                 {
-                  inlineData: {
-                    mimeType: "audio/webm",
-                    data: audio_base64,
-                  },
+                  type: "input_audio",
+                  input_audio: { data: audio_base64, format: "webm" },
                 },
                 {
+                  type: "text",
                   text: "Transcribe this audio recording exactly as spoken. Return only the transcription text, no commentary or formatting.",
                 },
               ],
             },
           ],
-          generationConfig: {
-            temperature: 0.1,
-            maxOutputTokens: 4096,
-          },
         }),
       },
     );
 
     if (!geminiResp.ok) {
       const errText = await geminiResp.text();
-      console.error("Gemini transcription error", geminiResp.status, errText);
+      console.error("Lovable AI transcription error", geminiResp.status, errText);
+      if (geminiResp.status === 429) {
+        return new Response(
+          JSON.stringify({ error: "Rate limit reached. Please try again in a moment." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+      if (geminiResp.status === 402) {
+        return new Response(
+          JSON.stringify({ error: "AI credits exhausted. Please add credits in workspace settings." }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
       return new Response(
         JSON.stringify({ error: "Transcription failed" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
@@ -84,7 +96,7 @@ Deno.serve(async (req) => {
 
     const geminiData = await geminiResp.json();
     const transcript =
-      geminiData?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? "";
+      geminiData?.choices?.[0]?.message?.content?.trim() ?? "";
 
     if (!transcript) {
       return new Response(

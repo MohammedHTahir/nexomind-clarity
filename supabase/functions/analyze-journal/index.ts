@@ -189,12 +189,10 @@ const refineTool = {
   },
 };
 
-// Direct Google Gemini API (no Lovable Gateway).
-// We use OpenAI-compatible endpoint Google exposes so the existing
-// tools / tool_choice payload works unchanged.
+// Lovable AI Gateway (OpenAI-compatible). Uses LOVABLE_API_KEY auto-provisioned by Lovable Cloud.
 async function callGateway(body: unknown, apiKey: string) {
   const r = await fetch(
-    "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+    "https://ai.gateway.lovable.dev/v1/chat/completions",
     {
       method: "POST",
       headers: {
@@ -301,8 +299,8 @@ Deno.serve(async (req) => {
       }
     }
 
-    const apiKey = Deno.env.get("GEMINI_API_KEY");
-    if (!apiKey) throw new Error("GEMINI_API_KEY not configured");
+    const apiKey = Deno.env.get("LOVABLE_API_KEY");
+    if (!apiKey) throw new Error("LOVABLE_API_KEY not configured");
 
     // Resolve reflection mode and active persona from user profile
     let reflectionMode: ReflectionMode = "companion";
@@ -408,7 +406,7 @@ Deno.serve(async (req) => {
     // 2) primary analysis
     const aiResp = await callGateway(
       {
-        model: "gemini-2.5-flash",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
           {
@@ -449,7 +447,7 @@ Deno.serve(async (req) => {
     try {
       const refineResp = await callGateway(
         {
-          model: "gemini-2.5-flash-lite",
+          model: "google/gemini-2.5-flash-lite",
           messages: [
             { role: "system", content: REFINE_SYSTEM },
             {
