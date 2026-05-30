@@ -108,13 +108,14 @@ export const ScreenFloat: React.FC<Props> = ({ src, kicker, title, italicTail, b
                         rotateY(${(side === "right" ? -10 : 10) + driftR}deg)
                         rotateX(${4 + driftR * 0.5}deg)`,
             transformStyle: "preserve-3d",
-            borderRadius: 18,
+            borderRadius: 22,
             overflow: "hidden",
             border: `1px solid ${REVEAL.hairline}`,
+            background: "#fff",
             boxShadow: `
-              0 60px 120px -30px rgba(0,0,0,0.7),
-              0 0 0 1px ${REVEAL.blue}22,
-              0 0 80px ${REVEAL.blue}33
+              0 60px 120px -30px rgba(26,26,26,0.30),
+              0 20px 50px -20px rgba(26,26,26,0.20),
+              0 0 0 1px ${REVEAL.hairline}
             `,
           }}
         >
