@@ -106,7 +106,7 @@ Deno.serve(async (req) => {
     const stripe = createStripeClient(env);
     const portal = await stripe.billingPortal.sessions.create({
       customer: sub.stripe_customer_id as string,
-      ...(returnUrl && { return_url: returnUrl }),
+      ...(safeReturnUrl && { return_url: safeReturnUrl }),
     });
 
     return new Response(JSON.stringify({ url: portal.url }), {
