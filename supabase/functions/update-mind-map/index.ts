@@ -91,6 +91,17 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
+    // Internal-only: caller must present the service-role key as Bearer token.
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const authHeader = req.headers.get("Authorization") ?? "";
+    const presented = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+    if (!presented || presented !== serviceKey) {
+      return new Response(JSON.stringify({ error: "Forbidden: internal use only" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { user_id, journal_id, analysis } = await req.json();
     if (!user_id || !journal_id || !analysis) {
       return new Response(JSON.stringify({ error: "missing fields" }), {
