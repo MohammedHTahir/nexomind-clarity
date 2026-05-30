@@ -130,6 +130,7 @@ const Dashboard = () => {
   return (
     <AppShell>
       <div className="max-w-4xl mx-auto">
+        <OfflineIndicator />
         <motion.header
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
