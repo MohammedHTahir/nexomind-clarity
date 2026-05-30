@@ -13,6 +13,17 @@ const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  // Internal-only: caller must present the service-role key as Bearer token (pg_cron uses vault).
+  const authHeader = req.headers.get("Authorization") ?? "";
+  const presented = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+  if (!presented || presented !== SERVICE_KEY) {
+    return new Response(JSON.stringify({ error: "Forbidden: internal use only" }), {
+      status: 403,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
 
   try {
