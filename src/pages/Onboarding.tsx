@@ -130,10 +130,10 @@ const Onboarding = () => {
                     <button
                       key={m}
                       onClick={() => setMood(m)}
-                      className={`bg-white/70 backdrop-blur-md border rounded-full px-5 py-2.5 font-barlow text-[14px] transition-all duration-300 hover:scale-[1.03] ${
+                      className={`backdrop-blur-md border rounded-full px-5 py-2.5 font-barlow text-[14px] transition-all duration-300 hover:scale-[1.03] ${
                         active
                           ? "border-[#111] bg-[#111] text-white shadow-[0_4px_20px_rgba(0,0,0,0.15)]"
-                          : "border-black/5 text-[#111]/75 hover:border-black/15"
+                          : "bg-white/70 border-black/5 text-[#111]/75 hover:border-black/15"
                       }`}
                     >
                       {m}
@@ -179,10 +179,10 @@ const Onboarding = () => {
                     <button
                       key={it}
                       onClick={() => togglePicked(it)}
-                      className={`flex items-center gap-2 bg-white/70 backdrop-blur-md border rounded-full px-5 py-2.5 font-barlow text-[14px] transition-all duration-300 hover:scale-[1.03] ${
+                      className={`flex items-center gap-2 backdrop-blur-md border rounded-full px-5 py-2.5 font-barlow text-[14px] transition-all duration-300 hover:scale-[1.03] ${
                         active
                           ? "border-[#111] bg-[#111] text-white shadow-[0_4px_20px_rgba(0,0,0,0.15)]"
-                          : "border-black/5 text-[#111]/75 hover:border-black/15"
+                          : "bg-white/70 border-black/5 text-[#111]/75 hover:border-black/15"
                       }`}
                     >
                       {active && <Check className="w-3.5 h-3.5" strokeWidth={2.5} />}
