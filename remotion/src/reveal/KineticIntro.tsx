@@ -30,116 +30,68 @@ const Beat: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   );
 };
 
+const kicker = {
+  fontFamily: sans,
+  fontSize: 16,
+  letterSpacing: 6,
+  textTransform: "uppercase" as const,
+  color: REVEAL.muted,
+  fontWeight: 500,
+};
+
+const display = {
+  fontFamily: serif,
+  fontSize: 130,
+  color: REVEAL.ink,
+  lineHeight: 1.02,
+  letterSpacing: -3,
+  fontWeight: 400,
+};
+
 export const KineticIntro: React.FC = () => {
   return (
     <AbsoluteFill>
-      {/* Beat 1 — small kicker */}
+      {/* Beat 1 — wordmark kicker (matches site nav: nexomind) */}
       <Sequence from={0} durationInFrames={60}>
         <Beat>
-          <div
-            style={{
-              fontFamily: sans,
-              fontSize: 18,
-              letterSpacing: 8,
-              textTransform: "uppercase",
-              color: REVEAL.blue,
-            }}
-          >
-            ( nexomind )
+          <div style={{ fontFamily: serif, fontSize: 42, color: REVEAL.ink, letterSpacing: -0.5 }}>
+            nexo<span style={{ fontFamily: serifItalic }}>mind</span>
           </div>
         </Beat>
       </Sequence>
 
-      {/* Beat 2 — Imagine a tool */}
+      {/* Beat 2 — A quieter way */}
       <Sequence from={50} durationInFrames={75}>
         <Beat>
-          <div
-            style={{
-              fontFamily: serif,
-              fontSize: 110,
-              color: REVEAL.ink,
-              lineHeight: 1.05,
-              letterSpacing: -2,
-            }}
-          >
-            Imagine a <Pill text="tool" />
-          </div>
+          <div style={display}>A quieter way</div>
         </Beat>
       </Sequence>
 
-      {/* Beat 3 — that listens */}
+      {/* Beat 3 — to think */}
       <Sequence from={115} durationInFrames={75}>
         <Beat>
-          <div
-            style={{
-              fontFamily: serif,
-              fontSize: 110,
-              color: REVEAL.ink,
-              lineHeight: 1.05,
-              letterSpacing: -2,
-            }}
-          >
-            that <span style={{ fontFamily: serifItalic, color: REVEAL.blue }}>listens.</span>
-          </div>
+          <div style={display}>to think,</div>
         </Beat>
       </Sequence>
 
-      {/* Beat 4 — sees the patterns */}
-      <Sequence from={180} durationInFrames={80}>
+      {/* Beat 4 — one thought at a time (hero italic block) */}
+      <Sequence from={180} durationInFrames={90}>
         <Beat>
-          <div style={{ maxWidth: 1500 }}>
-            <div
-              style={{
-                fontFamily: serif,
-                fontSize: 90,
-                color: REVEAL.ink,
-                lineHeight: 1.1,
-                letterSpacing: -1.5,
-                marginBottom: 18,
-              }}
-            >
-              Sees the <span style={{ fontFamily: serifItalic, color: REVEAL.blue }}>patterns</span>
-            </div>
-            <div
-              style={{
-                fontFamily: serif,
-                fontSize: 90,
-                color: REVEAL.ink,
-                lineHeight: 1.1,
-                letterSpacing: -1.5,
-              }}
-            >
-              you can't see <Pill text="yet." delay={6} />
+          <div style={{ maxWidth: 1600 }}>
+            <div style={{ ...display, fontSize: 110, marginBottom: 24 }}>one thought</div>
+            <div style={{ ...display, fontSize: 110 }}>
+              <Pill text="at a time." delay={4} />
             </div>
           </div>
         </Beat>
       </Sequence>
 
-      {/* Beat 5 — Meet the screens */}
-      <Sequence from={255} durationInFrames={80}>
+      {/* Beat 5 — Meet NexoMind */}
+      <Sequence from={265} durationInFrames={80}>
         <Beat>
-          <div
-            style={{
-              fontFamily: sans,
-              fontSize: 18,
-              letterSpacing: 8,
-              textTransform: "uppercase",
-              color: REVEAL.faint,
-              marginBottom: 28,
-            }}
-          >
-            four surfaces. one quiet mind.
-          </div>
-          <div
-            style={{
-              fontFamily: serif,
-              fontSize: 120,
-              color: REVEAL.ink,
-              lineHeight: 1.02,
-              letterSpacing: -2.5,
-            }}
-          >
-            Meet <span style={{ fontFamily: serifItalic, color: REVEAL.blue }}>NexoMind.</span>
+          <div style={{ ...kicker, marginBottom: 28 }}>four surfaces · one quiet mind</div>
+          <div style={{ ...display, fontSize: 130 }}>
+            Meet <span style={{ fontFamily: serifItalic }}>nexomind.</span>
           </div>
         </Beat>
       </Sequence>

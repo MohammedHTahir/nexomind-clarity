@@ -54,11 +54,12 @@ export const ScreenFloat: React.FC<Props> = ({ src, kicker, title, italicTail, b
         <div
           style={{
             fontFamily: sans,
-            fontSize: 16,
+            fontSize: 15,
             letterSpacing: 6,
             textTransform: "uppercase",
-            color: REVEAL.blue,
-            marginBottom: 20,
+            color: REVEAL.muted,
+            marginBottom: 22,
+            fontWeight: 500,
           }}
         >
           {kicker}
@@ -66,14 +67,15 @@ export const ScreenFloat: React.FC<Props> = ({ src, kicker, title, italicTail, b
         <div
           style={{
             fontFamily: serif,
-            fontSize: 76,
+            fontSize: 82,
             lineHeight: 1.02,
             color: REVEAL.ink,
-            letterSpacing: -1.5,
+            letterSpacing: -2,
+            fontWeight: 400,
           }}
         >
           {title}{" "}
-          <span style={{ fontFamily: serifItalic, color: REVEAL.blue }}>{italicTail}</span>
+          <span style={{ fontFamily: serifItalic, color: REVEAL.ink }}>{italicTail}</span>
         </div>
         <div
           style={{
@@ -106,13 +108,14 @@ export const ScreenFloat: React.FC<Props> = ({ src, kicker, title, italicTail, b
                         rotateY(${(side === "right" ? -10 : 10) + driftR}deg)
                         rotateX(${4 + driftR * 0.5}deg)`,
             transformStyle: "preserve-3d",
-            borderRadius: 18,
+            borderRadius: 22,
             overflow: "hidden",
             border: `1px solid ${REVEAL.hairline}`,
+            background: "#fff",
             boxShadow: `
-              0 60px 120px -30px rgba(0,0,0,0.7),
-              0 0 0 1px ${REVEAL.blue}22,
-              0 0 80px ${REVEAL.blue}33
+              0 60px 120px -30px rgba(26,26,26,0.30),
+              0 20px 50px -20px rgba(26,26,26,0.20),
+              0 0 0 1px ${REVEAL.hairline}
             `,
           }}
         >
