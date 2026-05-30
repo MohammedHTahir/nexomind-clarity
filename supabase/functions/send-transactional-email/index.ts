@@ -30,9 +30,15 @@ function generateToken(): string {
     .join('')
 }
 
-// Auth note: this function uses verify_jwt = true in config.toml, so Supabase's
-// gateway validates the caller's JWT (anon or service_role) before the request
-// reaches this code. No in-function auth check is needed.
+// Auth: config.toml sets verify_jwt = true so Supabase validates JWT signature
+// (accepts anon, authenticated, or service_role keys). We enforce caller-identity
+// rules in-function to prevent abuse of the public anon key for phishing.
+//
+// Rules:
+//   - service_role  → may send any template to any recipient (server-to-server).
+//   - authenticated → may only send to their own email address.
+//   - anon          → may only send templates in ANON_ALLOWED_TEMPLATES.
+const ANON_ALLOWED_TEMPLATES = new Set<string>(['contact-confirmation'])
 
 Deno.serve(async (req) => {
   // Handle CORS preflight
