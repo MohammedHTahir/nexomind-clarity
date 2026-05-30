@@ -1,5 +1,11 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
+import {
+  enqueueJournal,
+  isOnline,
+  readCachedJournals,
+  writeCachedJournals,
+} from "@/lib/offline";
 
 export type AnalysisRow = {
   id: string;
