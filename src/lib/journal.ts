@@ -227,16 +227,33 @@ export async function analyzeAndStoreE2EE(
 }
 
 export async function fetchJournals(): Promise<JournalWithAnalysis[]> {
-  const { data, error } = await supabase
-    .from("journals")
-    .select("*, analysis:journal_analysis(*)")
-    .order("created_at", { ascending: false })
-    .limit(200);
-  if (error) throw error;
-  return (data ?? []).map((row: any) => ({
-    ...row,
-    analysis: Array.isArray(row.analysis) ? row.analysis[0] ?? null : row.analysis,
-  }));
+  // Offline: serve cached snapshot.
+  if (!isOnline()) {
+    return readCachedJournals();
+  }
+  try {
+    const { data, error } = await supabase
+      .from("journals")
+      .select("*, analysis:journal_analysis(*)")
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (error) throw error;
+    const normalized = (data ?? []).map((row: any) => ({
+      ...row,
+      analysis: Array.isArray(row.analysis) ? row.analysis[0] ?? null : row.analysis,
+    })) as JournalWithAnalysis[];
+
+    // Merge: keep any still-pending local entries on top of fresh server data.
+    const cached = await readCachedJournals();
+    const pendingLocals = cached.filter((r) => r.id.startsWith("local-"));
+    const merged = [...pendingLocals, ...normalized];
+    await writeCachedJournals(merged);
+    return merged;
+  } catch (e) {
+    const cached = await readCachedJournals();
+    if (cached.length > 0) return cached;
+    throw e;
+  }
 }
 
 export async function deleteAllJournals(): Promise<void> {
