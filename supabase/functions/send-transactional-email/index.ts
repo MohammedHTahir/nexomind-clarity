@@ -131,6 +131,51 @@ Deno.serve(async (req) => {
   // Create Supabase client with service role (bypasses RLS)
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
+  // Caller-identity check — prevents the public anon key from being abused
+  // to send NexoMind-branded phishing emails.
+  const authHeader = req.headers.get('Authorization') || ''
+  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : ''
+  let callerRole: 'service_role' | 'authenticated' | 'anon' = 'anon'
+  let callerEmail: string | null = null
+  if (token) {
+    try {
+      const { data: claimsData } = await supabase.auth.getClaims(token)
+      const claims = claimsData?.claims as { role?: string; email?: string } | undefined
+      if (claims?.role === 'service_role') {
+        callerRole = 'service_role'
+      } else if (claims?.role === 'authenticated' && claims.email) {
+        callerRole = 'authenticated'
+        callerEmail = claims.email.toLowerCase()
+      }
+    } catch {
+      // fall through as anon
+    }
+  }
+
+  if (callerRole === 'authenticated') {
+    if (effectiveRecipient.toLowerCase() !== callerEmail) {
+      console.warn('Authenticated caller attempted to send to a different recipient', {
+        templateName,
+        callerEmail,
+        effectiveRecipient,
+      })
+      return new Response(
+        JSON.stringify({ error: 'Recipient must match authenticated user email' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+  } else if (callerRole === 'anon') {
+    if (!ANON_ALLOWED_TEMPLATES.has(templateName)) {
+      console.warn('Anon caller attempted disallowed template', { templateName })
+      return new Response(
+        JSON.stringify({ error: 'Forbidden' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+  }
+
+
+
   // 2. Check suppression list (fail-closed: if we can't verify, don't send)
   const { data: suppressed, error: suppressionError } = await supabase
     .from('suppressed_emails')
