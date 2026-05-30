@@ -128,8 +128,8 @@ Deno.serve(async (req) => {
       );
     }
 
-    const apiKey = Deno.env.get("GEMINI_API_KEY");
-    if (!apiKey) throw new Error("GEMINI_API_KEY not configured");
+    const apiKey = Deno.env.get("LOVABLE_API_KEY");
+    if (!apiKey) throw new Error("LOVABLE_API_KEY not configured");
 
     // 30-second timeout for AI call
     const controller = new AbortController();
@@ -138,7 +138,7 @@ Deno.serve(async (req) => {
     const userContent = `Here are ${analyses.length} journal analyses from the past 30 days:\n\n${JSON.stringify(analyses, null, 2)}`;
 
     const aiResp = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+      "https://ai.gateway.lovable.dev/v1/chat/completions",
       {
         method: "POST",
         headers: {
@@ -146,7 +146,7 @@ Deno.serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "gemini-2.5-flash",
+          model: "google/gemini-2.5-flash",
           messages: [
             { role: "system", content: THERAPIST_BRIEF_PROMPT },
             { role: "user", content: userContent },

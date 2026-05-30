@@ -42,7 +42,7 @@ const extractTool = {
 
 async function callGemini(body: unknown, apiKey: string) {
   const r = await fetch(
-    "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+    "https://ai.gateway.lovable.dev/v1/chat/completions",
     {
       method: "POST",
       headers: {
@@ -147,8 +147,8 @@ Deno.serve(async (req) => {
       );
     }
 
-    const apiKey = Deno.env.get("GEMINI_API_KEY");
-    if (!apiKey) throw new Error("GEMINI_API_KEY not configured");
+    const apiKey = Deno.env.get("LOVABLE_API_KEY");
+    if (!apiKey) throw new Error("LOVABLE_API_KEY not configured");
 
     // Build context from analyses
     const analysisSummaries = analyses
@@ -168,7 +168,7 @@ Be specific and grounded in the data provided.`;
 
     const aiResp = await callGemini(
       {
-        model: "gemini-2.5-flash",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
           {

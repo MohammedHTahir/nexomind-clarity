@@ -10,7 +10,7 @@ const corsHeaders = {
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY")!;
+const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
 
 const MAX_RETRIES = 3;
 const BASE_DELAY_MS = 2000;
@@ -65,15 +65,15 @@ function parseTimeToHour(timeStr: string): number {
 
 async function callGemini(prompt: string): Promise<string> {
   const res = await fetch(
-    "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+    "https://ai.gateway.lovable.dev/v1/chat/completions",
     {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${GEMINI_API_KEY}`,
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gemini-2.5-flash",
+        model: "google/gemini-2.5-flash",
         messages: [
           {
             role: "system",
@@ -86,7 +86,7 @@ async function callGemini(prompt: string): Promise<string> {
   );
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(`Gemini API error ${res.status}: ${text}`);
+    throw new Error(`Lovable AI error ${res.status}: ${text}`);
   }
   const data = await res.json();
   return data.choices?.[0]?.message?.content ?? "";
