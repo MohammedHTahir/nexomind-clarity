@@ -66,7 +66,7 @@ const PaywallModal = ({ open, onUnlock, onContinue, tier = "premium" }: PaywallM
             {!showCheckout ? (
               <>
                 <p className="font-barlow font-medium text-[11px] tracking-[0.2em] uppercase text-[#111]/45 mb-3">
-                  ( NexoMind Premium )
+                  ( NexoMind {LABEL[tier]} )
                 </p>
                 <h2 className="font-instrument text-[36px] md:text-[44px] leading-[1.04] tracking-tight text-[#111]">
                   See what's really <span className="italic">going on</span>
