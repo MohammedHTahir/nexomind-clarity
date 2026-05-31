@@ -103,7 +103,7 @@ export function getGoogleFitAuthUrl(): string {
 }
 
 export function getGoogleCalendarAuthUrl(): string {
-  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
+  const clientId = GOOGLE_CLIENT_ID;
   const params = new URLSearchParams({
     response_type: "code",
     client_id: clientId,
