@@ -1,0 +1,1 @@
+UPDATE public.feature_flags SET min_tier='free', updated_at=now() WHERE key='wearable_integrations';
