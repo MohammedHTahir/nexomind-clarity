@@ -20,6 +20,7 @@ const MindMap = lazy(() => import("./pages/app/MindMap.tsx"));
 const Inbox = lazy(() => import("./pages/app/Inbox.tsx"));
 const TherapistBridge = lazy(() => import("./pages/app/TherapistBridge.tsx"));
 const MentorProfile = lazy(() => import("./pages/app/MentorProfile.tsx"));
+const IntegrationsCallback = lazy(() => import("./pages/app/IntegrationsCallback.tsx"));
 
 const DynamicSeoPage = lazy(() => import("./pages/seo/DynamicSeoPage.tsx"));
 const About = lazy(() => import("./pages/About.tsx"));
