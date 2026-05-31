@@ -33,7 +33,7 @@ export default defineConfig(({ mode }) => ({
         description:
           "A private AI journaling app that turns overthinking into clarity.",
         theme_color: "#1a1a2a",
-        background_color: "#1a1a2a",
+        background_color: "#FFFFFF",
         display: "standalone",
         orientation: "portrait",
         start_url: "/?source=pwa",
