@@ -83,8 +83,13 @@ export function getOuraAuthUrl(): string {
   return `https://cloud.ouraring.com/oauth/authorize?${params.toString()}`;
 }
 
+// Public OAuth client IDs (safe to ship in client bundle)
+const GOOGLE_CLIENT_ID =
+  import.meta.env.VITE_GOOGLE_CLIENT_ID ??
+  "564658078394-8r89v37156uboejrbbru4g50k3eanec5.apps.googleusercontent.com";
+
 export function getGoogleFitAuthUrl(): string {
-  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
+  const clientId = GOOGLE_CLIENT_ID;
   const params = new URLSearchParams({
     response_type: "code",
     client_id: clientId,
@@ -98,7 +103,7 @@ export function getGoogleFitAuthUrl(): string {
 }
 
 export function getGoogleCalendarAuthUrl(): string {
-  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
+  const clientId = GOOGLE_CLIENT_ID;
   const params = new URLSearchParams({
     response_type: "code",
     client_id: clientId,
