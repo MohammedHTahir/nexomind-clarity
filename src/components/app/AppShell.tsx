@@ -91,8 +91,8 @@ const AppShell = ({ children }: { children: ReactNode }) => {
             nexo<span className="italic text-[#111]/60">mind</span>
           </Link>
 
-          <div className="hidden md:flex gap-7">
-            {nav.map((n) => {
+          <div className="hidden md:flex items-center gap-7">
+            {primaryNav.map((n) => {
               const active =
                 n.to === "/app" ? pathname === "/app" : pathname.startsWith(n.to);
               return (
@@ -100,7 +100,7 @@ const AppShell = ({ children }: { children: ReactNode }) => {
                   key={n.to}
                   to={n.to}
                   end={n.to === "/app"}
-                  className={`font-barlow font-medium text-[14px] transition-opacity ${
+                  className={`font-barlow font-medium text-[14px] whitespace-nowrap transition-opacity ${
                     active ? "opacity-100" : "opacity-50 hover:opacity-90"
                   }`}
                 >
@@ -108,7 +108,28 @@ const AppShell = ({ children }: { children: ReactNode }) => {
                 </NavLink>
               );
             })}
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                className={`flex items-center gap-1 font-barlow font-medium text-[14px] whitespace-nowrap transition-opacity outline-none ${
+                  moreNav.some((n) => pathname.startsWith(n.to))
+                    ? "opacity-100"
+                    : "opacity-50 hover:opacity-90"
+                }`}
+              >
+                More <ChevronDown className="w-3.5 h-3.5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-white/95 backdrop-blur-md">
+                {moreNav.map((n) => (
+                  <DropdownMenuItem key={n.to} asChild>
+                    <NavLink to={n.to} className="font-barlow text-[14px] cursor-pointer">
+                      {n.label}
+                    </NavLink>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
+
 
           <Link
             to="/"
