@@ -30,7 +30,7 @@ const moreNav = [
   { to: "/app/therapist-bridge", label: "Therapist" },
 ];
 
-const allNav = [...primaryNav, ...moreNav];
+
 
 
 const AppShell = ({ children }: { children: ReactNode }) => {
