@@ -10,7 +10,7 @@ import React from "react";
 type FlagMap = Record<string, boolean>;
 
 const CACHE_TIME = 5 * 60 * 1000; // 5 minutes
-const TIMEOUT_MS = 250;
+const TIMEOUT_MS = 3000;
 
 async function fetchFlags(): Promise<FlagMap> {
   const controller = new AbortController();
