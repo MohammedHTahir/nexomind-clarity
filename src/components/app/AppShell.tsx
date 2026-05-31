@@ -7,18 +7,30 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { toast } from "sonner";
 import PatternInterruptBanner from "@/components/app/PatternInterruptBanner";
 import CrisisCard from "@/components/app/CrisisCard";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
-const nav = [
+const primaryNav = [
   { to: "/app", label: "Reflect" },
   { to: "/app/journal", label: "Write" },
-  { to: "/app/mind-map", label: "Mind Map" },
-  { to: "/app/inbox", label: "Inbox" },
-  { to: "/app/therapist-bridge", label: "Therapist Bridge" },
   { to: "/app/insights", label: "Insights" },
   { to: "/app/settings", label: "Settings" },
 ];
+
+const moreNav = [
+  { to: "/app/mind-map", label: "Mind Map" },
+  { to: "/app/inbox", label: "Inbox" },
+  { to: "/app/therapist-bridge", label: "Therapist" },
+];
+
+
 
 
 const AppShell = ({ children }: { children: ReactNode }) => {
@@ -79,8 +91,8 @@ const AppShell = ({ children }: { children: ReactNode }) => {
             nexo<span className="italic text-[#111]/60">mind</span>
           </Link>
 
-          <div className="hidden md:flex gap-7">
-            {nav.map((n) => {
+          <div className="hidden md:flex items-center gap-7">
+            {primaryNav.map((n) => {
               const active =
                 n.to === "/app" ? pathname === "/app" : pathname.startsWith(n.to);
               return (
@@ -88,7 +100,7 @@ const AppShell = ({ children }: { children: ReactNode }) => {
                   key={n.to}
                   to={n.to}
                   end={n.to === "/app"}
-                  className={`font-barlow font-medium text-[14px] transition-opacity ${
+                  className={`font-barlow font-medium text-[14px] whitespace-nowrap transition-opacity ${
                     active ? "opacity-100" : "opacity-50 hover:opacity-90"
                   }`}
                 >
@@ -96,7 +108,28 @@ const AppShell = ({ children }: { children: ReactNode }) => {
                 </NavLink>
               );
             })}
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                className={`flex items-center gap-1 font-barlow font-medium text-[14px] whitespace-nowrap transition-opacity outline-none ${
+                  moreNav.some((n) => pathname.startsWith(n.to))
+                    ? "opacity-100"
+                    : "opacity-50 hover:opacity-90"
+                }`}
+              >
+                More <ChevronDown className="w-3.5 h-3.5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-white/95 backdrop-blur-md">
+                {moreNav.map((n) => (
+                  <DropdownMenuItem key={n.to} asChild>
+                    <NavLink to={n.to} className="font-barlow text-[14px] cursor-pointer">
+                      {n.label}
+                    </NavLink>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
+
 
           <Link
             to="/"
@@ -108,8 +141,8 @@ const AppShell = ({ children }: { children: ReactNode }) => {
       </header>
 
       {/* Mobile bottom nav */}
-      <div className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-white/85 backdrop-blur-md border border-black/5 rounded-full px-2 py-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] flex gap-1">
-        {nav.map((n) => {
+      <div className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-white/85 backdrop-blur-md border border-black/5 rounded-full px-2 py-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] flex gap-1 max-w-[calc(100vw-2rem)]">
+        {primaryNav.map((n) => {
           const active =
             n.to === "/app" ? pathname === "/app" : pathname.startsWith(n.to);
           return (
@@ -117,7 +150,7 @@ const AppShell = ({ children }: { children: ReactNode }) => {
               key={n.to}
               to={n.to}
               end={n.to === "/app"}
-              className={`font-barlow text-[12px] px-3 py-1.5 rounded-full transition-all ${
+              className={`font-barlow text-[12px] px-3 py-1.5 rounded-full transition-all whitespace-nowrap ${
                 active ? "bg-[#111] text-white" : "text-[#111]/60"
               }`}
             >
@@ -125,7 +158,28 @@ const AppShell = ({ children }: { children: ReactNode }) => {
             </NavLink>
           );
         })}
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            className={`flex items-center gap-1 font-barlow text-[12px] px-3 py-1.5 rounded-full transition-all whitespace-nowrap outline-none ${
+              moreNav.some((n) => pathname.startsWith(n.to))
+                ? "bg-[#111] text-white"
+                : "text-[#111]/60"
+            }`}
+          >
+            More <ChevronDown className="w-3 h-3" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" side="top" className="bg-white/95 backdrop-blur-md mb-2">
+            {moreNav.map((n) => (
+              <DropdownMenuItem key={n.to} asChild>
+                <NavLink to={n.to} className="font-barlow text-[13px] cursor-pointer">
+                  {n.label}
+                </NavLink>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
+
 
       <motion.main
         key={pathname}
