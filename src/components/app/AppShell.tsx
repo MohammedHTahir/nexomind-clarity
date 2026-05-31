@@ -7,18 +7,30 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { toast } from "sonner";
 import PatternInterruptBanner from "@/components/app/PatternInterruptBanner";
 import CrisisCard from "@/components/app/CrisisCard";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
-const nav = [
+const primaryNav = [
   { to: "/app", label: "Reflect" },
   { to: "/app/journal", label: "Write" },
-  { to: "/app/mind-map", label: "Mind Map" },
-  { to: "/app/inbox", label: "Inbox" },
-  { to: "/app/therapist-bridge", label: "Therapist Bridge" },
   { to: "/app/insights", label: "Insights" },
   { to: "/app/settings", label: "Settings" },
 ];
+
+const moreNav = [
+  { to: "/app/mind-map", label: "Mind Map" },
+  { to: "/app/inbox", label: "Inbox" },
+  { to: "/app/therapist-bridge", label: "Therapist" },
+];
+
+const allNav = [...primaryNav, ...moreNav];
 
 
 const AppShell = ({ children }: { children: ReactNode }) => {
