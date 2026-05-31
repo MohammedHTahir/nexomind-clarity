@@ -118,6 +118,14 @@ const App = () => (
                 }
               />
               <Route
+                path="/app/settings/integrations/callback"
+                element={
+                  <RequireAuth>
+                    <IntegrationsCallback />
+                  </RequireAuth>
+                }
+              />
+              <Route
                 path="/app/mind-map"
                 element={
                   <RequireAuth>
