@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import ScrollHeroImage from "@/components/ScrollHeroImage";
 import InstallPWA from "@/components/InstallPWA";
+import Seo from "@/components/Seo";
 import { useIsStandalone } from "@/hooks/useIsStandalone";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -35,6 +36,17 @@ const Index = () => {
 
   return (
     <main className="min-h-screen bg-[#F3F4ED]">
+      <Seo
+        title="NexoMind — AI journaling for a quieter mind"
+        description="NexoMind is the private AI journaling app that turns racing thoughts into clarity. Reflect, understand patterns, and quiet overthinking."
+        canonical="https://www.nexomind.ai/"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "NexoMind",
+          url: "https://www.nexomind.ai/",
+        }}
+      />
       <Navbar />
       <Hero />
       <ScrollHeroImage />
