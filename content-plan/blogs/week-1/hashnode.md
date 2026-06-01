@@ -1,6 +1,6 @@
 # Why Your Brain Hides Your Patterns From You (And How I Built a Tool to Surface Them)
 
-> **Note:** Set canonical_url to the Medium article URL in Hashnode's post settings UI before publishing.
+> **Note:** Set canonical_url to `https://medium.com/@nexomind68/5b0384d86b98` in Hashnode's post settings UI before publishing.
 
 ---
 

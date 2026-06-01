@@ -3,7 +3,7 @@ title: "I Built a System That Detects Thought Loops in Human Writing"
 published: true
 description: "Treating overthinking like recursive loops. Pattern detection in unstructured text. Building NexoMind."
 tags: ai, mentalhealth, building, productivity
-canonical_url: https://medium.com/@YOUR_HANDLE/the-hidden-loop-behind-overthinking-PLACEHOLDER
+canonical_url: https://medium.com/@nexomind68/5b0384d86b98
 ---
 
 # I Built a System That Detects Thought Loops in Human Writing
