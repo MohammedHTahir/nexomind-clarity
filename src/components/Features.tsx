@@ -132,7 +132,7 @@ const Features = () => {
         {/* Header */}
         <div className="text-center mb-24 max-w-2xl mx-auto">
           <p className="font-barlow font-medium text-[12px] tracking-[0.2em] uppercase text-white/40 mb-4">
-            ( Free · Premium $9.99/mo · Premium+ $19.99/mo )
+            ( Free · Premium $9.99/mo · Premium+ $49.00/mo )
           </p>
           <h2 className="font-instrument text-[44px] md:text-[64px] leading-[1]">
             See what your mind is{" "}
