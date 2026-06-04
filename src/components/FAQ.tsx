@@ -7,7 +7,7 @@ import {
 
 const faqs = [
   { q: "Is my journal really private?", a: "Yes. Entries are encrypted at rest and never sold or used to train external models. On Premium+, end-to-end encryption and on-device AI mean not even we can read them." },
-  { q: "What do I get on Free vs Premium vs Premium+?", a: "Free gives you 3 reflections a week and AI insight on each entry. Premium ($9.99/mo or $95/yr) unlocks unlimited reflections, deep pattern analysis, emotional trends, voice entries, your Sunday Letter, and the Therapist Brief. Premium+ ($19.99/mo or $190/yr) adds end-to-end encryption and on-device AI for maximum privacy." },
+  { q: "What do I get on Free vs Premium vs Premium+?", a: "Free gives you 3 reflections a week and AI insight on each entry. Premium ($9.99/mo or $95/yr) unlocks unlimited reflections, deep pattern analysis, emotional trends, voice entries, your Sunday Letter, and the Therapist Brief. Premium+ ($49.00/mo or $470/yr) adds end-to-end encryption and on-device AI for maximum privacy." },
   { q: "What's the Sunday Letter?", a: "A private weekly letter from your AI mentor — what shifted this week, the loops it noticed, and one quiet thing to watch for. It arrives every Sunday morning." },
   { q: "Can I use voice instead of typing?", a: "Yes. Premium members can speak a reflection and NexoMind will transcribe and analyze it privately — useful for late nights or walks." },
   { q: "Can I share insights with my therapist?", a: "Yes. The Therapist Brief generates a concise, professional summary of your week that you can export and share — entirely under your control." },

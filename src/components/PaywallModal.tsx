@@ -22,8 +22,8 @@ const PLANS: Record<Tier, Record<Plan, { priceId: string; price: string; cadence
     yearly: { priceId: "premium_yearly", price: "$95", cadence: "/year", note: "Save ~20% vs monthly" },
   },
   premium_plus: {
-    monthly: { priceId: "premium_plus_monthly", price: "$19.99", cadence: "/month", note: "Cancel anytime" },
-    yearly: { priceId: "premium_plus_yearly", price: "$190", cadence: "/year", note: "Save ~20% vs monthly" },
+    monthly: { priceId: "premium_plus_monthly", price: "$49.00", cadence: "/month", note: "Cancel anytime" },
+    yearly: { priceId: "premium_plus_yearly", price: "$470", cadence: "/year", note: "Save ~20% vs monthly" },
   },
 };
 

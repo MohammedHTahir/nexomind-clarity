@@ -100,7 +100,7 @@ const Hero = () => {
           transition={{ duration: 0.9, delay: 0.55, ease }}
           className="mt-4 font-barlow text-[12px] text-foreground/50"
         >
-          Free to start · Premium $9.99/mo · Premium+ $19.99/mo · cancel anytime
+          Free to start · Premium $9.99/mo · Premium+ $49.00/mo · cancel anytime
         </motion.p>
 
         {/* Floating testimonial cards (desktop only) */}

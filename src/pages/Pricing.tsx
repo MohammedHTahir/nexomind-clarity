@@ -253,11 +253,11 @@ const Pricing = () => {
             </p>
 
             <div className="mt-8">
-              <span className="font-instrument text-[56px] leading-none">$19.99</span>
+              <span className="font-instrument text-[56px] leading-none">$49.00</span>
               <span className="font-barlow text-[15px] text-white/55 ml-2">/month</span>
             </div>
             <p className="font-barlow text-[12px] text-white/45 mt-1">
-              or $190/year (save 20%)
+              or $470/year (save 20%)
             </p>
 
             <ul className="mt-8 space-y-3 flex-1">
