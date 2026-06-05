@@ -27,7 +27,7 @@ describe("resolveTier", () => {
       status: "active",
       current_period_end: new Date(Date.now() + 86400000).toISOString(),
       cancel_at_period_end: false,
-      price_id: "premium_plus_monthly",
+      price_id: "premium_plus_monthly_49",
     };
     expect(resolveTier(sub)).toBe("premium_plus");
   });
@@ -61,7 +61,7 @@ describe("resolveTier", () => {
       status: "canceled",
       current_period_end: new Date(Date.now() + 86400000).toISOString(),
       cancel_at_period_end: true,
-      price_id: "premium_plus_monthly",
+      price_id: "premium_plus_monthly_49",
     };
     expect(resolveTier(sub)).toBe("premium_plus");
   });
@@ -81,7 +81,7 @@ describe("resolveTier", () => {
       status: "active",
       current_period_end: new Date(Date.now() + 86400000).toISOString(),
       cancel_at_period_end: false,
-      price_id: "premium_plus_monthly",
+      price_id: "premium_plus_monthly_49",
     };
     const tier = resolveTier(sub);
     // isPremium logic: tier !== 'free'
