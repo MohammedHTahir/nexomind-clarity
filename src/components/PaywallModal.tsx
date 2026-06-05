@@ -85,7 +85,23 @@ const PaywallModal = ({ open, onUnlock, onContinue, tier: tierProp = "premium" }
                   Unlock the full insight behind your thoughts
                 </p>
 
-                <div className="mt-6 inline-flex rounded-full bg-black/[0.04] p-1 text-[12px] font-barlow">
+                {availableTiers.length > 1 && (
+                  <div className="mt-6 inline-flex rounded-full bg-black/[0.04] p-1 text-[12px] font-barlow">
+                    {availableTiers.map((t) => (
+                      <button
+                        key={t}
+                        onClick={() => setTier(t)}
+                        className={`px-4 py-1.5 rounded-full transition-colors ${
+                          tier === t ? "bg-[#111] text-white" : "text-[#111]/60"
+                        }`}
+                      >
+                        {LABEL[t]}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                <div className="mt-3 inline-flex rounded-full bg-black/[0.04] p-1 text-[12px] font-barlow">
                   {(["monthly", "yearly"] as Plan[]).map((p) => (
                     <button
                       key={p}
