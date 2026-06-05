@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
         .maybeSingle();
 
       const priceId = subData?.price_id ?? "";
-      const plusIds = new Set(["premium_plus_monthly", "premium_plus_yearly"]);
+      const plusIds = new Set(["premium_plus_monthly_49", "premium_plus_monthly", "premium_plus_yearly"]);
       userTier = plusIds.has(priceId) ? "premium_plus" : "premium";
     }
     const userTierLevel = TIER_ORDER[userTier] ?? 0;
