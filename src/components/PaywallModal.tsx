@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 import { StripeEmbeddedCheckoutForm } from "@/components/StripeEmbeddedCheckout";
 
 const ease = [0.16, 1, 0.3, 1] as const;
@@ -29,10 +30,18 @@ const PLANS: Record<Tier, Record<Plan, { priceId: string; price: string; cadence
 
 const LABEL: Record<Tier, string> = { premium: "Premium", premium_plus: "Premium+" };
 
-const PaywallModal = ({ open, onUnlock, onContinue, tier = "premium" }: PaywallModalProps) => {
+const PaywallModal = ({ open, onUnlock, onContinue, tier: tierProp = "premium" }: PaywallModalProps) => {
   const { user } = useAuth();
+  const { tier: currentTier } = useSubscription();
+  // If the user already has Premium, only Premium+ is a meaningful purchase.
+  const isOnPremium = currentTier === "premium";
+  const [tier, setTier] = useState<Tier>(isOnPremium ? "premium_plus" : tierProp);
   const [plan, setPlan] = useState<Plan>("monthly");
   const [showCheckout, setShowCheckout] = useState(false);
+
+  useEffect(() => {
+    if (open) setTier(isOnPremium ? "premium_plus" : tierProp);
+  }, [open, isOnPremium, tierProp]);
 
   const handleUnlock = () => {
     setShowCheckout(true);
@@ -45,6 +54,7 @@ const PaywallModal = ({ open, onUnlock, onContinue, tier = "premium" }: PaywallM
   };
 
   const selected = PLANS[tier][plan];
+  const availableTiers: Tier[] = isOnPremium ? ["premium_plus"] : ["premium", "premium_plus"];
 
   return (
     <AnimatePresence>
@@ -75,7 +85,23 @@ const PaywallModal = ({ open, onUnlock, onContinue, tier = "premium" }: PaywallM
                   Unlock the full insight behind your thoughts
                 </p>
 
-                <div className="mt-6 inline-flex rounded-full bg-black/[0.04] p-1 text-[12px] font-barlow">
+                {availableTiers.length > 1 && (
+                  <div className="mt-6 inline-flex rounded-full bg-black/[0.04] p-1 text-[12px] font-barlow">
+                    {availableTiers.map((t) => (
+                      <button
+                        key={t}
+                        onClick={() => setTier(t)}
+                        className={`px-4 py-1.5 rounded-full transition-colors ${
+                          tier === t ? "bg-[#111] text-white" : "text-[#111]/60"
+                        }`}
+                      >
+                        {LABEL[t]}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                <div className="mt-3 inline-flex rounded-full bg-black/[0.04] p-1 text-[12px] font-barlow">
                   {(["monthly", "yearly"] as Plan[]).map((p) => (
                     <button
                       key={p}
