@@ -12,6 +12,7 @@ export const PREMIUM_PRICE_IDS = new Set([
 ]);
 
 export const PREMIUM_PLUS_PRICE_IDS = new Set([
+  "premium_plus_monthly_49",
   "premium_plus_monthly",
   "premium_plus_yearly",
 ]);
