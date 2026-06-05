@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 import { StripeEmbeddedCheckoutForm } from "@/components/StripeEmbeddedCheckout";
 
 const ease = [0.16, 1, 0.3, 1] as const;
@@ -29,10 +30,18 @@ const PLANS: Record<Tier, Record<Plan, { priceId: string; price: string; cadence
 
 const LABEL: Record<Tier, string> = { premium: "Premium", premium_plus: "Premium+" };
 
-const PaywallModal = ({ open, onUnlock, onContinue, tier = "premium" }: PaywallModalProps) => {
+const PaywallModal = ({ open, onUnlock, onContinue, tier: tierProp = "premium" }: PaywallModalProps) => {
   const { user } = useAuth();
+  const { tier: currentTier } = useSubscription();
+  // If the user already has Premium, only Premium+ is a meaningful purchase.
+  const isOnPremium = currentTier === "premium";
+  const [tier, setTier] = useState<Tier>(isOnPremium ? "premium_plus" : tierProp);
   const [plan, setPlan] = useState<Plan>("monthly");
   const [showCheckout, setShowCheckout] = useState(false);
+
+  useEffect(() => {
+    if (open) setTier(isOnPremium ? "premium_plus" : tierProp);
+  }, [open, isOnPremium, tierProp]);
 
   const handleUnlock = () => {
     setShowCheckout(true);
@@ -45,6 +54,7 @@ const PaywallModal = ({ open, onUnlock, onContinue, tier = "premium" }: PaywallM
   };
 
   const selected = PLANS[tier][plan];
+  const availableTiers: Tier[] = isOnPremium ? ["premium_plus"] : ["premium", "premium_plus"];
 
   return (
     <AnimatePresence>
