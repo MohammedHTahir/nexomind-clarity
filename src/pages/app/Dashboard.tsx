@@ -6,6 +6,7 @@ import AppShell from "@/components/app/AppShell";
 import OfflineIndicator from "@/components/app/OfflineIndicator";
 import GlassCard from "@/components/app/GlassCard";
 import PatternsCard from "@/components/app/PatternsCard";
+import TodayContextCard from "@/components/app/TodayContextCard";
 import ChallengerNotice from "@/components/app/ChallengerNotice";
 import ModeConflictNotice from "@/components/app/ModeConflictNotice";
 import VoiceEntryButton from "@/components/app/VoiceEntryButton";
@@ -371,6 +372,10 @@ const Dashboard = () => {
               </Link>
             </div>
           </GlassCard>
+        </div>
+
+        <div className="mt-6">
+          <TodayContextCard />
         </div>
 
         <PatternsCard />
