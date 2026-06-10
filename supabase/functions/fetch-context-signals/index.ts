@@ -216,23 +216,26 @@ Deno.serve(async (req) => {
       source_versions: {},
     };
 
-    for (const integration of integrations as Integration[]) {
-      const token = integration.access_token_enc;
-      if (!token) continue;
-
-      // TODO: Check token_expires_at before using the token. If expired, use
-      // refresh_token_enc to obtain a new access token from the provider's OAuth
-      // refresh endpoint, then update the stored tokens. Currently expired tokens
-      // produce silent 401 failures from provider APIs.
+    for (const integration of integrations as (Integration & { user_id?: string })[]) {
+      const rawToken = integration.access_token_enc;
+      if (!rawToken) continue;
 
       try {
         if (integration.provider === "oura") {
-          const oura = await fetchOuraData(token);
+          const oura = await fetchOuraData(rawToken);
           if (oura.sleep_minutes !== null) signals.sleep_minutes = oura.sleep_minutes;
           if (oura.hrv_avg !== null) signals.hrv_avg = oura.hrv_avg;
           signals.source_versions["oura"] = "v2";
         } else if (integration.provider === "google_fit") {
-          const gfit = await fetchGoogleFitData(token);
+          const token = await getFreshGoogleToken(admin, {
+            user_id,
+            provider: integration.provider,
+            access_token_enc: integration.access_token_enc,
+            refresh_token_enc: integration.refresh_token_enc,
+            token_expires_at: integration.token_expires_at,
+          });
+          if (!token) continue;
+          const gfit = await fetchGoogleFitSignals(token);
           if (gfit.sleep_minutes !== null && signals.sleep_minutes === null) {
             signals.sleep_minutes = gfit.sleep_minutes;
           }
@@ -241,6 +244,14 @@ Deno.serve(async (req) => {
           }
           signals.source_versions["google_fit"] = "v1";
         } else if (integration.provider === "google_calendar") {
+          const token = await getFreshGoogleToken(admin, {
+            user_id,
+            provider: integration.provider,
+            access_token_enc: integration.access_token_enc,
+            refresh_token_enc: integration.refresh_token_enc,
+            token_expires_at: integration.token_expires_at,
+          });
+          if (!token) continue;
           const cal = await fetchGoogleCalendarData(token, integration.calendar_mask_titles);
           signals.meeting_count_24h = cal.meeting_count_24h;
           signals.meeting_minutes_24h = cal.meeting_minutes_24h;
