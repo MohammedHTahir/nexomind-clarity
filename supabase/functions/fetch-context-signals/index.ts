@@ -16,6 +16,10 @@
  */
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import {
+  fetchGoogleFitSignals,
+  getFreshGoogleToken,
+} from "../_shared/google-fit.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -119,58 +123,7 @@ async function fetchOuraData(token: string): Promise<{ sleep_minutes: number | n
   return { sleep_minutes, hrv_avg };
 }
 
-async function fetchGoogleFitData(token: string): Promise<{ sleep_minutes: number | null; hrv_avg: number | null }> {
-  const endTime = Date.now();
-  const startTime = endTime - 24 * 60 * 60 * 1000;
-
-  let sleep_minutes: number | null = null;
-  let hrv_avg: number | null = null;
-
-  const res = await fetchWithRetry(
-    "https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        aggregateBy: [
-          { dataTypeName: "com.google.sleep.segment" },
-          { dataTypeName: "com.google.heart_rate.bpm" },
-        ],
-        startTimeMillis: startTime,
-        endTimeMillis: endTime,
-      }),
-    }
-  );
-
-  if (res) {
-    try {
-      const data = await res.json();
-      const buckets = data?.bucket ?? [];
-      for (const bucket of buckets) {
-        for (const dataset of bucket.dataset ?? []) {
-          if (dataset.dataSourceId?.includes("sleep") && dataset.point?.length) {
-            const totalMs = dataset.point.reduce(
-              (sum: number, p: any) => sum + ((p.endTimeNanos - p.startTimeNanos) / 1e6),
-              0
-            );
-            sleep_minutes = Math.round(totalMs / 60000);
-          }
-          if (dataset.dataSourceId?.includes("heart_rate") && dataset.point?.length) {
-            const values = dataset.point.map((p: any) => p.value?.[0]?.fpVal).filter(Boolean);
-            if (values.length) {
-              hrv_avg = Math.round(values.reduce((a: number, b: number) => a + b, 0) / values.length);
-            }
-          }
-        }
-      }
-    } catch { /* ignore parse errors */ }
-  }
-
-  return { sleep_minutes, hrv_avg };
-}
+// Google Fit fetching is delegated to ../_shared/google-fit.ts.
 
 async function fetchGoogleCalendarData(
   token: string,
@@ -263,23 +216,26 @@ Deno.serve(async (req) => {
       source_versions: {},
     };
 
-    for (const integration of integrations as Integration[]) {
-      const token = integration.access_token_enc;
-      if (!token) continue;
-
-      // TODO: Check token_expires_at before using the token. If expired, use
-      // refresh_token_enc to obtain a new access token from the provider's OAuth
-      // refresh endpoint, then update the stored tokens. Currently expired tokens
-      // produce silent 401 failures from provider APIs.
+    for (const integration of integrations as (Integration & { user_id?: string })[]) {
+      const rawToken = integration.access_token_enc;
+      if (!rawToken) continue;
 
       try {
         if (integration.provider === "oura") {
-          const oura = await fetchOuraData(token);
+          const oura = await fetchOuraData(rawToken);
           if (oura.sleep_minutes !== null) signals.sleep_minutes = oura.sleep_minutes;
           if (oura.hrv_avg !== null) signals.hrv_avg = oura.hrv_avg;
           signals.source_versions["oura"] = "v2";
         } else if (integration.provider === "google_fit") {
-          const gfit = await fetchGoogleFitData(token);
+          const token = await getFreshGoogleToken(admin, {
+            user_id,
+            provider: integration.provider,
+            access_token_enc: integration.access_token_enc,
+            refresh_token_enc: integration.refresh_token_enc,
+            token_expires_at: integration.token_expires_at,
+          });
+          if (!token) continue;
+          const gfit = await fetchGoogleFitSignals(token);
           if (gfit.sleep_minutes !== null && signals.sleep_minutes === null) {
             signals.sleep_minutes = gfit.sleep_minutes;
           }
@@ -288,6 +244,14 @@ Deno.serve(async (req) => {
           }
           signals.source_versions["google_fit"] = "v1";
         } else if (integration.provider === "google_calendar") {
+          const token = await getFreshGoogleToken(admin, {
+            user_id,
+            provider: integration.provider,
+            access_token_enc: integration.access_token_enc,
+            refresh_token_enc: integration.refresh_token_enc,
+            token_expires_at: integration.token_expires_at,
+          });
+          if (!token) continue;
           const cal = await fetchGoogleCalendarData(token, integration.calendar_mask_titles);
           signals.meeting_count_24h = cal.meeting_count_24h;
           signals.meeting_minutes_24h = cal.meeting_minutes_24h;

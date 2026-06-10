@@ -6,6 +6,10 @@
  */
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import {
+  fetchGoogleFitSignals,
+  getFreshGoogleToken,
+} from "../_shared/google-fit.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -68,50 +72,9 @@ async function oura(token: string) {
   return { sleep_minutes, hrv_avg };
 }
 
-async function googleFit(token: string) {
-  const end = Date.now();
-  const start = end - 86400000;
-  let sleep_minutes: number | null = null;
-  let hrv_avg: number | null = null;
-  const res = await safeFetch(
-    "https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate",
-    {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        aggregateBy: [
-          { dataTypeName: "com.google.sleep.segment" },
-          { dataTypeName: "com.google.heart_rate.bpm" },
-        ],
-        startTimeMillis: start,
-        endTimeMillis: end,
-      }),
-    },
-  );
-  if (res) {
-    try {
-      const data = await res.json();
-      for (const bucket of data?.bucket ?? []) {
-        for (const ds of bucket.dataset ?? []) {
-          if (ds.dataSourceId?.includes("sleep") && ds.point?.length) {
-            const ms = ds.point.reduce(
-              (a: number, p: any) => a + (p.endTimeNanos - p.startTimeNanos) / 1e6,
-              0,
-            );
-            sleep_minutes = Math.round(ms / 60000);
-          }
-          if (ds.dataSourceId?.includes("heart_rate") && ds.point?.length) {
-            const vals = ds.point.map((p: any) => p.value?.[0]?.fpVal).filter(Boolean);
-            if (vals.length) {
-              hrv_avg = Math.round(vals.reduce((a: number, b: number) => a + b, 0) / vals.length);
-            }
-          }
-        }
-      }
-    } catch { /* ignore */ }
-  }
-  return { sleep_minutes, hrv_avg };
-}
+// Google Fit fetching is delegated to ../_shared/google-fit.ts so the same
+// logic (Sessions API for sleep, aggregate for heart rate, token refresh)
+// runs for both the dashboard and the internal analyze-journal pipeline.
 
 async function googleCalendar(token: string) {
   const now = new Date();
@@ -174,7 +137,9 @@ Deno.serve(async (req) => {
 
     const { data: integrations } = await admin
       .from("user_integrations")
-      .select("provider, access_token_enc, calendar_mask_titles")
+      .select(
+        "provider, access_token_enc, refresh_token_enc, token_expires_at, calendar_mask_titles",
+      )
       .eq("user_id", userId);
 
     const signals: Signals = {
@@ -186,17 +151,25 @@ Deno.serve(async (req) => {
       fetched_at: new Date().toISOString(),
     };
 
-    for (const i of integrations ?? []) {
-      const token = (i as any).access_token_enc;
-      if (!token) continue;
+    for (const i of (integrations ?? []) as any[]) {
+      const rawToken: string | null = i.access_token_enc;
+      if (!rawToken) continue;
       try {
         if (i.provider === "oura") {
-          const r = await oura(token);
+          const r = await oura(rawToken);
           if (r.sleep_minutes !== null) signals.sleep_minutes = r.sleep_minutes;
           if (r.hrv_avg !== null) signals.hrv_avg = r.hrv_avg;
           signals.providers.push("oura");
         } else if (i.provider === "google_fit") {
-          const r = await googleFit(token);
+          const token = await getFreshGoogleToken(admin, {
+            user_id: userId,
+            provider: i.provider,
+            access_token_enc: i.access_token_enc,
+            refresh_token_enc: i.refresh_token_enc,
+            token_expires_at: i.token_expires_at,
+          });
+          if (!token) continue;
+          const r = await fetchGoogleFitSignals(token);
           if (r.sleep_minutes !== null && signals.sleep_minutes === null) {
             signals.sleep_minutes = r.sleep_minutes;
           }
@@ -205,6 +178,14 @@ Deno.serve(async (req) => {
           }
           signals.providers.push("google_fit");
         } else if (i.provider === "google_calendar") {
+          const token = await getFreshGoogleToken(admin, {
+            user_id: userId,
+            provider: i.provider,
+            access_token_enc: i.access_token_enc,
+            refresh_token_enc: i.refresh_token_enc,
+            token_expires_at: i.token_expires_at,
+          });
+          if (!token) continue;
           const r = await googleCalendar(token);
           signals.meeting_count_24h = r.meeting_count_24h;
           signals.meeting_minutes_24h = r.meeting_minutes_24h;
