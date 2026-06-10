@@ -123,58 +123,7 @@ async function fetchOuraData(token: string): Promise<{ sleep_minutes: number | n
   return { sleep_minutes, hrv_avg };
 }
 
-async function fetchGoogleFitData(token: string): Promise<{ sleep_minutes: number | null; hrv_avg: number | null }> {
-  const endTime = Date.now();
-  const startTime = endTime - 24 * 60 * 60 * 1000;
-
-  let sleep_minutes: number | null = null;
-  let hrv_avg: number | null = null;
-
-  const res = await fetchWithRetry(
-    "https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        aggregateBy: [
-          { dataTypeName: "com.google.sleep.segment" },
-          { dataTypeName: "com.google.heart_rate.bpm" },
-        ],
-        startTimeMillis: startTime,
-        endTimeMillis: endTime,
-      }),
-    }
-  );
-
-  if (res) {
-    try {
-      const data = await res.json();
-      const buckets = data?.bucket ?? [];
-      for (const bucket of buckets) {
-        for (const dataset of bucket.dataset ?? []) {
-          if (dataset.dataSourceId?.includes("sleep") && dataset.point?.length) {
-            const totalMs = dataset.point.reduce(
-              (sum: number, p: any) => sum + ((p.endTimeNanos - p.startTimeNanos) / 1e6),
-              0
-            );
-            sleep_minutes = Math.round(totalMs / 60000);
-          }
-          if (dataset.dataSourceId?.includes("heart_rate") && dataset.point?.length) {
-            const values = dataset.point.map((p: any) => p.value?.[0]?.fpVal).filter(Boolean);
-            if (values.length) {
-              hrv_avg = Math.round(values.reduce((a: number, b: number) => a + b, 0) / values.length);
-            }
-          }
-        }
-      }
-    } catch { /* ignore parse errors */ }
-  }
-
-  return { sleep_minutes, hrv_avg };
-}
+// Google Fit fetching is delegated to ../_shared/google-fit.ts.
 
 async function fetchGoogleCalendarData(
   token: string,
