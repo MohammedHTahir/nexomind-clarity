@@ -72,50 +72,9 @@ async function oura(token: string) {
   return { sleep_minutes, hrv_avg };
 }
 
-async function googleFit(token: string) {
-  const end = Date.now();
-  const start = end - 86400000;
-  let sleep_minutes: number | null = null;
-  let hrv_avg: number | null = null;
-  const res = await safeFetch(
-    "https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate",
-    {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        aggregateBy: [
-          { dataTypeName: "com.google.sleep.segment" },
-          { dataTypeName: "com.google.heart_rate.bpm" },
-        ],
-        startTimeMillis: start,
-        endTimeMillis: end,
-      }),
-    },
-  );
-  if (res) {
-    try {
-      const data = await res.json();
-      for (const bucket of data?.bucket ?? []) {
-        for (const ds of bucket.dataset ?? []) {
-          if (ds.dataSourceId?.includes("sleep") && ds.point?.length) {
-            const ms = ds.point.reduce(
-              (a: number, p: any) => a + (p.endTimeNanos - p.startTimeNanos) / 1e6,
-              0,
-            );
-            sleep_minutes = Math.round(ms / 60000);
-          }
-          if (ds.dataSourceId?.includes("heart_rate") && ds.point?.length) {
-            const vals = ds.point.map((p: any) => p.value?.[0]?.fpVal).filter(Boolean);
-            if (vals.length) {
-              hrv_avg = Math.round(vals.reduce((a: number, b: number) => a + b, 0) / vals.length);
-            }
-          }
-        }
-      }
-    } catch { /* ignore */ }
-  }
-  return { sleep_minutes, hrv_avg };
-}
+// Google Fit fetching is delegated to ../_shared/google-fit.ts so the same
+// logic (Sessions API for sleep, aggregate for heart rate, token refresh)
+// runs for both the dashboard and the internal analyze-journal pipeline.
 
 async function googleCalendar(token: string) {
   const now = new Date();
