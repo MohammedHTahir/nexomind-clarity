@@ -35,8 +35,20 @@ const moreNav = [
 
 const AppShell = ({ children }: { children: ReactNode }) => {
   const { pathname } = useLocation();
-  const { isPastDue } = useSubscription();
+  const { isPastDue, subscription, tier } = useSubscription();
   const [openingPortal, setOpeningPortal] = useState(false);
+
+  // Promo-trial near-expiry banner: trialing sub from promo code, <=7 days left.
+  const promoDaysLeft = (() => {
+    if (
+      subscription?.status !== "trialing" ||
+      tier === "free" ||
+      !subscription.current_period_end
+    ) return null;
+    const ms = new Date(subscription.current_period_end).getTime() - Date.now();
+    const days = Math.ceil(ms / (1000 * 60 * 60 * 24));
+    return days > 0 && days <= 7 ? days : null;
+  })();
 
   const openPortal = async () => {
     if (openingPortal) return;
@@ -69,6 +81,14 @@ const AppShell = ({ children }: { children: ReactNode }) => {
           >
             {openingPortal ? "Opening…" : "Update payment method"}
           </button>
+        </div>
+      )}
+      {promoDaysLeft !== null && (
+        <div className="w-full bg-emerald-50 border-b border-emerald-200 px-4 py-2 text-center text-[13px] text-emerald-900 relative z-40">
+          Your free Premium+ ends in {promoDaysLeft} {promoDaysLeft === 1 ? "day" : "days"}.{" "}
+          <Link to="/pricing" className="underline font-medium hover:text-emerald-950">
+            Keep your access
+          </Link>
         </div>
       )}
       <PatternInterruptBanner />

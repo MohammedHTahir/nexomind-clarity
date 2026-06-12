@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import SiteFooter from "@/components/SiteFooter";
 import Seo from "@/components/Seo";
 import PaywallModal from "@/components/PaywallModal";
+import PromoCodeRedeem from "@/components/PromoCodeRedeem";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { trackEvent } from "@/lib/analytics";
@@ -283,6 +284,8 @@ const Pricing = () => {
           14-day refund · No hidden fees · Encrypted &amp; never sold
         </p>
       </section>
+
+      <PromoCodeRedeem />
 
       {/* FAQ */}
       <section className="px-6 pb-28 max-w-3xl mx-auto">

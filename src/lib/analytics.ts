@@ -24,7 +24,10 @@ export type ConversionEvent =
   | "blog_post_view"
   | "overthinking_analyzer_result"
   | "overthinking_analyzer_copy"
-  | "overthinking_analyzer_share";
+  | "overthinking_analyzer_share"
+  | "promo_code_redeem_attempt"
+  | "promo_code_redeem_failed"
+  | "promo_code_redeem_success";
 
 export function trackEvent(
   event: ConversionEvent,
