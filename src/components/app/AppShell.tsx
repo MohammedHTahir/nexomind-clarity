@@ -83,6 +83,14 @@ const AppShell = ({ children }: { children: ReactNode }) => {
           </button>
         </div>
       )}
+      {promoDaysLeft !== null && (
+        <div className="w-full bg-emerald-50 border-b border-emerald-200 px-4 py-2 text-center text-[13px] text-emerald-900 relative z-40">
+          Your free Premium+ ends in {promoDaysLeft} {promoDaysLeft === 1 ? "day" : "days"}.{" "}
+          <Link to="/pricing" className="underline font-medium hover:text-emerald-950">
+            Keep your access
+          </Link>
+        </div>
+      )}
       <PatternInterruptBanner />
       {/* Soft ambient gradients (subtle, matches landing calm) */}
       <div
