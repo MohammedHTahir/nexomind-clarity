@@ -141,7 +141,11 @@
         "@id": "https://www.nexomind.ai/#premium",
         "name": "NexoMind Premium",
         "description": "Unlimited private AI journaling, deeper reflection insights, overthinking analysis, and emotional trend tracking.",
-        "brand": { "@id": "https://www.nexomind.ai/#organization" },
+        "image": "https://www.nexomind.ai/og-image.jpg",
+        "brand": {
+          "@type": "Brand",
+          "name": "NexoMind"
+        },
         "category": "AI journaling subscription",
         "offers": {
           "@type": "Offer",
@@ -155,6 +159,27 @@
             "priceCurrency": "USD",
             "billingDuration": "P1M",
             "unitText": "month"
+          },
+          "shippingDetails": {
+            "@type": "OfferShippingDetails",
+            "shippingRate": {
+              "@type": "MonetaryAmount",
+              "value": "0",
+              "currency": "USD"
+            },
+            "shippingDestination": {
+              "@type": "DefinedRegion",
+              "geoMidpoint": {
+                "@type": "GeoCoordinates",
+                "addressCountry": "US"
+              }
+            },
+            "doesNotShip": true
+          },
+          "hasMerchantReturnPolicy": {
+            "@type": "MerchantReturnPolicy",
+            "applicableCountry": "US",
+            "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted"
           }
         }
       }
