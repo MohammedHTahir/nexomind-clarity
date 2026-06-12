@@ -635,6 +635,72 @@ export type Database = {
         }
         Relationships: []
       }
+      promo_codes: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          expires_at: string
+          free_months: number
+          id: string
+          max_redemptions: number | null
+          redemption_count: number
+          tier: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          expires_at: string
+          free_months?: number
+          id?: string
+          max_redemptions?: number | null
+          redemption_count?: number
+          tier?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          expires_at?: string
+          free_months?: number
+          id?: string
+          max_redemptions?: number | null
+          redemption_count?: number
+          tier?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      promo_redemptions: {
+        Row: {
+          code: string
+          created_at: string
+          environment: string
+          granted_until: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          environment?: string
+          granted_until: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          environment?: string
+          granted_until?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       push_subscriptions: {
         Row: {
           auth: string
@@ -949,6 +1015,10 @@ export type Database = {
           msg_id: number
           read_ct: number
         }[]
+      }
+      redeem_promo_code: {
+        Args: { _code: string; _environment: string; _user_id: string }
+        Returns: Json
       }
     }
     Enums: {
