@@ -80,7 +80,7 @@ const ScrollHeroImage = () => {
           <div className="relative overflow-hidden rounded-[24px] md:rounded-[32px] bg-black">
             <img
               src="/herosection.jpg"
-              alt="NexoMind product preview"
+              alt="NexoMind AI journaling app dashboard showing a reflection entry with AI-generated clarity insights"
               className="block w-full h-auto select-none"
               loading="eager"
               decoding="async"
