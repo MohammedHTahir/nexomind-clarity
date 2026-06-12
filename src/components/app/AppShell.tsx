@@ -35,8 +35,20 @@ const moreNav = [
 
 const AppShell = ({ children }: { children: ReactNode }) => {
   const { pathname } = useLocation();
-  const { isPastDue } = useSubscription();
+  const { isPastDue, subscription, tier } = useSubscription();
   const [openingPortal, setOpeningPortal] = useState(false);
+
+  // Promo-trial near-expiry banner: trialing sub from promo code, <=7 days left.
+  const promoDaysLeft = (() => {
+    if (
+      subscription?.status !== "trialing" ||
+      tier === "free" ||
+      !subscription.current_period_end
+    ) return null;
+    const ms = new Date(subscription.current_period_end).getTime() - Date.now();
+    const days = Math.ceil(ms / (1000 * 60 * 60 * 24));
+    return days > 0 && days <= 7 ? days : null;
+  })();
 
   const openPortal = async () => {
     if (openingPortal) return;
