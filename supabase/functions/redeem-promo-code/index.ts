@@ -53,12 +53,8 @@ Deno.serve(async (req) => {
     }
 
     const result = data as { ok: boolean; error?: string; tier?: string; granted_until?: string };
-    if (!result.ok) {
-      return new Response(JSON.stringify({ error: result.error ?? "invalid_code" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    // Return 200 even for business-rule failures so the client can read `ok`/`error`
+    // from the JSON body (supabase.functions.invoke discards the body on non-2xx).
 
     return new Response(JSON.stringify(result), {
       status: 200,
