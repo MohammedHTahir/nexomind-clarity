@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import SiteFooter from "@/components/SiteFooter";
 import Seo from "@/components/Seo";
 import PaywallModal from "@/components/PaywallModal";
+import PromoCodeRedeem from "@/components/PromoCodeRedeem";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { trackEvent } from "@/lib/analytics";
