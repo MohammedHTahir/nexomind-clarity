@@ -285,6 +285,8 @@ const Pricing = () => {
         </p>
       </section>
 
+      <PromoCodeRedeem />
+
       {/* FAQ */}
       <section className="px-6 pb-28 max-w-3xl mx-auto">
         <h2 className="font-instrument text-[36px] md:text-[48px] text-[#111] tracking-tight mb-10">
