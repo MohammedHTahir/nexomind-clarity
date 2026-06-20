@@ -37,6 +37,7 @@ const ResetPassword = lazy(() => import("./pages/ResetPassword.tsx"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe.tsx"));
 const AdminAnalytics = lazy(() => import("./pages/app/AdminAnalytics.tsx"));
 const AdminUsers = lazy(() => import("./pages/app/AdminUsers.tsx"));
+const AdminSeo = lazy(() => import("./pages/app/AdminSeo.tsx"));
 const Compare = lazy(() => import("./pages/Compare.tsx"));
 const MobileWelcome = lazy(() => import("./pages/MobileWelcome.tsx"));
 
@@ -171,6 +172,14 @@ const App = () => (
                 element={
                   <RequireAuth>
                     <AdminUsers />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/app/admin/seo"
+                element={
+                  <RequireAuth>
+                    <AdminSeo />
                   </RequireAuth>
                 }
               />
