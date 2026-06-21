@@ -1,0 +1,97 @@
+<!--
+  Premium+ upgrade campaign — for marketing tool (Loops/Brevo/Mailgun broadcasts).
+  DO NOT send through Lovable's transactional email (notify.nexomind.ai) —
+  it will damage deliverability of signup/payment notifications.
+
+  Replace {{first_name}}, {{upgrade_url}}, {{unsubscribe_url}} with your tool's merge tags.
+  Default upgrade_url:
+    https://nexomind.ai/upgrade?code=UPGRADE10&utm_source=email&utm_medium=campaign&utm_campaign=premium_plus_upgrade_q3
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>You've been showing up. Time to go deeper.</title>
+</head>
+<body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Helvetica,Arial,sans-serif;color:#111111;">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">
+    A note about what you've been doing — and where it could go next.
+  </div>
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#ffffff;">
+    <tr><td align="center" style="padding:48px 16px 24px;">
+      <table role="presentation" width="560" cellspacing="0" cellpadding="0" border="0" style="max-width:560px;width:100%;">
+
+        <tr><td style="padding:0 8px 32px;font-family:Georgia,'Times New Roman',serif;font-size:22px;color:#111;letter-spacing:-0.01em;">
+          NexoMind <span style="font-style:italic;opacity:0.55;">— a note for you</span>
+        </td></tr>
+
+        <tr><td style="background:#F3F4ED;border-radius:24px;padding:44px 36px;">
+          <h1 style="margin:0 0 18px;font-family:Georgia,'Times New Roman',serif;font-size:34px;font-weight:normal;line-height:1.15;letter-spacing:-0.01em;color:#111;">
+            Hi {{first_name}} — your <em style="font-style:italic;opacity:0.7;">future self</em> is on Premium+.
+          </h1>
+
+          <p style="margin:0 0 18px;font-size:16px;line-height:1.65;color:#111;opacity:0.78;">
+            I noticed you've been showing up to NexoMind. That alone is rare — most people quit on themselves before week two.
+          </p>
+          <p style="margin:0 0 24px;font-size:16px;line-height:1.65;color:#111;opacity:0.78;">
+            But there's a wall in the free tier. Free helps you write things down. <strong style="color:#111;opacity:1;">Premium+ helps you actually change.</strong>
+          </p>
+
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 28px;">
+            <tr><td style="padding:14px 0;border-top:1px solid rgba(0,0,0,0.08);font-size:15px;line-height:1.5;">
+              <strong>Pattern detection across every entry</strong><br/>
+              <span style="opacity:0.65;">The mentor sees the loops you can't — the same fear in three different disguises.</span>
+            </td></tr>
+            <tr><td style="padding:14px 0;border-top:1px solid rgba(0,0,0,0.08);font-size:15px;line-height:1.5;">
+              <strong>The Sunday Letter</strong><br/>
+              <span style="opacity:0.65;">Every Sunday, a letter from your week back to you. People say it's the part they wait for.</span>
+            </td></tr>
+            <tr><td style="padding:14px 0;border-top:1px solid rgba(0,0,0,0.08);font-size:15px;line-height:1.5;">
+              <strong>A mentor that becomes <em>your</em> mentor</strong><br/>
+              <span style="opacity:0.65;">Persona that adapts to how you think — not a generic chatbot.</span>
+            </td></tr>
+            <tr><td style="padding:14px 0;border-top:1px solid rgba(0,0,0,0.08);border-bottom:1px solid rgba(0,0,0,0.08);font-size:15px;line-height:1.5;">
+              <strong>Therapist Bridge + Pattern Interrupts</strong><br/>
+              <span style="opacity:0.65;">Share a clean summary with your therapist. Get nudged when overthinking spikes.</span>
+            </td></tr>
+          </table>
+
+          <div style="background:#ffffff;border:1px dashed rgba(0,0,0,0.15);border-radius:14px;padding:20px;margin:0 0 24px;text-align:center;">
+            <div style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;opacity:0.5;margin-bottom:8px;">Your code</div>
+            <div style="font-family:'Courier New',monospace;font-size:24px;font-weight:bold;letter-spacing:0.15em;color:#111;">UPGRADE10</div>
+            <div style="font-size:13px;opacity:0.6;margin-top:8px;">10% off Premium+ for 3 months — applied automatically.</div>
+          </div>
+
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:8px 0 4px;">
+            <tr><td align="center" style="border-radius:999px;background:#111;">
+              <a href="{{upgrade_url}}" style="display:inline-block;padding:15px 32px;font-size:15px;font-weight:500;color:#fff;text-decoration:none;border-radius:999px;">
+                Claim 10% off Premium+ →
+              </a>
+            </td></tr>
+          </table>
+
+          <p style="margin:18px 0 0;font-size:12px;opacity:0.5;line-height:1.5;">
+            Cancel anytime. No tricks. Code expires in 7 days.
+          </p>
+        </td></tr>
+
+        <tr><td style="padding:32px 8px 0;font-size:14px;line-height:1.6;color:#111;opacity:0.7;">
+          One more thing — the people who get the most from NexoMind aren't the ones with the most to fix. They're the ones who decided to stop carrying it alone.
+          <br/><br/>
+          — Lloyd, founder
+        </td></tr>
+
+        <tr><td style="padding:40px 8px 16px;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;opacity:0.4;text-align:center;">
+          Quiet your mind. Find your signal.
+        </td></tr>
+        <tr><td style="padding:0 8px 48px;font-size:12px;color:#111;opacity:0.45;text-align:center;line-height:1.6;">
+          You're getting this because you signed up at nexomind.ai.<br/>
+          <a href="{{unsubscribe_url}}" style="color:#111;opacity:0.6;text-decoration:underline;">Unsubscribe</a>
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>
