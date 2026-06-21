@@ -13,10 +13,12 @@ import { template as welcome } from './welcome.tsx'
 import { template as contactConfirmation } from './contact-confirmation.tsx'
 import { template as patternInterrupt } from './pattern-interrupt.tsx'
 import { template as sundayLetter } from './sunday-letter.tsx'
+import { template as adminNotification } from './admin-notification.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'welcome': welcome,
   'contact-confirmation': contactConfirmation,
   'pattern-interrupt': patternInterrupt,
   'sunday-letter': sundayLetter,
+  'admin-notification': adminNotification,
 }
