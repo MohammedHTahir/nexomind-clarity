@@ -40,6 +40,8 @@ const AdminUsers = lazy(() => import("./pages/app/AdminUsers.tsx"));
 const AdminSeo = lazy(() => import("./pages/app/AdminSeo.tsx"));
 const Compare = lazy(() => import("./pages/Compare.tsx"));
 const MobileWelcome = lazy(() => import("./pages/MobileWelcome.tsx"));
+const Upgrade = lazy(() => import("./pages/Upgrade.tsx"));
+
 
 const queryClient = new QueryClient();
 const OAUTH_REDIRECT_KEY = "nexomind:oauth_redirect";

@@ -79,7 +79,8 @@ Deno.serve(async (req) => {
     const customerEmail = (claimsData.claims.email as string | undefined) ?? undefined;
 
     const body = await req.json();
-    const { priceId, quantity, returnUrl, environment } = body ?? {};
+    const { priceId, quantity, returnUrl, environment, promoCode } = body ?? {};
+
 
     if (!priceId || !/^[a-zA-Z0-9_-]+$/.test(priceId)) {
       return new Response(JSON.stringify({ error: "Invalid priceId" }), {
@@ -146,6 +147,15 @@ Deno.serve(async (req) => {
       userId,
     });
 
+    // Optional promo code: resolve string code → active promotion_code id
+    let discounts: Array<{ promotion_code: string }> | undefined;
+    if (typeof promoCode === "string" && /^[A-Za-z0-9_-]{1,32}$/.test(promoCode)) {
+      const pcs = await stripe.promotionCodes.list({
+        code: promoCode.toUpperCase(), active: true, limit: 1,
+      });
+      if (pcs.data.length) discounts = [{ promotion_code: pcs.data[0].id }];
+    }
+
     const session = await stripe.checkout.sessions.create({
       line_items: [{ price: stripePrice.id, quantity: quantity || 1 }],
       mode: isRecurring ? "subscription" : "payment",
@@ -153,9 +163,12 @@ Deno.serve(async (req) => {
       return_url: returnUrl,
       customer: customerId,
       managed_payments: { enabled: true },
-      metadata: { userId, managed_payments: "true" },
+      metadata: { userId, managed_payments: "true", ...(promoCode && { promo_code: String(promoCode).toUpperCase() }) },
+      ...(discounts && { discounts }),
+      ...(!discounts && { allow_promotion_codes: true }),
       ...(isRecurring && { subscription_data: { metadata: { userId } } }),
     });
+
 
     return new Response(JSON.stringify({ clientSecret: session.client_secret }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
