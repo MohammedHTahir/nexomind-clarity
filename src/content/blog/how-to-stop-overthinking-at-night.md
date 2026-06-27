@@ -2,12 +2,14 @@
 title: "How to Stop Overthinking at Night: 9 Techniques That Actually Work"
 description: "Racing thoughts keeping you awake? Learn why overthinking gets louder at night and 9 evidence-based techniques to quiet your mind and fall asleep."
 date: "2026-04-18"
-updated: "2026-06-18"
+updated: "2026-06-27"
 author: "NexoMind Team"
 authorBio: "Written by the NexoMind team, reviewed against guidance from the Sleep Foundation, Harvard Health, and the American Academy of Sleep Medicine."
 tags: ["overthinking", "sleep", "mental-clarity", "anxiety", "rumination"]
 excerpt: "The day goes quiet, and your mind gets loud. Here's why — and 9 calm, evidence-based ways out of the loop."
+canonical: "/how-to-stop-overthinking-at-night"
 ---
+
 
 The day goes quiet. The lights go off. And then your mind — busy all day — finally has space, and uses it to replay the conversation you had at 2pm, the email you forgot, the thing you should have said three years ago.
 

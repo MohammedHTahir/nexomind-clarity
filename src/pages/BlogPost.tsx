@@ -21,6 +21,10 @@ const BlogPost = () => {
   if (!post) return <NotFound />;
 
   const url = `${SITE_URL}/blog/${post.slug}`;
+  const canonicalUrl = post.canonical
+    ? (post.canonical.startsWith("http") ? post.canonical : `${SITE_URL}${post.canonical}`)
+    : url;
+
   const jsonLd = [
     {
       "@context": "https://schema.org",
@@ -57,7 +61,7 @@ const BlogPost = () => {
       <Seo
         title={`${post.title} — NexoMind`}
         description={post.description}
-        canonical={url}
+        canonical={canonicalUrl}
         jsonLd={jsonLd}
         type="article"
       />

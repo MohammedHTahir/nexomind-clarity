@@ -13,7 +13,10 @@ export interface BlogPost {
   tags: string[];
   excerpt: string;
   body: string;
+  /** Optional canonical override — used to consolidate duplicate-intent pages. */
+  canonical?: string;
 }
+
 
 const FRONTMATTER_RE = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/;
 
@@ -58,8 +61,10 @@ export function parseMarkdown(slug: string, raw: string): BlogPost {
     tags: (meta.tags as string[]) || [],
     excerpt: (meta.excerpt as string) || "",
     body: body.trim(),
+    canonical: (meta.canonical as string) || undefined,
   };
 }
+
 
 export function renderMarkdown(md: string): string {
   return marked.parse(md, { async: false }) as string;

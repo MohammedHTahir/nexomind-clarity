@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://nexomind.ai/</loc>
-    <lastmod>2026-06-01</lastmod>
+    <lastmod>2026-06-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -38,7 +38,7 @@
   </url>
   <url>
     <loc>https://nexomind.ai/pricing</loc>
-    <lastmod>2026-06-04</lastmod>
+    <lastmod>2026-06-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -61,8 +61,8 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nexomind.ai/blog/how-to-stop-overthinking-at-night</loc>
-    <lastmod>2026-05-10</lastmod>
+    <loc>https://nexomind.ai/blog/journaling-techniques</loc>
+    <lastmod>2026-06-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
