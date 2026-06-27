@@ -61,8 +61,10 @@ export function parseMarkdown(slug: string, raw: string): BlogPost {
     tags: (meta.tags as string[]) || [],
     excerpt: (meta.excerpt as string) || "",
     body: body.trim(),
+    canonical: (meta.canonical as string) || undefined,
   };
 }
+
 
 export function renderMarkdown(md: string): string {
   return marked.parse(md, { async: false }) as string;
