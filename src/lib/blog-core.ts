@@ -13,7 +13,10 @@ export interface BlogPost {
   tags: string[];
   excerpt: string;
   body: string;
+  /** Optional canonical override — used to consolidate duplicate-intent pages. */
+  canonical?: string;
 }
+
 
 const FRONTMATTER_RE = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/;
 
