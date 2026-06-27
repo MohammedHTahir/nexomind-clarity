@@ -33,13 +33,15 @@ const programmaticPaths = curatedMatch
 // Note: /terms removed (it's a duplicate of /terms-of-service and now 301-redirects to it)
 const staticPaths = ["/", "/about", "/founder", "/contact", "/privacy-policy", "/terms-of-service", "/pricing", "/blog", "/compare"];
 
-// Blog posts
+// Blog posts — skip any with a `canonical:` frontmatter (they consolidate to another URL)
 const blogDir = resolve(root, "src/content/blog");
 const blogPaths = existsSync(blogDir)
   ? readdirSync(blogDir)
       .filter((f) => f.endsWith(".md"))
+      .filter((f) => !/^canonical:\s*\S+/m.test(readFileSync(resolve(blogDir, f), "utf8")))
       .map((f) => `/blog/${f.replace(/\.md$/, "")}`)
   : [];
+
 
 const paths = Array.from(
   new Set([
