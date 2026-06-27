@@ -61,7 +61,7 @@ const BlogPost = () => {
       <Seo
         title={`${post.title} — NexoMind`}
         description={post.description}
-        canonical={url}
+        canonical={canonicalUrl}
         jsonLd={jsonLd}
         type="article"
       />
