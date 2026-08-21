@@ -4,6 +4,7 @@ import { ReactNode, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
 import PatternInterruptBanner from "@/components/app/PatternInterruptBanner";
 import CrisisCard from "@/components/app/CrisisCard";
