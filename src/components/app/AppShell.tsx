@@ -146,7 +146,7 @@ const AppShell = ({ children }: { children: ReactNode }) => {
                 More <ChevronDown className="w-3.5 h-3.5" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-white/95 backdrop-blur-md">
-                {moreNav.map((n) => (
+                {menuNav.map((n) => (
                   <DropdownMenuItem key={n.to} asChild>
                     <NavLink to={n.to} className="font-barlow text-[14px] cursor-pointer">
                       {n.label}
