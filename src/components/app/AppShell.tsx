@@ -43,6 +43,8 @@ const adminNav = [
 const AppShell = ({ children }: { children: ReactNode }) => {
   const { pathname } = useLocation();
   const { isPastDue, subscription, tier } = useSubscription();
+  const { isAdmin } = useIsAdmin();
+  const menuNav = isAdmin ? [...moreNav, ...adminNav] : moreNav;
   const [openingPortal, setOpeningPortal] = useState(false);
 
   // Promo-trial near-expiry banner: trialing sub from promo code, <=7 days left.
