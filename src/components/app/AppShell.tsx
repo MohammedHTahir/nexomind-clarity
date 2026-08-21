@@ -4,6 +4,7 @@ import { ReactNode, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
 import PatternInterruptBanner from "@/components/app/PatternInterruptBanner";
 import CrisisCard from "@/components/app/CrisisCard";
@@ -30,12 +31,21 @@ const moreNav = [
   { to: "/app/therapist-bridge", label: "Therapist" },
 ];
 
+const adminNav = [
+  { to: "/app/admin/users", label: "Customers" },
+  { to: "/app/admin/analytics", label: "Analytics" },
+  { to: "/app/admin/seo", label: "SEO" },
+];
+
+
 
 
 
 const AppShell = ({ children }: { children: ReactNode }) => {
   const { pathname } = useLocation();
   const { isPastDue, subscription, tier } = useSubscription();
+  const { isAdmin } = useIsAdmin();
+  const menuNav = isAdmin ? [...moreNav, ...adminNav] : moreNav;
   const [openingPortal, setOpeningPortal] = useState(false);
 
   // Promo-trial near-expiry banner: trialing sub from promo code, <=7 days left.
@@ -131,7 +141,7 @@ const AppShell = ({ children }: { children: ReactNode }) => {
             <DropdownMenu>
               <DropdownMenuTrigger
                 className={`flex items-center gap-1 font-barlow font-medium text-[14px] whitespace-nowrap transition-opacity outline-none ${
-                  moreNav.some((n) => pathname.startsWith(n.to))
+                  menuNav.some((n) => pathname.startsWith(n.to))
                     ? "opacity-100"
                     : "opacity-50 hover:opacity-90"
                 }`}
@@ -139,7 +149,7 @@ const AppShell = ({ children }: { children: ReactNode }) => {
                 More <ChevronDown className="w-3.5 h-3.5" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-white/95 backdrop-blur-md">
-                {moreNav.map((n) => (
+                {menuNav.map((n) => (
                   <DropdownMenuItem key={n.to} asChild>
                     <NavLink to={n.to} className="font-barlow text-[14px] cursor-pointer">
                       {n.label}
@@ -181,7 +191,7 @@ const AppShell = ({ children }: { children: ReactNode }) => {
         <DropdownMenu>
           <DropdownMenuTrigger
             className={`flex items-center gap-1 font-barlow text-[12px] px-3 py-1.5 rounded-full transition-all whitespace-nowrap outline-none ${
-              moreNav.some((n) => pathname.startsWith(n.to))
+              menuNav.some((n) => pathname.startsWith(n.to))
                 ? "bg-[#111] text-white"
                 : "text-[#111]/60"
             }`}
@@ -189,7 +199,7 @@ const AppShell = ({ children }: { children: ReactNode }) => {
             More <ChevronDown className="w-3 h-3" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" side="top" className="bg-white/95 backdrop-blur-md mb-2">
-            {moreNav.map((n) => (
+            {menuNav.map((n) => (
               <DropdownMenuItem key={n.to} asChild>
                 <NavLink to={n.to} className="font-barlow text-[13px] cursor-pointer">
                   {n.label}
