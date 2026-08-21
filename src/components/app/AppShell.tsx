@@ -30,6 +30,13 @@ const moreNav = [
   { to: "/app/therapist-bridge", label: "Therapist" },
 ];
 
+const adminNav = [
+  { to: "/app/admin/users", label: "Customers" },
+  { to: "/app/admin/analytics", label: "Analytics" },
+  { to: "/app/admin/seo", label: "SEO" },
+];
+
+
 
 
 
