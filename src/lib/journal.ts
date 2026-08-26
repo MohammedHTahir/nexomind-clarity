@@ -94,7 +94,18 @@ export async function analyzeAndStore(
     const { data, error } = await supabase.functions.invoke("analyze-journal", {
       body,
     });
-    const payload = (data ?? {}) as any;
+    let payload = (data ?? {}) as any;
+
+    // Non-2xx responses surface as FunctionsHttpError with data === null.
+    // Read the real JSON body so structured codes (FREE_LIMIT_REACHED, etc.) survive.
+    if (error && (error as any).context instanceof Response) {
+      try {
+        payload = await (error as any).context.clone().json();
+      } catch {
+        /* keep empty payload */
+      }
+    }
+
     if (payload?.code === "FREE_LIMIT_REACHED") {
       throw new FreeLimitReachedError(
         payload.error ?? "Free limit reached",
@@ -102,14 +113,15 @@ export async function analyzeAndStore(
         payload.used ?? 0,
       );
     }
-    if (error) throw error;
     if (payload?.error) throw new Error(payload.error);
+    if (error) throw error;
     return payload as {
       journal: JournalRow;
       analysis: AnalysisRow;
       usage?: AnalyzeUsage;
       isPremium?: boolean;
     };
+
   } catch (e) {
     // Network failure during request — fall back to offline queue rather than losing the entry.
     if (e instanceof FreeLimitReachedError) throw e;
