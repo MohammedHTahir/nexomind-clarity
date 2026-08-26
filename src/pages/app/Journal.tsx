@@ -97,8 +97,9 @@ const Journal = () => {
 
       <h1 className="sr-only">Journal — write a private reflection</h1>
       <div className="relative z-10 h-full flex">
-        <div className="flex-1 flex items-center justify-center px-6 md:px-10">
+        <div className="flex-1 overflow-y-auto overscroll-contain flex items-start md:items-center justify-center px-6 md:px-10 pt-24 pb-12 md:py-0">
           <div className="w-full max-w-2xl">
+
             <AnimatePresence mode="wait">
               {phase === "write" && (
                 <motion.div
@@ -127,9 +128,10 @@ const Journal = () => {
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     placeholder="Begin anywhere. Only you can read this."
-                    rows={10}
-                    className="w-full resize-none bg-transparent outline-none font-instrument text-[26px] md:text-[34px] leading-[1.4] placeholder:text-[#111]/25 text-[#111]"
+                    rows={6}
+                    className="w-full resize-none bg-transparent outline-none font-instrument text-[22px] md:text-[34px] leading-[1.4] placeholder:text-[#111]/25 text-[#111] max-h-[38vh] md:max-h-none"
                   />
+
                   <div className="flex items-center justify-between mt-6">
                     <span className="font-barlow text-[12px] text-[#111]/40">
                       {text.trim().split(/\s+/).filter(Boolean).length} words
