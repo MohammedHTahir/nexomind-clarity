@@ -27,6 +27,14 @@ type SubLike = {
 const ACTIVE_STATUSES = ["active", "trialing", "past_due"];
 
 /**
+ * Grace window (days) applied after current_period_end while the subscription
+ * is still marked active/trialing/past_due. Protects paying customers from
+ * being downgraded when a renewal webhook is delayed or missed.
+ */
+export const GRACE_PERIOD_DAYS = 7;
+const GRACE_MS = GRACE_PERIOD_DAYS * 24 * 60 * 60 * 1000;
+
+/**
  * Returns true if the subscription grants access (active, trialing, past_due,
  * or canceled but still within billing period).
  */
@@ -35,13 +43,17 @@ export function subIsActive(sub: SubLike): boolean {
   const periodEnd = sub.current_period_end
     ? new Date(sub.current_period_end)
     : null;
-  const withinPeriod = !periodEnd || periodEnd > new Date();
+  const now = new Date();
+  // Active-ish statuses keep access through a grace window after period end.
+  const withinPeriod =
+    !periodEnd || periodEnd.getTime() + GRACE_MS > now.getTime();
 
   return (
     (ACTIVE_STATUSES.includes(sub.status) && withinPeriod) ||
-    (sub.status === "canceled" && !!periodEnd && periodEnd > new Date())
+    (sub.status === "canceled" && !!periodEnd && periodEnd > now)
   );
 }
+
 
 /**
  * Resolves the user's effective tier from their subscription row.
