@@ -59,6 +59,37 @@ export interface VoiceFeaturesParam {
   tonal_variability_hz: number;
 }
 
+async function invokeJournalAnalysis(body: Record<string, unknown>) {
+  const { data: sessionData } = await supabase.auth.getSession();
+  let accessToken = sessionData.session?.access_token;
+
+  if (!accessToken) {
+    throw new Error("Your session has expired. Please sign in again.");
+  }
+
+  let response = await supabase.functions.invoke("analyze-journal", {
+    body,
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+
+  if (response.error && (response.error as any).context instanceof Response) {
+    const status = (response.error as any).context.status as number;
+    if (status === 401) {
+      const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession();
+      accessToken = refreshed.session?.access_token;
+      if (refreshError || !accessToken) {
+        throw new Error("Your session has expired. Please sign in again.");
+      }
+      response = await supabase.functions.invoke("analyze-journal", {
+        body,
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+    }
+  }
+
+  return response;
+}
+
 export async function analyzeAndStore(
   content: string,
   voice_features?: VoiceFeaturesParam
@@ -91,9 +122,7 @@ export async function analyzeAndStore(
   }
 
   try {
-    const { data, error } = await supabase.functions.invoke("analyze-journal", {
-      body,
-    });
+    const { data, error } = await invokeJournalAnalysis(body);
     let payload = (data ?? {}) as any;
 
     // Non-2xx responses surface as FunctionsHttpError with data === null.

@@ -18,6 +18,7 @@ import PremiumGate from "@/components/PremiumGate";
 import { toast } from "sonner";
 import { trackEvent } from "@/lib/analytics";
 import { t } from "@/lib/i18n";
+import { Button } from "@/components/ui/button";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -86,13 +87,16 @@ const Journal = () => {
         <Link to="/" className="font-instrument text-[22px] tracking-tight">
           nexo<span className="italic text-[#111]/60">mind</span>
         </Link>
-        <button
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
           onClick={() => navigate("/app")}
           className="w-10 h-10 rounded-full bg-white/70 backdrop-blur-md border border-black/5 flex items-center justify-center text-[#111]/60 hover:text-[#111] hover:scale-[1.05] transition-all"
           aria-label="Close"
         >
           <X className="w-4 h-4" strokeWidth={2} />
-        </button>
+        </Button>
       </div>
 
       <h1 className="sr-only">Journal — write a private reflection</h1>
@@ -123,16 +127,17 @@ const Journal = () => {
                     </div>
                   )}
                   <MentorPersonaPicker />
-                  <textarea
+                   <textarea
                     autoFocus
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     placeholder="Begin anywhere. Only you can read this."
-                    rows={6}
-                    className="w-full resize-none bg-transparent outline-none font-instrument text-[22px] md:text-[34px] leading-[1.4] placeholder:text-[#111]/25 text-[#111] max-h-[38vh] md:max-h-none"
+                     rows={6}
+                     enterKeyHint="done"
+                     className="w-full min-h-[30vh] resize-none bg-transparent outline-none font-instrument text-[22px] md:text-[34px] leading-[1.4] placeholder:text-[#111]/25 text-[#111] max-h-[38vh] md:max-h-none"
                   />
 
-                  <div className="flex items-center justify-between mt-6">
+                   <div className="sticky bottom-0 flex items-center justify-between mt-6 py-3 bg-[#F3F4ED]/95 backdrop-blur-sm md:static md:py-0 md:bg-transparent md:backdrop-blur-none">
                     <span className="font-barlow text-[12px] text-[#111]/40">
                       {text.trim().split(/\s+/).filter(Boolean).length} words
                     </span>
@@ -146,16 +151,17 @@ const Journal = () => {
                           }}
                         />
                       )}
-                      <button
+                       <Button
+                         type="button"
                         onClick={submit}
                         disabled={!text.trim()}
-                        className="group flex items-center gap-2 bg-[#111] text-white rounded-full pl-5 pr-1.5 py-1.5 font-barlow font-medium text-[13px] hover:bg-black transition-colors disabled:opacity-30"
+                         className="group h-auto flex items-center gap-2 bg-[#111] text-white rounded-full pl-5 pr-1.5 py-1.5 font-barlow font-medium text-[13px] hover:bg-black transition-colors disabled:opacity-30"
                       >
                         <span>Reflect</span>
                         <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white text-[#111] group-hover:rotate-45 transition-transform duration-300">
                           <ArrowRight className="w-3.5 h-3.5" strokeWidth={2.25} />
                         </span>
-                      </button>
+                       </Button>
                     </div>
                   </div>
                 </motion.div>
