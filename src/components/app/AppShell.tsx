@@ -248,7 +248,10 @@ const AppShell = ({ children }: { children: ReactNode }) => {
       <PaywallModal
         open={resubscribeOpen}
         defaultTier={legacyTier}
-        onContinue={() => setResubscribeOpen(false)}
+        onContinue={() => {
+          setResubscribeOpen(false);
+          refreshLegacy();
+        }}
       />
     </div>
   );
