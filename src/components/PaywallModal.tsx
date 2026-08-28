@@ -61,7 +61,6 @@ const PaywallModal = ({ open, onUnlock, onContinue, tier: tierProp = "premium", 
 
   const selected = PLANS[tier][plan];
   const availableTiers: Tier[] = isOnPremium ? ["premium_plus"] : ["premium", "premium_plus"];
-  void availableTiers;
 
   return (
     <AnimatePresence>
