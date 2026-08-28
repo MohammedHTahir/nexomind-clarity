@@ -164,21 +164,35 @@ Deno.serve(async (req) => {
       if (!subscriptionId) {
         const list = await stripe.subscriptions.list({
           customer: customerId,
-          status: "active",
-          limit: 1,
+          status: "all",
+          limit: 20,
         });
-        subscriptionId = list.data[0]?.id ?? null;
+        const rank: Record<string, number> = {
+          active: 0,
+          trialing: 1,
+          past_due: 2,
+          unpaid: 3,
+          paused: 4,
+        };
+        const usable = list.data
+          .filter((s) => s.status in rank)
+          .sort((a, b) => (rank[a.status] ?? 9) - (rank[b.status] ?? 9));
+        subscriptionId = usable[0]?.id ?? null;
       }
       if (!subscriptionId) {
+        const storedSubId = (sub?.stripe_subscription_id as string | null) ?? null;
+        const isLegacy = !!storedSubId && !storedSubId.startsWith("promo_");
         return new Response(
           JSON.stringify({
-            error:
-              "We couldn't find an active paid subscription to change. If you redeemed a promo code, your access simply ends on its expiry date.",
-            code: "NO_ACTIVE_SUBSCRIPTION",
+            error: isLegacy
+              ? "Your plan was started on our previous payment provider, so it can't be changed here yet. Your access stays active — email support@nexomind.ai and we'll move or adjust your plan for you."
+              : "We couldn't find an active paid subscription to change. If you redeemed a promo code, your access simply ends on its expiry date.",
+            code: isLegacy ? "LEGACY_BILLING" : "NO_ACTIVE_SUBSCRIPTION",
           }),
           { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
       }
+
       flowData =
         flow === "cancel"
           ? { type: "subscription_cancel", subscription_cancel: { subscription: subscriptionId } }
