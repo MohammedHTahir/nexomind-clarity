@@ -14,6 +14,7 @@ export function useLegacyBilling() {
   const [legacy, setLegacy] = useState(false);
   const [priceId, setPriceId] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
+  const [nonce, setNonce] = useState(0);
 
   useEffect(() => {
     if (!user || !isPremium || !subscription) {
@@ -41,9 +42,16 @@ export function useLegacyBilling() {
     return () => {
       cancelled = true;
     };
-  }, [user, isPremium, subscription?.status]);
+    // Re-check when the subscription row changes (e.g. after a restart) and on focus.
+  }, [user, isPremium, subscription?.status, subscription?.price_id, subscription?.current_period_end, nonce]);
 
-  return { legacy, priceId, checked };
+  useEffect(() => {
+    const onFocus = () => setNonce((n) => n + 1);
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, []);
+
+  return { legacy, priceId, checked, refresh: () => setNonce((n) => n + 1) };
 }
 
 export default useLegacyBilling;
