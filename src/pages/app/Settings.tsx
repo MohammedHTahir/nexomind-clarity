@@ -57,6 +57,9 @@ const Settings = () => {
   const { signOut, user } = useAuth();
   const { subscription, isPremium, isPremiumPlus, isCanceling, isPastDue, loading } =
     useSubscription();
+  const { legacy: legacyBilling, priceId: legacyPriceId } = useLegacyBilling();
+  const legacyTier: "premium" | "premium_plus" =
+    legacyPriceId?.includes("premium_plus") ? "premium_plus" : "premium";
   const [confirm, setConfirm] = useState(false);
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [busy, setBusy] = useState(false);

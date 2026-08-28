@@ -99,6 +99,18 @@ const AppShell = ({ children }: { children: ReactNode }) => {
           </button>
         </div>
       )}
+      {legacyBilling && (
+        <div className="w-full bg-[#111] px-4 py-2 text-center text-[13px] text-white/90 relative z-40">
+          We've moved to a new payment provider — restart your plan once to keep uninterrupted
+          access (same price, your current time is honored).{" "}
+          <button
+            onClick={() => setResubscribeOpen(true)}
+            className="underline font-medium hover:text-white"
+          >
+            Restart my plan
+          </button>
+        </div>
+      )}
       {promoDaysLeft !== null && (
         <div className="w-full bg-emerald-50 border-b border-emerald-200 px-4 py-2 text-center text-[13px] text-emerald-900 relative z-40">
           Your free Premium+ ends in {promoDaysLeft} {promoDaysLeft === 1 ? "day" : "days"}.{" "}
