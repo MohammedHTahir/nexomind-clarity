@@ -249,7 +249,7 @@ const Settings = () => {
                     Change plan
                   </button>
                 )}
-                {!isPremiumPlus && (
+                {!legacyBilling && !isPremiumPlus && (
                   <button
                     onClick={() => setPaywallOpen(true)}
                     className="bg-white/70 backdrop-blur-md border border-black/10 text-[#111] rounded-full px-5 py-2.5 font-barlow font-medium text-[13px] hover:bg-white transition-colors"
@@ -257,7 +257,7 @@ const Settings = () => {
                     Upgrade to Premium+
                   </button>
                 )}
-                {!isCanceling && (
+                {!legacyBilling && !isCanceling && (
                   <button
                     onClick={() => openPortal("cancel")}
                     disabled={openingPortal}
@@ -266,13 +266,15 @@ const Settings = () => {
                     Cancel plan
                   </button>
                 )}
-                <button
-                  onClick={() => openPortal()}
-                  disabled={openingPortal}
-                  className="bg-[#111] text-white rounded-full px-5 py-2.5 font-barlow font-medium text-[13px] hover:bg-black transition-colors disabled:opacity-50"
-                >
-                  {openingPortal ? "Opening…" : "Manage subscription"}
-                </button>
+                {!legacyBilling && (
+                  <button
+                    onClick={() => openPortal()}
+                    disabled={openingPortal}
+                    className="bg-[#111] text-white rounded-full px-5 py-2.5 font-barlow font-medium text-[13px] hover:bg-black transition-colors disabled:opacity-50"
+                  >
+                    {openingPortal ? "Opening…" : "Manage subscription"}
+                  </button>
+                )}
               </div>
             ) : (
               <button
