@@ -232,7 +232,15 @@ const Settings = () => {
             </div>
             {isPremium ? (
               <div className="flex flex-wrap gap-2 items-center">
-                {isPremiumPlus && (
+                {legacyBilling && (
+                  <button
+                    onClick={() => setPaywallOpen(true)}
+                    className="bg-[#111] text-white rounded-full px-5 py-2.5 font-barlow font-medium text-[13px] hover:bg-black transition-colors"
+                  >
+                    Restart my plan
+                  </button>
+                )}
+                {!legacyBilling && isPremiumPlus && (
                   <button
                     onClick={() => openPortal("update")}
                     disabled={openingPortal}

@@ -241,6 +241,11 @@ const AppShell = ({ children }: { children: ReactNode }) => {
 
       {/* Crisis detection overlay - never auto-contacts emergency services */}
       <CrisisCard />
+      <PaywallModal
+        open={resubscribeOpen}
+        defaultTier={legacyTier}
+        onContinue={() => setResubscribeOpen(false)}
+      />
     </div>
   );
 };
