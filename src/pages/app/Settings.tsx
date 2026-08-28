@@ -77,7 +77,22 @@ const Settings = () => {
           returnUrl: window.location.href,
         },
       });
-      if (error || !data?.url) throw new Error(error?.message || "Failed to open billing portal");
+      if (error) {
+        // Surface the structured error body instead of the generic non-2xx message.
+        let message = error.message;
+        const ctx = (error as { context?: Response }).context;
+        if (ctx && typeof ctx.text === "function") {
+          try {
+            const body = await ctx.clone().text();
+            const parsed = JSON.parse(body) as { error?: string };
+            if (parsed?.error) message = parsed.error;
+          } catch {
+            /* keep default message */
+          }
+        }
+        throw new Error(message);
+      }
+      if (!data?.url) throw new Error("Failed to open billing portal");
       window.open(data.url, "_blank", "noopener,noreferrer");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not open billing portal");
@@ -85,6 +100,7 @@ const Settings = () => {
       setOpeningPortal(false);
     }
   };
+
 
   const handleDelete = async () => {
     setBusy(true);

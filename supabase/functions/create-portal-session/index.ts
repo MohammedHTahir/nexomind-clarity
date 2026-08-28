@@ -96,22 +96,61 @@ Deno.serve(async (req) => {
       .limit(1)
       .maybeSingle();
 
-    if (!sub?.stripe_customer_id) {
-      return new Response(JSON.stringify({ error: "No subscription found" }), {
-        status: 404,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    const stripe = createStripeClient(env);
+    const userEmail = userData.user.email ?? undefined;
+
+    // Resolve a customer that actually exists in the CURRENT Stripe account.
+    // Records created under a previous Stripe account contain stale customer IDs.
+    let customerId: string | null = (sub?.stripe_customer_id as string) ?? null;
+
+    if (customerId) {
+      try {
+        const existing = await stripe.customers.retrieve(customerId);
+        if ((existing as { deleted?: boolean }).deleted) customerId = null;
+      } catch (err) {
+        const code = (err as { code?: string }).code;
+        if (code === "resource_missing") {
+          console.warn("Stale stripe customer id, re-resolving by email", { customerId });
+          customerId = null;
+        } else {
+          throw err;
+        }
+      }
     }
 
-    const stripe = createStripeClient(env);
+    if (!customerId && userEmail) {
+      const found = await stripe.customers.list({ email: userEmail, limit: 1 });
+      if (found.data.length > 0) customerId = found.data[0].id;
+    }
+
+    if (!customerId) {
+      return new Response(
+        JSON.stringify({
+          error:
+            "We couldn't find your billing record in our current payment provider. Your plan is still active — please contact support@nexomind.ai to manage billing.",
+          code: "CUSTOMER_NOT_IN_ACCOUNT",
+        }),
+        { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    if (customerId !== sub?.stripe_customer_id) {
+      await supabaseAdmin
+        .from("subscriptions")
+        .update({ stripe_customer_id: customerId })
+        .eq("user_id", userData.user.id)
+        .eq("environment", env);
+    }
+
     const portal = await stripe.billingPortal.sessions.create({
-      customer: sub.stripe_customer_id as string,
+      customer: customerId,
       ...(safeReturnUrl && { return_url: safeReturnUrl }),
     });
 
     return new Response(JSON.stringify({ url: portal.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
+
   } catch (e) {
     console.error("create-portal-session error", e);
     return new Response(
