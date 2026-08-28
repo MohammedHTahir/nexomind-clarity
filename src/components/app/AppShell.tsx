@@ -46,9 +46,13 @@ const adminNav = [
 const AppShell = ({ children }: { children: ReactNode }) => {
   const { pathname } = useLocation();
   const { isPastDue, subscription, tier } = useSubscription();
+  const { legacy: legacyBilling, priceId: legacyPriceId } = useLegacyBilling();
   const { isAdmin } = useIsAdmin();
   const menuNav = isAdmin ? [...moreNav, ...adminNav] : moreNav;
   const [openingPortal, setOpeningPortal] = useState(false);
+  const [resubscribeOpen, setResubscribeOpen] = useState(false);
+  const legacyTier: "premium" | "premium_plus" =
+    legacyPriceId?.includes("premium_plus") ? "premium_plus" : "premium";
 
   // Promo-trial near-expiry banner: trialing sub from promo code, <=7 days left.
   const promoDaysLeft = (() => {

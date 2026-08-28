@@ -14,6 +14,7 @@ import PaywallModal from "@/components/PaywallModal";
 import { deleteAllJournals } from "@/lib/journal";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useLegacyBilling } from "@/hooks/useLegacyBilling";
 import { supabase } from "@/integrations/supabase/client";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { toast } from "sonner";
