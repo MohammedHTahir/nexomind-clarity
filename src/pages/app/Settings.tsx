@@ -54,7 +54,8 @@ const formatDate = (iso: string | null | undefined) => {
 const Settings = () => {
   const navigate = useNavigate();
   const { signOut, user } = useAuth();
-  const { subscription, isPremium, isCanceling, isPastDue, loading } = useSubscription();
+  const { subscription, isPremium, isPremiumPlus, isCanceling, isPastDue, loading } =
+    useSubscription();
   const [confirm, setConfirm] = useState(false);
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -68,13 +69,14 @@ const Settings = () => {
     (subscription ? "NexoMind Premium" : "Free");
   const renewalDate = formatDate(subscription?.current_period_end ?? null);
 
-  const openPortal = async () => {
+  const openPortal = async (flow?: "update" | "cancel") => {
     setOpeningPortal(true);
     try {
       const { data, error } = await supabase.functions.invoke("create-portal-session", {
         body: {
           environment: getStripeEnvironment(),
           returnUrl: window.location.href,
+          ...(flow && { flow }),
         },
       });
       if (error) {
@@ -225,13 +227,41 @@ const Settings = () => {
               </p>
             </div>
             {isPremium ? (
-              <button
-                onClick={openPortal}
-                disabled={openingPortal}
-                className="bg-[#111] text-white rounded-full px-5 py-2.5 font-barlow font-medium text-[13px] hover:bg-black transition-colors disabled:opacity-50"
-              >
-                {openingPortal ? "Opening…" : "Manage subscription"}
-              </button>
+              <div className="flex flex-wrap gap-2 items-center">
+                {isPremiumPlus && (
+                  <button
+                    onClick={() => openPortal("update")}
+                    disabled={openingPortal}
+                    className="bg-white/70 backdrop-blur-md border border-black/10 text-[#111] rounded-full px-5 py-2.5 font-barlow font-medium text-[13px] hover:bg-white transition-colors disabled:opacity-50"
+                  >
+                    Change plan
+                  </button>
+                )}
+                {!isPremiumPlus && (
+                  <button
+                    onClick={() => setPaywallOpen(true)}
+                    className="bg-white/70 backdrop-blur-md border border-black/10 text-[#111] rounded-full px-5 py-2.5 font-barlow font-medium text-[13px] hover:bg-white transition-colors"
+                  >
+                    Upgrade to Premium+
+                  </button>
+                )}
+                {!isCanceling && (
+                  <button
+                    onClick={() => openPortal("cancel")}
+                    disabled={openingPortal}
+                    className="text-[#111]/55 hover:text-[#111] font-barlow text-[13px] px-3 py-2.5 transition-colors disabled:opacity-50"
+                  >
+                    Cancel plan
+                  </button>
+                )}
+                <button
+                  onClick={() => openPortal()}
+                  disabled={openingPortal}
+                  className="bg-[#111] text-white rounded-full px-5 py-2.5 font-barlow font-medium text-[13px] hover:bg-black transition-colors disabled:opacity-50"
+                >
+                  {openingPortal ? "Opening…" : "Manage subscription"}
+                </button>
+              </div>
             ) : (
               <button
                 onClick={() => setPaywallOpen(true)}
@@ -243,7 +273,8 @@ const Settings = () => {
           </div>
           {isPremium && (
             <p className="font-barlow text-[12px] text-[#111]/45 mt-4">
-              Manage your card, switch monthly ↔ yearly, view invoices, or cancel anytime.
+              Change plan switches you between Premium+ and Premium (pro-rated). Cancelling keeps
+              your access until the end of the current period.
             </p>
           )}
         </GlassCard>

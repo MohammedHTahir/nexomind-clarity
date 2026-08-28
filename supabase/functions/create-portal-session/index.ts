@@ -39,7 +39,13 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { returnUrl, environment } = await req.json();
+    const { returnUrl, environment, flow } = await req.json();
+    if (flow !== undefined && flow !== "update" && flow !== "cancel") {
+      return new Response(JSON.stringify({ error: "Invalid flow" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     if (environment !== "sandbox" && environment !== "live") {
       return new Response(JSON.stringify({ error: "Invalid environment" }), {
         status: 400,
@@ -89,7 +95,7 @@ Deno.serve(async (req) => {
 
     const { data: sub } = await supabaseAdmin
       .from("subscriptions")
-      .select("stripe_customer_id")
+      .select("stripe_customer_id, stripe_subscription_id")
       .eq("user_id", userData.user.id)
       .eq("environment", env)
       .order("created_at", { ascending: false })
@@ -142,9 +148,47 @@ Deno.serve(async (req) => {
         .eq("environment", env);
     }
 
+    // Deep-link flows (change plan / cancel) need a live subscription in this account.
+    let flowData: Record<string, unknown> | undefined;
+    if (flow) {
+      let subscriptionId: string | null =
+        (sub?.stripe_subscription_id as string | null) ?? null;
+      if (subscriptionId?.startsWith("promo_")) subscriptionId = null;
+      if (subscriptionId) {
+        try {
+          await stripe.subscriptions.retrieve(subscriptionId);
+        } catch {
+          subscriptionId = null;
+        }
+      }
+      if (!subscriptionId) {
+        const list = await stripe.subscriptions.list({
+          customer: customerId,
+          status: "active",
+          limit: 1,
+        });
+        subscriptionId = list.data[0]?.id ?? null;
+      }
+      if (!subscriptionId) {
+        return new Response(
+          JSON.stringify({
+            error:
+              "We couldn't find an active paid subscription to change. If you redeemed a promo code, your access simply ends on its expiry date.",
+            code: "NO_ACTIVE_SUBSCRIPTION",
+          }),
+          { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+      flowData =
+        flow === "cancel"
+          ? { type: "subscription_cancel", subscription_cancel: { subscription: subscriptionId } }
+          : { type: "subscription_update", subscription_update: { subscription: subscriptionId } };
+    }
+
     const portal = await stripe.billingPortal.sessions.create({
       customer: customerId,
       ...(safeReturnUrl && { return_url: safeReturnUrl }),
+      ...(flowData && { flow_data: flowData as never }),
     });
 
     return new Response(JSON.stringify({ url: portal.url }), {
