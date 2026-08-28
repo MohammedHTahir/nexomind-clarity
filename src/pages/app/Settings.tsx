@@ -68,13 +68,14 @@ const Settings = () => {
     (subscription ? "NexoMind Premium" : "Free");
   const renewalDate = formatDate(subscription?.current_period_end ?? null);
 
-  const openPortal = async () => {
+  const openPortal = async (flow?: "update" | "cancel") => {
     setOpeningPortal(true);
     try {
       const { data, error } = await supabase.functions.invoke("create-portal-session", {
         body: {
           environment: getStripeEnvironment(),
           returnUrl: window.location.href,
+          ...(flow && { flow }),
         },
       });
       if (error) {
