@@ -226,13 +226,41 @@ const Settings = () => {
               </p>
             </div>
             {isPremium ? (
-              <button
-                onClick={openPortal}
-                disabled={openingPortal}
-                className="bg-[#111] text-white rounded-full px-5 py-2.5 font-barlow font-medium text-[13px] hover:bg-black transition-colors disabled:opacity-50"
-              >
-                {openingPortal ? "Opening…" : "Manage subscription"}
-              </button>
+              <div className="flex flex-wrap gap-2 items-center">
+                {isPremiumPlus && (
+                  <button
+                    onClick={() => openPortal("update")}
+                    disabled={openingPortal}
+                    className="bg-white/70 backdrop-blur-md border border-black/10 text-[#111] rounded-full px-5 py-2.5 font-barlow font-medium text-[13px] hover:bg-white transition-colors disabled:opacity-50"
+                  >
+                    Change plan
+                  </button>
+                )}
+                {!isPremiumPlus && (
+                  <button
+                    onClick={() => setPaywallOpen(true)}
+                    className="bg-white/70 backdrop-blur-md border border-black/10 text-[#111] rounded-full px-5 py-2.5 font-barlow font-medium text-[13px] hover:bg-white transition-colors"
+                  >
+                    Upgrade to Premium+
+                  </button>
+                )}
+                {!isCanceling && (
+                  <button
+                    onClick={() => openPortal("cancel")}
+                    disabled={openingPortal}
+                    className="text-[#111]/55 hover:text-[#111] font-barlow text-[13px] px-3 py-2.5 transition-colors disabled:opacity-50"
+                  >
+                    Cancel plan
+                  </button>
+                )}
+                <button
+                  onClick={() => openPortal()}
+                  disabled={openingPortal}
+                  className="bg-[#111] text-white rounded-full px-5 py-2.5 font-barlow font-medium text-[13px] hover:bg-black transition-colors disabled:opacity-50"
+                >
+                  {openingPortal ? "Opening…" : "Manage subscription"}
+                </button>
+              </div>
             ) : (
               <button
                 onClick={() => setPaywallOpen(true)}
@@ -244,7 +272,8 @@ const Settings = () => {
           </div>
           {isPremium && (
             <p className="font-barlow text-[12px] text-[#111]/45 mt-4">
-              Manage your card, switch monthly ↔ yearly, view invoices, or cancel anytime.
+              Change plan switches you between Premium+ and Premium (pro-rated). Cancelling keeps
+              your access until the end of the current period.
             </p>
           )}
         </GlassCard>
