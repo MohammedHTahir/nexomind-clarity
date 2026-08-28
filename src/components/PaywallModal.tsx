@@ -13,6 +13,10 @@ interface PaywallModalProps {
   onUnlock?: () => void;
   onContinue: () => void;
   tier?: Tier;
+  /** Forces the preselected tier and allows switching between both tiers
+   *  (used for resubscribe flows where an existing Premium user may want
+   *  to restart on the same tier). */
+  defaultTier?: Tier;
 }
 
 type Plan = "monthly" | "yearly";
