@@ -46,7 +46,11 @@ const adminNav = [
 const AppShell = ({ children }: { children: ReactNode }) => {
   const { pathname } = useLocation();
   const { isPastDue, subscription, tier } = useSubscription();
-  const { legacy: legacyBilling, priceId: legacyPriceId } = useLegacyBilling();
+  const {
+    legacy: legacyBilling,
+    priceId: legacyPriceId,
+    refresh: refreshLegacy,
+  } = useLegacyBilling();
   const { isAdmin } = useIsAdmin();
   const menuNav = isAdmin ? [...moreNav, ...adminNav] : moreNav;
   const [openingPortal, setOpeningPortal] = useState(false);
@@ -244,7 +248,10 @@ const AppShell = ({ children }: { children: ReactNode }) => {
       <PaywallModal
         open={resubscribeOpen}
         defaultTier={legacyTier}
-        onContinue={() => setResubscribeOpen(false)}
+        onContinue={() => {
+          setResubscribeOpen(false);
+          refreshLegacy();
+        }}
       />
     </div>
   );

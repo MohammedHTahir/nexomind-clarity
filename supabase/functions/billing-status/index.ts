@@ -46,40 +46,71 @@ Deno.serve(async (req) => {
     const { environment } = await req.json().catch(() => ({}));
     const env: StripeEnv = environment === "live" ? "live" : "sandbox";
 
-    const { data: sub } = await supabaseAdmin
+    // Look at ALL rows for this user/env: a fresh resubscribe creates a new
+    // row in the current account while the legacy row may still exist.
+    const { data: subs } = await supabaseAdmin
       .from("subscriptions")
-      .select("stripe_subscription_id, stripe_customer_id, price_id, status")
+      .select("stripe_subscription_id, stripe_customer_id, price_id, status, created_at")
       .eq("user_id", userData.user.id)
       .eq("environment", env)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      .order("created_at", { ascending: false });
 
-    const priceId = (sub?.price_id as string | null) ?? null;
+    const rows = subs ?? [];
+    const priceId = (rows[0]?.price_id as string | null) ?? null;
 
-    // No paid row, or a promo/granted row: nothing to resubscribe.
-    const subId = (sub?.stripe_subscription_id as string | null) ?? null;
-    if (!sub || !subId || subId.startsWith("promo_")) {
+    const paid = rows.filter((r) => {
+      const id = r.stripe_subscription_id as string | null;
+      return !!id && !id.startsWith("promo_");
+    });
+
+    // No paid row, or only promo/granted rows: nothing to resubscribe.
+    if (paid.length === 0) {
       return new Response(JSON.stringify({ legacy: false, priceId }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     const stripe = createStripeClient(env);
-    try {
-      await stripe.subscriptions.retrieve(subId);
-      return new Response(JSON.stringify({ legacy: false, priceId }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    } catch (err) {
-      const code = (err as { code?: string }).code;
-      if (code === "resource_missing") {
-        return new Response(JSON.stringify({ legacy: true, priceId }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+    const activeStatuses = new Set(["active", "trialing", "past_due", "unpaid", "paused"]);
+
+    // If ANY row resolves in the current account, the user has already
+    // restarted — not legacy.
+    for (const row of paid) {
+      try {
+        const s = await stripe.subscriptions.retrieve(row.stripe_subscription_id as string);
+        if (activeStatuses.has(s.status)) {
+          return new Response(
+            JSON.stringify({ legacy: false, priceId: (row.price_id as string | null) ?? priceId }),
+            { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          );
+        }
+      } catch (err) {
+        if ((err as { code?: string }).code !== "resource_missing") throw err;
       }
-      throw err;
     }
+
+    // Fallback: check the current account by email for a live subscription
+    // (covers a checkout whose webhook row hasn't landed yet).
+    const email = userData.user.email;
+    if (email) {
+      try {
+        const customers = await stripe.customers.list({ email, limit: 5 });
+        for (const c of customers.data) {
+          const list = await stripe.subscriptions.list({ customer: c.id, status: "all", limit: 10 });
+          if (list.data.some((s) => activeStatuses.has(s.status))) {
+            return new Response(JSON.stringify({ legacy: false, priceId }), {
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
+          }
+        }
+      } catch {
+        /* non-fatal */
+      }
+    }
+
+    return new Response(JSON.stringify({ legacy: true, priceId }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (e) {
     console.error("billing-status error", e);
     return new Response(
