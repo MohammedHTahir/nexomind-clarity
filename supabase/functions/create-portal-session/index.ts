@@ -39,7 +39,13 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { returnUrl, environment } = await req.json();
+    const { returnUrl, environment, flow } = await req.json();
+    if (flow !== undefined && flow !== "update" && flow !== "cancel") {
+      return new Response(JSON.stringify({ error: "Invalid flow" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     if (environment !== "sandbox" && environment !== "live") {
       return new Response(JSON.stringify({ error: "Invalid environment" }), {
         status: 400,
