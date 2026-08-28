@@ -34,18 +34,20 @@ const PLANS: Record<Tier, Record<Plan, { priceId: string; price: string; cadence
 
 const LABEL: Record<Tier, string> = { premium: "Premium", premium_plus: "Premium+" };
 
-const PaywallModal = ({ open, onUnlock, onContinue, tier: tierProp = "premium" }: PaywallModalProps) => {
+const PaywallModal = ({ open, onUnlock, onContinue, tier: tierProp = "premium", defaultTier }: PaywallModalProps) => {
   const { user } = useAuth();
   const { tier: currentTier } = useSubscription();
-  // If the user already has Premium, only Premium+ is a meaningful purchase.
-  const isOnPremium = currentTier === "premium";
-  const [tier, setTier] = useState<Tier>(isOnPremium ? "premium_plus" : tierProp);
+  // If the user already has Premium, only Premium+ is a meaningful purchase —
+  // unless a defaultTier is forced (resubscribe flows).
+  const isOnPremium = !defaultTier && currentTier === "premium";
+  const initialTier = defaultTier ?? (isOnPremium ? "premium_plus" : tierProp);
+  const [tier, setTier] = useState<Tier>(initialTier);
   const [plan, setPlan] = useState<Plan>("monthly");
   const [showCheckout, setShowCheckout] = useState(false);
 
   useEffect(() => {
-    if (open) setTier(isOnPremium ? "premium_plus" : tierProp);
-  }, [open, isOnPremium, tierProp]);
+    if (open) setTier(initialTier);
+  }, [open, initialTier]);
 
   const handleUnlock = () => {
     setShowCheckout(true);
@@ -59,6 +61,7 @@ const PaywallModal = ({ open, onUnlock, onContinue, tier: tierProp = "premium" }
 
   const selected = PLANS[tier][plan];
   const availableTiers: Tier[] = isOnPremium ? ["premium_plus"] : ["premium", "premium_plus"];
+  void availableTiers;
 
   return (
     <AnimatePresence>
