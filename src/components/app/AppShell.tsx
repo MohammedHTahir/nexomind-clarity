@@ -4,8 +4,10 @@ import { ReactNode, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useLegacyBilling } from "@/hooks/useLegacyBilling";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
+import PaywallModal from "@/components/PaywallModal";
 import PatternInterruptBanner from "@/components/app/PatternInterruptBanner";
 import CrisisCard from "@/components/app/CrisisCard";
 import {
@@ -44,9 +46,13 @@ const adminNav = [
 const AppShell = ({ children }: { children: ReactNode }) => {
   const { pathname } = useLocation();
   const { isPastDue, subscription, tier } = useSubscription();
+  const { legacy: legacyBilling, priceId: legacyPriceId } = useLegacyBilling();
   const { isAdmin } = useIsAdmin();
   const menuNav = isAdmin ? [...moreNav, ...adminNav] : moreNav;
   const [openingPortal, setOpeningPortal] = useState(false);
+  const [resubscribeOpen, setResubscribeOpen] = useState(false);
+  const legacyTier: "premium" | "premium_plus" =
+    legacyPriceId?.includes("premium_plus") ? "premium_plus" : "premium";
 
   // Promo-trial near-expiry banner: trialing sub from promo code, <=7 days left.
   const promoDaysLeft = (() => {
@@ -90,6 +96,18 @@ const AppShell = ({ children }: { children: ReactNode }) => {
             className="underline font-medium hover:text-amber-950 disabled:opacity-60"
           >
             {openingPortal ? "Opening…" : "Update payment method"}
+          </button>
+        </div>
+      )}
+      {legacyBilling && (
+        <div className="w-full bg-[#111] px-4 py-2 text-center text-[13px] text-white/90 relative z-40">
+          We've moved to a new payment provider — restart your plan once to keep uninterrupted
+          access (same price, your current time is honored).{" "}
+          <button
+            onClick={() => setResubscribeOpen(true)}
+            className="underline font-medium hover:text-white"
+          >
+            Restart my plan
           </button>
         </div>
       )}
@@ -223,6 +241,11 @@ const AppShell = ({ children }: { children: ReactNode }) => {
 
       {/* Crisis detection overlay - never auto-contacts emergency services */}
       <CrisisCard />
+      <PaywallModal
+        open={resubscribeOpen}
+        defaultTier={legacyTier}
+        onContinue={() => setResubscribeOpen(false)}
+      />
     </div>
   );
 };

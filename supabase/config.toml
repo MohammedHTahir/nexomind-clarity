@@ -9,6 +9,8 @@ project_id = "ltwnshkruuotjdcqikgf"
     verify_jwt = false
   [functions.create-portal-session]
     verify_jwt = false
+  [functions.billing-status]
+    verify_jwt = false
   [functions.payments-webhook]
     verify_jwt = false
   [functions.seo-ai]

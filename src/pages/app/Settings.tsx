@@ -14,6 +14,7 @@ import PaywallModal from "@/components/PaywallModal";
 import { deleteAllJournals } from "@/lib/journal";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useLegacyBilling } from "@/hooks/useLegacyBilling";
 import { supabase } from "@/integrations/supabase/client";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { toast } from "sonner";
@@ -56,6 +57,9 @@ const Settings = () => {
   const { signOut, user } = useAuth();
   const { subscription, isPremium, isPremiumPlus, isCanceling, isPastDue, loading } =
     useSubscription();
+  const { legacy: legacyBilling, priceId: legacyPriceId } = useLegacyBilling();
+  const legacyTier: "premium" | "premium_plus" =
+    legacyPriceId?.includes("premium_plus") ? "premium_plus" : "premium";
   const [confirm, setConfirm] = useState(false);
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -228,7 +232,15 @@ const Settings = () => {
             </div>
             {isPremium ? (
               <div className="flex flex-wrap gap-2 items-center">
-                {isPremiumPlus && (
+                {legacyBilling && (
+                  <button
+                    onClick={() => setPaywallOpen(true)}
+                    className="bg-[#111] text-white rounded-full px-5 py-2.5 font-barlow font-medium text-[13px] hover:bg-black transition-colors"
+                  >
+                    Restart my plan
+                  </button>
+                )}
+                {!legacyBilling && isPremiumPlus && (
                   <button
                     onClick={() => openPortal("update")}
                     disabled={openingPortal}
@@ -237,7 +249,7 @@ const Settings = () => {
                     Change plan
                   </button>
                 )}
-                {!isPremiumPlus && (
+                {!legacyBilling && !isPremiumPlus && (
                   <button
                     onClick={() => setPaywallOpen(true)}
                     className="bg-white/70 backdrop-blur-md border border-black/10 text-[#111] rounded-full px-5 py-2.5 font-barlow font-medium text-[13px] hover:bg-white transition-colors"
@@ -245,7 +257,7 @@ const Settings = () => {
                     Upgrade to Premium+
                   </button>
                 )}
-                {!isCanceling && (
+                {!legacyBilling && !isCanceling && (
                   <button
                     onClick={() => openPortal("cancel")}
                     disabled={openingPortal}
@@ -254,13 +266,15 @@ const Settings = () => {
                     Cancel plan
                   </button>
                 )}
-                <button
-                  onClick={() => openPortal()}
-                  disabled={openingPortal}
-                  className="bg-[#111] text-white rounded-full px-5 py-2.5 font-barlow font-medium text-[13px] hover:bg-black transition-colors disabled:opacity-50"
-                >
-                  {openingPortal ? "Opening…" : "Manage subscription"}
-                </button>
+                {!legacyBilling && (
+                  <button
+                    onClick={() => openPortal()}
+                    disabled={openingPortal}
+                    className="bg-[#111] text-white rounded-full px-5 py-2.5 font-barlow font-medium text-[13px] hover:bg-black transition-colors disabled:opacity-50"
+                  >
+                    {openingPortal ? "Opening…" : "Manage subscription"}
+                  </button>
+                )}
               </div>
             ) : (
               <button
@@ -271,7 +285,15 @@ const Settings = () => {
               </button>
             )}
           </div>
-          {isPremium && (
+          {isPremium && legacyBilling && (
+            <p className="font-barlow text-[12px] text-[#111]/45 mt-4">
+              Your plan was started on our previous payment provider, so it can't be changed or
+              cancelled from here. Restarting moves you to the new provider at the same price —
+              any time you've already paid for is honored. To cancel the old plan instead, email
+              support@nexomind.ai.
+            </p>
+          )}
+          {isPremium && !legacyBilling && (
             <p className="font-barlow text-[12px] text-[#111]/45 mt-4">
               Change plan switches you between Premium+ and Premium (pro-rated). Cancelling keeps
               your access until the end of the current period.
@@ -412,7 +434,11 @@ const Settings = () => {
         </GlassCard>
 
       </div>
-      <PaywallModal open={paywallOpen} onContinue={() => setPaywallOpen(false)} />
+      <PaywallModal
+        open={paywallOpen}
+        defaultTier={legacyBilling ? legacyTier : undefined}
+        onContinue={() => setPaywallOpen(false)}
+      />
     </AppShell>
   );
 };
