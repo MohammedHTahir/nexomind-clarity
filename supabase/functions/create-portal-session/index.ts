@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
 
     const { data: sub } = await supabaseAdmin
       .from("subscriptions")
-      .select("stripe_customer_id")
+      .select("stripe_customer_id, stripe_subscription_id")
       .eq("user_id", userData.user.id)
       .eq("environment", env)
       .order("created_at", { ascending: false })
