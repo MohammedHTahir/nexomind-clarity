@@ -285,7 +285,15 @@ const Settings = () => {
               </button>
             )}
           </div>
-          {isPremium && (
+          {isPremium && legacyBilling && (
+            <p className="font-barlow text-[12px] text-[#111]/45 mt-4">
+              Your plan was started on our previous payment provider, so it can't be changed or
+              cancelled from here. Restarting moves you to the new provider at the same price —
+              any time you've already paid for is honored. To cancel the old plan instead, email
+              support@nexomind.ai.
+            </p>
+          )}
+          {isPremium && !legacyBilling && (
             <p className="font-barlow text-[12px] text-[#111]/45 mt-4">
               Change plan switches you between Premium+ and Premium (pro-rated). Cancelling keeps
               your access until the end of the current period.
@@ -426,7 +434,11 @@ const Settings = () => {
         </GlassCard>
 
       </div>
-      <PaywallModal open={paywallOpen} onContinue={() => setPaywallOpen(false)} />
+      <PaywallModal
+        open={paywallOpen}
+        defaultTier={legacyBilling ? legacyTier : undefined}
+        onContinue={() => setPaywallOpen(false)}
+      />
     </AppShell>
   );
 };
