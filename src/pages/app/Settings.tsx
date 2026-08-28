@@ -54,7 +54,8 @@ const formatDate = (iso: string | null | undefined) => {
 const Settings = () => {
   const navigate = useNavigate();
   const { signOut, user } = useAuth();
-  const { subscription, isPremium, isCanceling, isPastDue, loading } = useSubscription();
+  const { subscription, isPremium, isPremiumPlus, isCanceling, isPastDue, loading } =
+    useSubscription();
   const [confirm, setConfirm] = useState(false);
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [busy, setBusy] = useState(false);
